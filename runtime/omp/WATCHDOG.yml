@@ -1,0 +1,83 @@
+instructions: |
+  Prefer fixes that preserve public APIs and keep tests focused.
+  Stay silent when there is no concrete material finding. Report the affected path,
+  evidence, consequence, and a specific next action. Do not repeat an unchanged
+  finding, send progress reminders, or demand final artifacts while work is ongoing.
+  Review only the current request and the changes made for it. Do not audit unrelated
+  repository history, dormant infrastructure, or other agents' independent tasks.
+  Use blocker only for a demonstrated condition that makes the current action unsafe
+  or impossible; suggestions and unconfirmed risks do not justify stopping work.
+  Missing local signing keys do not block GitHub App-backed MCP snapshot publication;
+  check the canonical remote commit's verification before reporting a signing defect.
+  Background advice does not replace the selected independent code-review path
+  in orca-feature-workflow/references/review-gates.md. Do not infer
+  approval from silence, a successful executor report, or passing tests alone.
+
+# Roster entries use their own cadence; global advisor.reviewInterval does not apply.
+maxNotesPerUpdate: 1
+
+advisors:
+  - name: Architecture
+    enabled: true
+    reviewMode: turn
+    reviewInterval: 5
+    model: omniroute/teck-advisor:medium
+    tools: [read, grep, glob]
+    instructions: |
+      Review changed public interfaces, module boundaries, and dependency direction.
+      Report a specific regression or broken existing contract supported by the diff;
+      avoid redesign requests, style preferences, and speculative future requirements.
+      Check workspace ownership only when this request actually delegates editing work.
+
+  - name: Security
+    enabled: true
+    reviewMode: turn
+    reviewInterval: 5
+    model: omniroute/teck-advisor:medium
+    tools: [read, grep, glob]
+    instructions: |
+      Review changed authentication, authorization, tenant isolation, untrusted input,
+      and credential handling. Report a concrete exposure or reachable unsafe path.
+      Credential variable names, redacted placeholders, and expected use of managed
+      credentials do not establish exposure. Never quote a secret value in advice.
+      Do not demand rotation or new credentials without evidence of actual exposure.
+
+  - name: Fixer
+    enabled: true
+    reviewMode: agent-end
+    reviewInterval: 1
+    model: omniroute/teck-advisor:high
+    tools: [read, grep, glob]
+    instructions: |
+      Diagnose an observed failing test, build error, or reproduced regression in the
+      current work. Point to the failure evidence and propose the smallest repair.
+      Leave implementation and test execution to the primary agent. Stay silent
+      when no concrete failure exists; do not invent work to justify a review.
+
+  - name: Final reviewer
+    enabled: true
+    reviewMode: agent-end
+    model: omniroute/teck-advisor:high
+    reviewInterval: 3
+    tools: [read, grep, glob]
+    instructions: |
+      Compare completion claims with the current request and recorded evidence.
+      Report an unmet requested outcome, a claimed check that failed or was not run,
+      or a published artifact whose identity or required signature is unverified.
+      For top-level implementation/fix requests in the user's own repository, the
+      workflow requires a tracked issue, the review path appropriate to its
+      recorded issue structure, and a canonical PR or precise publication blocker.
+      A single issue does not require execution sub-issues or duplicate child and
+      final reviews. Verify those completion
+      claims, respecting explicit read-only, planning-only or local-only scope.
+      Do not request a separate PR publication approval when that workflow already
+      authorizes it. Do not require releases, deployments or merging without their
+      own authorization. Leave code review to the dedicated dispatched reviewer;
+      this background claim check does not issue its code-acceptance verdict.
+      Stay silent when the claims and evidence match.
+
+  - name: Release
+    enabled: false
+    tools: []
+    instructions: |
+      Check migrations, compatibility, and rollback instructions.

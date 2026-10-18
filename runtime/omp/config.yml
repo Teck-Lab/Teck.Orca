@@ -1,0 +1,68 @@
+setupVersion: 2
+startup:
+  setupWizard: false
+theme:
+  dark: titanium
+  light: light
+symbolPreset: nerd # unicode, nerd, ascii
+statusLine:
+  preset: nerd # default, minimal, compact, full, nerd, ascii, custom
+  separator: powerline-thin
+  transparent: false
+  showHookStatus: true
+
+terminal:
+  showImages: true
+images:
+  autoResize: true
+  blockImages: false
+tui:
+  hyperlinks: auto # off, auto, always
+modelRoles:
+  default: omniroute/teck-orchestrator
+  plan: omniroute/teck-orchestrator
+  slow: omniroute/teck-researcher
+  advisor: omniroute/teck-advisor
+  vision: omniroute/teck-orchestrator
+  task: omniroute/teck-executor
+  designer: omniroute/teck-executor
+  smol: omniroute/teck-fast-tool
+  tiny: omniroute/teck-fast-tool
+  commit: omniroute/teck-fast-text
+  memory: omniroute/teck-fast-tool
+  judge: omniroute/teck-judge
+advisor:
+  enabled: true
+enabledModels:
+  - omniroute/teck-orchestrator
+  - omniroute/teck-advisor
+  - omniroute/teck-executor
+  - omniroute/teck-fast-tool
+  - omniroute/teck-fast-text
+  - omniroute/teck-judge
+  - omniroute/teck-researcher
+cycleOrder: [smol, default, task]
+retry:
+  enabled: true
+  maxRetries: 3
+  maxDelayMs: 30000
+  modelFallback: false
+providers:
+  # web_search is supplied by the MCPHub extension; this is the native provider order.
+  webSearchOrder: [searxng]
+  fetch: firecrawl
+  maxInFlightRequests:
+    omniroute: 4
+task:
+  isolation:
+    enabled: false
+github:
+  enabled: true
+  cache:
+    enabled: true
+memory:
+  backend: local
+autolearn:
+  enabled: true
+
+

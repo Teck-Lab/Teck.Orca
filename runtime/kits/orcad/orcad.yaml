@@ -1,0 +1,14 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Teck Orca runtime
+description: Pinned Orca daemon and CLI; runtime identity is generated per feature.
+provides:
+  - "orcad@1.4.224"
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: sh /usr/share/teck-orcad/install.sh
+          user: "0"
+          description: Install the portable Orca runtime without starting it.

@@ -1,0 +1,24 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: MCPHub access
+description: Proxy-managed MCPHub credential and endpoint.
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - mcp.tecklab.dk:443
+
+  - type: com.docker.sandbox/credential@1
+    config:
+      service: mcphub
+      phase: runtime
+      apiKey:
+        name: MCPHUB_API_KEY
+        proxyManaged: true
+        inject:
+          - domain: mcp.tecklab.dk
+            header: Authorization
+            format: "Bearer %s"

@@ -1,0 +1,32 @@
+{
+  "name": "teck-orca",
+  "version": "0.5.4",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/refresh-assets.mjs && node scripts/build-recipe.mjs",
+    "check": "node scripts/build-recipe.mjs --check",
+    "bundle:skills": "node scripts/bundle-orca-skills.mjs",
+    "bundle:labels": "node scripts/bundle-github-labels.mjs",
+    "bundle:daemon": "node scripts/bundle-daemon.mjs",
+    "cleanup": "node scripts/cleanup-features.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "setup": "node scripts/setup.mjs",
+    "project": "node scripts/project.mjs",
+    "smoke:project": "node scripts/smoke-project.mjs",
+    "doctor": "node scripts/bootstrap.mjs",
+    "build:image": "node scripts/build-image.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:cleanup": "node scripts/smoke-worker-cleanup.mjs",
+    "smoke:bun": "node scripts/smoke-bun.mjs",
+    "smoke:review": "node scripts/smoke-review.mjs",
+    "smoke:restart": "node scripts/smoke-restart.mjs",
+    "smoke:omp-resume": "node scripts/smoke-omp-resume.mjs",
+    "smoke:devtools": "node scripts/smoke-devtools.mjs",
+    "smoke:dotnet-tests": "node scripts/smoke-dotnet-tests.mjs",
+    "smoke:workflow-policy": "node scripts/smoke-workflow-policy.mjs"
+  }
+}

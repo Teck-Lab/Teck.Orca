@@ -1,0 +1,76 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: workload
+displayName: Teck Orca feature
+description: Full feature workload with OMP, .NET, Node, Bun, development tools, LSPs and browsers.
+
+args:
+  bunVersion:
+    default: "1.4.2"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    buildArg: BUN_VERSION
+  ompVersion:
+    default: "18.11.3"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    buildArg: OMP_VERSION
+  playwrightVersion:
+    default: "1.61.1"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    buildArg: PLAYWRIGHT_VERSION
+
+provides:
+  - "bun@${{ kit.args.bunVersion }}"
+  - "omp@${{ kit.args.ompVersion }}"
+  - "dotnet@10.0.401"
+  - "typescript@5.9.3"
+  - "teck-language-servers@1"
+  - "agent-browser@0.38.1"
+  - "playwright@${{ kit.args.playwrightVersion }}"
+
+capabilities:
+  - type: com.docker.sandbox/sbx@1
+  - type: com.docker.sandbox/long-running@1
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - api.nuget.org:443
+          - data.nuget.org:443
+          - globalcdn.nuget.org:443
+          - quay.io:443
+          - "*.quay.io:443"
+          - builds.dotnet.microsoft.com:443
+          - aka.ms:443
+          - playwright.download.prss.microsoft.com:443
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: |
+            set -eu
+            tar -xzf /usr/share/teck-devtools/base-runtime.tar.gz -C /
+            update-ca-certificates --fresh
+            install -d -m 755 /opt/paseo-omp
+            tar -xzf /usr/share/paseo-omp/runtime.tar.gz -C /
+            tar -xzf /usr/share/teck-devtools/runtime.tar.gz -C /
+            ln -sfn /opt/paseo-bun/bin/bun /usr/local/bin/bun
+            ln -sfn /opt/paseo-bun/bin/bunx /usr/local/bin/bunx
+            ln -sfn /opt/paseo-omp/bin/omp /usr/local/bin/omp
+            export PATH=/opt/paseo-omp/bin:$PATH
+            test "$(/opt/paseo-omp/bin/bun --version)" = "${{ kit.args.bunVersion }}"
+            test "$(/opt/paseo-omp/bin/omp --version)" = "omp/${{ kit.args.ompVersion }}"
+            test "$(agent-browser --version)" = "agent-browser 0.38.1"
+            test -x /usr/local/bin/chromium
+            test "$(dotnet --version)" = "10.0.401"
+            test -x /usr/local/bin/omnisharp
+            test -x /usr/local/bin/typescript-language-server
+            install -d -o agent -g agent -m 755 /home/agent/.dotnet /home/agent/.nuget
+            chown -R agent:agent /home/agent/.dotnet /home/agent/.nuget
+            install -d -o agent -g agent -m 755 /home/agent/.bun /home/agent/.bun/install /home/agent/.bun/install/cache
+            chown -R agent:agent /home/agent/.bun/install/cache
+          user: "0"
+          description: Expand and validate the prebuilt OMP and full development runtimes.
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      filename: AGENTS.md
+      contentFile: context.md

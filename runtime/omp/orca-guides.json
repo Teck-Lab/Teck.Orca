@@ -1,0 +1,65 @@
+{
+  "source": "Installed Orca CLI: skills get --full --json",
+  "files": [
+    {
+      "skill": "orca-cli",
+      "path": "SKILL.md",
+      "sha256": "fb6eb80e55223e93ed4401fe3228ca0a840f06328f4029e694deaec70a8720cb"
+    },
+    {
+      "skill": "orca-cli",
+      "path": "references/automations.md",
+      "sha256": "9e4ff221b4cb0ef6351ae4187143cedc20c8d651928c86a81ab13f052f85b770"
+    },
+    {
+      "skill": "orca-cli",
+      "path": "references/browser.md",
+      "sha256": "009a31a16b1c08b754f03d9372a4409b48b3cdf7a36851ef413616c2bddaa95e"
+    },
+    {
+      "skill": "orca-cli",
+      "path": "references/publishing.md",
+      "sha256": "6807b7d147ac0233b3731b6726c0c87479a8ffc74bb0a7aa754a08573882b976"
+    },
+    {
+      "skill": "orchestration",
+      "path": "SKILL.md",
+      "sha256": "6c90f71d8d98899e5dd16e304db42c867f0b5df8a3e1c98eb6c6b694a66d5344"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/coordinator-loop.md",
+      "sha256": "4eb2229faf6179b4a4578840a0f461ce36923c2094f46ec48db7879f27259742"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/legacy-contract-migration.md",
+      "sha256": "a4a961937b601bc116ae8d658d13e95f61beed70026521fe4323654f8322ca42"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/low-level-topology.md",
+      "sha256": "a4b2aec2291f7856b48b188b803fc101ebd560a76bcf4c3d10706e0847c8f297"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/messaging-and-gates.md",
+      "sha256": "c201fe5da4ce4300e3c5f4d8784c69ff57cfb9c3bccaa1c487be914c1fdf872c"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/placement-and-remote.md",
+      "sha256": "52ff2c6cb1c93782a949cdb9457054266e68198441dc4e869d2d2048adf93e40"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/recovery-and-cleanup.md",
+      "sha256": "9b99dbf4d71863667090af7fe3e5781df1e2af10825e040a15ee2e51f3a32596"
+    },
+    {
+      "skill": "orchestration",
+      "path": "references/worker-contract.md",
+      "sha256": "8cad6c7540fa5fa6dbf264077492855710eff71c06b7f63c84854c7e943baa91"
+    }
+  ]
+}

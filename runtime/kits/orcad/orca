@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+export ORCA_USER_DATA_PATH=/home/agent/.local/share/teck-orca/orca
+export ORCA_USER_DATA="$ORCA_USER_DATA_PATH"
+export ORCA_VERSION=1.4.224
+export ORCA_APP_VERSION="$ORCA_VERSION"
+if [ "${1:-}" = serve ]; then
+  shift
+  exec /opt/teck-orcad/node /opt/teck-orcad/server/orcad.js "$@"
+fi
+exec /opt/teck-orcad/node /opt/teck-orcad/server/out/cli/index.js "$@"

@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+set -eu
+
+test "$(dotnet --version)" = "10.0.300"
+test "$(bun --version)" = "1.4.0"
+test "$(omp --version)" = "omp/18.11.3"
+test "$(typescript-language-server --version)" = "4.4.1"
+test "$(tsc --version)" = "Version 5.9.3"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["next-devtools-mcp"].version')" = "0.4.0"
+test -x "$(command -v next-devtools-mcp)"
+test "$(google-chrome-stable --version | awk '{print $3}')" = "153.0.8010.36"
+test "$(biome --version)" = "Version: 2.5.14"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["@biomejs/biome"].version')" = "2.5.14"
+test -x "$(command -v vscode-html-language-server)"
+test -x "$(command -v vscode-css-language-server)"
+test -x "$(command -v vscode-json-language-server)"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["vscode-langservers-extracted"].version')" = "4.10.0"
+test -x "$(command -v tailwindcss-language-server)"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["@tailwindcss/language-server"].version')" = "0.16.0"
+test "$(pyright --version)" = "pyright 1.1.414"
+test -x "$(command -v pyright-langserver)"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["pyright"].version')" = "1.1.414"
+test "$(bash-language-server --version)" = "5.8.0"
+test "$(yaml-language-server --version)" = "1.24.0"
+test -x "$(command -v docker-langserver)"
+test "$(npm list --global --depth=0 --json | jq -r '.dependencies["dockerfile-language-server-nodejs"].version')" = "0.15.0"
+test -x "$(command -v omnisharp)"
+test "$(marksman --version)" = "1.0.0-8299f11+8299f11dfad36a9162e010245b380ba25001b15c"
+test "$(terraform-ls --version)" = "0.39.0"
+test -x "$(command -v helm_ls)"
+helm_ls version | grep -q "^Helm-ls version:"
+test -x "$(command -v gh)"
+google-chrome-stable --headless --no-sandbox --disable-gpu \
+  --dump-dom 'data:text/html,<title>paseo-worker-ready</title>' 2>/dev/null |
+  grep -q paseo-worker-ready

@@ -1,0 +1,146 @@
+{
+  "version": "1.4.224",
+  "artifactVersion": "0.1.0+15ec2904eb00",
+  "nodeVersion": "24.21.0",
+  "source": "Orca packaged orcad-template; no runtime user data",
+  "nodeArchiveSha256": {
+    "x64": "6e1db87ef58b8819e5d5402eff1536491b18edd8eb7bee5ef7897876e88dc5ff",
+    "arm64": "724282c3b43aec998aa9527380465b45d229e021b58035f5f4f63095eabfe5d5"
+  },
+  "upstreamManifest": {
+    "schemaVersion": 3,
+    "commonSha256": {
+      "out/cli/index.js": "5657d1a40453b6fa85a41a4df0ffda3341bd22fc367e3e8985d05648d493e1d2",
+      "out/package.json": "eb0783a4735b6b0ec484aafcb0d426e29c1a8d72397247f95dc6ba1e5d25dd05",
+      "orcad.js": "db31cc324880c29a0738d10471e52818073333f12b823d01ecf8bffa534b6393",
+      "orcad-server.js": "bea1e0ce0f5cd40a046a40c04ef5e66c9e38ce110387f35d5b54abccf65cb8ba",
+      "parcel-watcher-process-entry.js": "9d2c9b946e74d3ec1b4f158194c6be75ce0dbeddaadfd3f352500f5eb5e1811b",
+      "daemon-entry.js": "cfe6bfc622402df4b1c7982dadb8177c3c16e0f01bd4bb5dffe2a87abeef9056",
+      "profile-state-writer-worker-entry.js": "1fd99b3234460ca228b8fdc94107489bd746a7322c27c1a5c6c6b5ef754b368d",
+      "profile-state-backup-worker-entry.js": "7e84a6e571ac8f68bfb025a3be60437cd6d246e42d95cb1a77f6668341d938e5",
+      "foreign-sqlite-reader-entry.js": "2dd0e74ccf43fe47b7d3636ebd3bc970233f21bf4713ba25c11987c7c1f7f319",
+      "port-scan-command-worker-entry.js": "5df777d9eef47f91c1733f75ef90b83d07637468d32ab0b426802782fef4e161",
+      "session-scanner-service-entry.js": "11e5911dfa79f7543d73c74364c0b86c0979550550cb21e2927cf79a61dc0fab",
+      "node_modules/@parcel/watcher/index.js": "45c1a25ea1fd833eecec8539da7a12dd22b6109e2dd3ca33cf24e37cefc59838",
+      "node_modules/emojibase-data/en/shortcodes/emojibase.json": "db3d41edf2f190bcb81bf171a51b1f889af774eed5dc24d21ad8dfcb998b40d3",
+      "node_modules/node-pty/package.json": "f8b6a14f7022c14f1cd5d109486f5dacd32bffb63a9a63e38eced37dacb47439",
+      "node_modules/node-pty/lib/conpty_console_list_agent.js": "345337d05527cc0a6e26bf618bc63cda3d98aabb677f1399e6040c90414e50ea",
+      "node_modules/node-pty/lib/eventEmitter2.js": "f1c14613aa90c10def4ca7238329270871997eb26f919f7074dc25533e3e75dd",
+      "node_modules/node-pty/lib/index.js": "c1b82c92c4c63aaa8e8441fc5a291c4727cd3f3550666d2fec7250e0f6d4b173",
+      "node_modules/node-pty/lib/interfaces.js": "56e4173f09aad26173f9d4c79800fda0b808c34424f987ef8d671cc931119a0a",
+      "node_modules/node-pty/lib/shared/conout.js": "6ae3b0532616da11aa2a11b4506bb89b0d40be005a9ea9fb369fb59eefdbda47",
+      "node_modules/node-pty/lib/terminal.js": "7bf8b54691a735654cd9a19104fe4d8ffcbcbca455075998bc53b363c3031843",
+      "node_modules/node-pty/lib/types.js": "408bf8287717b6322cc380ea66caf1b5e366dcf697707ae2f3cc454e08f3b151",
+      "node_modules/node-pty/lib/unixTerminal.js": "73497355416919e4dd984eea84e267b8615f9fe3080f4a66944453292cb452fe",
+      "node_modules/node-pty/lib/utils.js": "f75ad341c13fbf1a9a6605d7ee42dff5bbc5d43b7b381e413fb97eb1b8300beb",
+      "node_modules/node-pty/lib/windowsConoutConnection.js": "1440f70908fb1f55911ac8e936a1230f68a9c00c03096fcef6788eac6aad9d62",
+      "node_modules/node-pty/lib/windowsPtyAgent.js": "b395bf47bd4f8ce9573c66987129a2c8385499887a8e9aadbd4037cb42afe8f8",
+      "node_modules/node-pty/lib/windowsTerminal.js": "8247ecd69be8b18257050fb026b290024612c5ffc6d492ff1d46f81e613be2cf",
+      "node_modules/node-pty/lib/worker/conoutSocketWorker.js": "3e4bac095ac3870c3248a7302f5d10217de625f30c32b7000fe48a34788e47ac",
+      "ripgrep/licenses/JEMALLOC-COPYING": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53",
+      "ripgrep/licenses/LICENSE-MIT": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+      "ripgrep/licenses/LLVM-LIBUNWIND-LICENSE.TXT": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+      "ripgrep/licenses/MUSL-COPYRIGHT": "b870108ec5e7790e9f9919064f1b9421d62d5f9b0e6c230c6adf7ea2da62e97b",
+      "ripgrep/licenses/PCRE2-LICENCE.md": "197d8a73ffee0d6b09adba2f9c677b5f5aede24edf89258a68e48248d010d811",
+      "ripgrep/licenses/README.md": "3ee8fe1b547d624c58cafa60f07a0d070fceea4d1e7cbeb627a2d8a85c032e79",
+      "ripgrep/licenses/RUST-CRATE-NOTICES.txt": "a1b651e6966ccbf71377aa496117d2a5f3a8e4b5c04155f98a49f3d80def6aac",
+      "ripgrep/licenses/SLJIT-LICENSE": "17d0e3d9c9f398ad5bfe684472d56ae78d0dbfb24abaa527a9c4b3b2e6134719",
+      "ripgrep/licenses/UNLICENSE": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+      "native-chat-visuals/.claude-plugin/plugin.json": "455f4597890cc2c9fea39f88de695b3750910d43cce450b6fc506c8826b8c5f4",
+      "native-chat-visuals/skills/orca-chat-visuals/SKILL.md": "dfaa8249f985387a90fe9959d05fbcb7153009c6584de84fae65c48a14be2a0f"
+    },
+    "targets": {
+      "darwin-arm64": {
+        "files": {
+          ".server-target": "8d881856b9e9a2991794a6cb91599bddc227db867a3ff50402438c3d5a02cb57",
+          ".runtime-node": "070aba0455d5e422f33a9e57c97d49b8ec5bace5d12c82a173f3c9e596884503",
+          "node_modules/@parcel/watcher/watcher.node": "ab8bc3d89413ab68ddca894b9b0a217c9209dace11a2056f299d144fba38f230",
+          "node_modules/node-pty/build/Release/pty.node": "e3a6110196742c9db2d2d702b3309578b483d8e107a94e61fe27bbefada97dcd",
+          "node_modules/node-pty/build/Release/spawn-helper": "11f032a7893cacf16d626544f3a5da27ed78b355ef6e8c99a3ae5c51792cbd5b",
+          "ripgrep/darwin-arm64/rg": "6ef40346bf31fcce79d9614c7745c198542925a0c7d4911e1ffe794c53392ac1"
+        }
+      },
+      "darwin-x64": {
+        "files": {
+          ".server-target": "2c5ace2d43ad1f7672ed7d113ccf72b831ea468fa659cca1592d901c7066e5ec",
+          ".runtime-node": "e303e87e0ff79a08b57855770a04839adbef14518973da0c13753a2bc8bedcbd",
+          "node_modules/@parcel/watcher/watcher.node": "60c098886f67801f27644d60cfe57201f5b8cca67c1897407349b0454a806eff",
+          "node_modules/node-pty/build/Release/pty.node": "d76e7e86d5c789bb1e938dc8f9bbb9c546efedea955851003a42d62ba766f448",
+          "node_modules/node-pty/build/Release/spawn-helper": "56441541570c80fa6a3ecaea572e917c0cb201987c999e2ba5f21258836eff19",
+          "ripgrep/darwin-x64/rg": "f999495980a5e6f1e7d26461ef5768b4013a62df610ed7d77a8b2de247a5b228"
+        }
+      },
+      "linux-arm64-glibc": {
+        "files": {
+          ".server-target": "71fdd002e8a09963523a72fa1f611ec06f454c33525130b0a404f089a100b158",
+          ".runtime-node": "d054be0f2bc68de7cfdeb934e08e93b50a00c27d5a17b29e0d98ac3058599e99",
+          "node_modules/@parcel/watcher/watcher.node": "7c05ea16fe5d983c4bab7b39abe07c3622bfbc7acdbce9c816a6d1936d855222",
+          "node_modules/node-pty/build/Release/pty.node": "f6460eb0835a353bcb2bdab32ff5b56455f85a432f3d2c70082274cb8ec64768",
+          "ripgrep/linux-arm64/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda"
+        }
+      },
+      "linux-x64-glibc": {
+        "files": {
+          ".server-target": "ffed780ac8653bacfdaa1dd591acf15a0f9c969d0097cc51cfef2ea54952fd98",
+          ".runtime-node": "923a4d31d9d9fed1874d583aeda69d26cd546fc7c4c525a883ac5c3249f7528b",
+          "node_modules/@parcel/watcher/watcher.node": "f5a86a5231fb33c6c1830649eafd2c9e72647edb45aad753148d08cee6a42dea",
+          "node_modules/node-pty/build/Release/pty.node": "7958845dd174cef8bde8d1f8ecf03f4d0e8448954332e21002424b053ffd027e",
+          "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
+        }
+      },
+      "linux-arm64-musl": {
+        "files": {
+          ".server-target": "9054b0b271cb949791124f04098a2dff343a8117df3824a874087a0fda1faf7c",
+          ".runtime-node": "2d948129b2463032ae4b1509d60c0db9059d339d412b8cdeb7cf3d512faf32e8",
+          "node_modules/@parcel/watcher/watcher.node": "d2851a5a42053a91f8df28e0f81da539809cd2f30752215a6a10358113194cc6",
+          "node_modules/node-pty/build/Release/pty.node": "a0050fc6fcd4810a93c48d7ca35f096da2011c1e29129d0deddea33082dbe5df",
+          "ripgrep/linux-arm64/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda"
+        }
+      },
+      "linux-x64-musl": {
+        "files": {
+          ".server-target": "ba69a3e982cc2a74091968fe45c3b60a93bd383b277f62c0b0d779003cfd8667",
+          ".runtime-node": "cc3fc59820ff794db8f7f2b702f0a049de26bacc3deef7e2281451b13c59e455",
+          "node_modules/@parcel/watcher/watcher.node": "fea0cee2d578a5aa62c6cdceb61bc4392031d5a3c37a75afb4a3e109a99061f6",
+          "node_modules/node-pty/build/Release/pty.node": "8fbd60eee2d3a95032a29712139004dda5a2a136c99b93796e8d483b5c222232",
+          "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
+        }
+      },
+      "win32-arm64": {
+        "files": {
+          ".server-target": "bfe7ef81988d092c602bf7ec846c92e9cc3efd47e836c63e5fc93b6b3cf3e8a9",
+          ".runtime-node": "c59c709f4904fe3378c87e448050362e46b6f76dfdd44ec87797b7c5bab35b64",
+          "node_modules/@parcel/watcher/watcher.node": "0973af9423367edd1f10643f5c4265dac7d6e487d376a2d4d29f884b6d8725fc",
+          "node_modules/node-pty/build/Release/conpty.node": "566f8276861418e220cb69c5d4270fcb7910af00c28c309e4bde2e0fbaed340e",
+          "node_modules/node-pty/build/Release/conpty_console_list.node": "38dc1131a39f9831500078610ff6f133188a0040df3b52dc7b74ba57bf748fa0",
+          "node_modules/node-pty/build/Release/conpty/conpty.dll": "b6cca5f1081111f59e5255eec043d924ebd11a86d09986c0d121b680540b3380",
+          "node_modules/node-pty/build/Release/conpty/OpenConsole.exe": "b7763ba27e80d5e84f9e60d1368ec2ddb25dfd10283336c0c9f3f252d35cb2f8",
+          "ripgrep/win32-arm64/rg.exe": "b5a8a2dfecc1d7135dfb31a53565b460bfaf475a670b2bb101d96b5276ee63a1",
+          "windows-process-tree.node": "387ceb7e0faff18f44632a6898cd0ef972c0ca34f7d9e4c34e0242b18b61144c"
+        }
+      },
+      "win32-x64": {
+        "files": {
+          ".server-target": "47865cb70f3801831acc971cb8fa442c22587d52136e7eb50e44d430d60e152f",
+          ".runtime-node": "cf7540d3587df8e2c154cfbbbcbd7fc16d89f04eb0a66c9d0a4b408793a38f22",
+          "node_modules/@parcel/watcher/watcher.node": "d413706789f565f197870a7fa4cb5618deb0ea463d8b5ecbf65c16c7b4fb1cf5",
+          "node_modules/node-pty/build/Release/conpty.node": "dbafac4d07096a972182fe783b741968413cf67d7d913e28744c85d47a01cbbf",
+          "node_modules/node-pty/build/Release/conpty_console_list.node": "72b016971b9c01fe8beeaa58937e26db1de4bf4cb16aa1fac755f262eb29e088",
+          "node_modules/node-pty/build/Release/conpty/conpty.dll": "7c7430632052ff703540b68371ec43821820aa1335d8e11dfbcd9ff00e9daaed",
+          "node_modules/node-pty/build/Release/conpty/OpenConsole.exe": "d1fe7faa62f9e955e2ac2371f95d7e5513df4d496255097158f979c94782c5fc",
+          "ripgrep/win32-x64/rg.exe": "2b727484d978fb2242433c66b1d819ccdb8ed43c9b9bf6573758c29ae7ae2aa2",
+          "windows-process-tree.node": "52d56400cf1d31b0e3ddc5dba03ad7e3d3691cee0fa3b4ad6c62e066837754a8"
+        }
+      },
+      "linux-x64-glibc217": {
+        "files": {
+          ".server-target": "c68cb72de5f5bd4454cdd517b10d5ce40ac9499f143ee7c2b0f513be5aeb2ce5",
+          ".runtime-node": "b4cb3a0cb80a39f924726900e82bb8cf724525b571c41b8d3b9081d6ee5f2037",
+          "node_modules/@parcel/watcher/watcher.node": "110f2f5f8078c6cd9cc2edb527946c52b6c8b46e6d6fffb5939382e3fa010772",
+          "node_modules/node-pty/build/Release/pty.node": "0a1f271402b06c4ad7d8bf421386dd6618130b87527b1a61dad3405bc3bc88a2",
+          "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
+        }
+      }
+    }
+  }
+}

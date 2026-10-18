@@ -1,0 +1,24 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: OmniRoute access
+description: Proxy-managed OmniRoute credential and endpoint.
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - omniroute.tecklab.dk:443
+
+  - type: com.docker.sandbox/credential@1
+    config:
+      service: omniroute
+      phase: runtime
+      apiKey:
+        name: OMNIROUTE_API_KEY
+        proxyManaged: true
+        inject:
+          - domain: omniroute.tecklab.dk
+            header: Authorization
+            format: "Bearer %s"

@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "repository": "Teck-Lab/Teck.Monorepo",
+  "source": "https://api.github.com/repos/Teck-Lab/Teck.Monorepo/labels?per_page=100",
+  "retrievedAt": "2026-10-11T21:56:10.999Z",
+  "labels": [
+    {
+      "name": ".NET",
+      "description": "Issues and pull requests affecting .NET code or dependencies",
+      "color": "7121c6",
+      "archived": false
+    },
+    {
+      "name": "agent:blocked",
+      "description": "A verified dependency or operational blocker prevents progress",
+      "color": "ededed",
+      "archived": false
+    },
+    {
+      "name": "agent:claimed",
+      "description": "Accepted by an Orca feature orchestrator",
+      "color": "1d76db",
+      "archived": false
+    },
+    {
+      "name": "agent:completed",
+      "description": "Agent-owned work met its verified acceptance gate; closure alone is not completion",
+      "color": "6f42c1",
+      "archived": false
+    },
+    {
+      "name": "agent:in-progress",
+      "description": "Owned research, planning or implementation is actively underway",
+      "color": "ededed",
+      "archived": false
+    },
+    {
+      "name": "agent:in-review",
+      "description": "Implementation PR is awaiting human review",
+      "color": "5319e7",
+      "archived": false
+    },
+    {
+      "name": "agent:needs-input",
+      "description": "Waiting for a person to answer or decide",
+      "color": "fbca04",
+      "archived": false
+    },
+    {
+      "name": "agent:ready",
+      "description": "Eligible for Orca intake; research and planning may still be required",
+      "color": "0e8a16",
+      "archived": false
+    },
+    {
+      "name": "aspire",
+      "description": "Issues and pull requests affecting Aspire AppHost, service discovery or development orchestration",
+      "color": "512bd4",
+      "archived": false
+    },
+    {
+      "name": "autorelease: pending",
+      "description": null,
+      "color": "ededed",
+      "archived": false
+    },
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a",
+      "archived": false
+    },
+    {
+      "name": "ci:failed",
+      "description": "Required CI or validation is failing",
+      "color": "d93f0b",
+      "archived": false
+    },
+    {
+      "name": "dependencies",
+      "description": "Dependency updates and dependency repair work",
+      "color": "0366d6",
+      "archived": false
+    },
+    {
+      "name": "dependency-update:stuck",
+      "description": "Automated dependency pull request requires a manual repair",
+      "color": "b60205",
+      "archived": false
+    },
+    {
+      "name": "docker",
+      "description": "Issues and pull requests affecting container images, Containerfiles or container builds",
+      "color": "2496ed",
+      "archived": false
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca",
+      "archived": false
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7",
+      "archived": false
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef",
+      "archived": false
+    },
+    {
+      "name": "github_actions",
+      "description": "Issues and pull requests affecting GitHub Actions workflows",
+      "color": "000000",
+      "archived": false
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff",
+      "archived": false
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672",
+      "archived": false
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669",
+      "archived": false
+    },
+    {
+      "name": "javascript",
+      "description": "Issues and pull requests affecting JavaScript/TypeScript code or dependencies",
+      "color": "168700",
+      "archived": false
+    },
+    {
+      "name": "known-exploited",
+      "description": "Listed in the CISA Known Exploited Vulnerabilities catalog",
+      "color": "b60205",
+      "archived": false
+    },
+    {
+      "name": "kubernetes",
+      "description": "Issues and pull requests affecting Kubernetes deployment manifests or Kustomize configuration",
+      "color": "326ce5",
+      "archived": false
+    },
+    {
+      "name": "nextjs",
+      "description": "Issues and pull requests affecting Next.js rendering, routing or configuration",
+      "color": "000000",
+      "archived": false
+    },
+    {
+      "name": "nx",
+      "description": "Issues and pull requests affecting Nx project graphs, tasks, affected builds or releases",
+      "color": "143055",
+      "archived": false
+    },
+    {
+      "name": "postgresql",
+      "description": "Issues and pull requests affecting PostgreSQL persistence, schemas, migrations or configuration",
+      "color": "336791",
+      "archived": false
+    },
+    {
+      "name": "preview",
+      "description": "Build canary images + deploy preview env",
+      "color": "0e8a16",
+      "archived": false
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3",
+      "archived": false
+    },
+    {
+      "name": "rabbitmq",
+      "description": "Issues and pull requests affecting RabbitMQ transport, queues, routing or broker configuration",
+      "color": "ff6600",
+      "archived": false
+    },
+    {
+      "name": "react-native",
+      "description": "Issues and pull requests affecting React Native, Expo or native mobile UI",
+      "color": "61dafb",
+      "archived": false
+    },
+    {
+      "name": "redis",
+      "description": "Issues and pull requests affecting Redis caching, backplanes or Redis configuration",
+      "color": "dc382d",
+      "archived": false
+    },
+    {
+      "name": "security",
+      "description": "Security remediation work",
+      "color": "b60205",
+      "archived": false
+    },
+    {
+      "name": "security:tracked",
+      "description": "Historical marker from retired security-intake synchronization; not used for new work",
+      "color": "5319e7",
+      "archived": false
+    },
+    {
+      "name": "severity:critical",
+      "description": "Critical security severity",
+      "color": "b60205",
+      "archived": false
+    },
+    {
+      "name": "severity:high",
+      "description": "High security severity",
+      "color": "ff7f00",
+      "archived": false
+    },
+    {
+      "name": "severity:low",
+      "description": "Low security severity",
+      "color": "0e8a16",
+      "archived": false
+    },
+    {
+      "name": "severity:medium",
+      "description": "Medium security severity",
+      "color": "fbca04",
+      "archived": false
+    },
+    {
+      "name": "source:code-scanning",
+      "description": "GitHub code scanning finding",
+      "color": "d4c5f9",
+      "archived": false
+    },
+    {
+      "name": "source:dependabot",
+      "description": "Work originating from Dependabot alerts or dependency update pull requests",
+      "color": "d4c5f9",
+      "archived": false
+    },
+    {
+      "name": "source:secret-scanning",
+      "description": "GitHub secret scanning alert",
+      "color": "d4c5f9",
+      "archived": false
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff",
+      "archived": false
+    }
+  ]
+}

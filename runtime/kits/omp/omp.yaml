@@ -1,0 +1,39 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Paseo OMP runtime
+description: Pinned OMP and Bun runtime built into the reusable mixin image.
+
+args:
+  bunVersion:
+    default: "1.4.0"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    buildArg: BUN_VERSION
+  ompVersion:
+    default: "18.11.3"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    buildArg: OMP_VERSION
+
+provides:
+  - "bun@${{ kit.args.bunVersion }}"
+  - "omp@${{ kit.args.ompVersion }}"
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - omniroute.tecklab.dk:443
+          - mcp.tecklab.dk:443
+          - github.com:443
+          - api.github.com:443
+          - objects.githubusercontent.com:443
+          - semgrep.dev:443
+          - registry.semgrep.dev:443
+          - builds.dotnet.microsoft.com:443
+          - dl.google.com:443
+          - registry.npmjs.org:443
+          - docker.io:443
+          - registry-1.docker.io:443
+          - production.cloudflare.docker.com:443
+          - releases.hashicorp.com:443

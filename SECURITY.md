@@ -1,0 +1,13 @@
+# Security notes
+
+The plugin executes approved local commands and requires Orca's plugin consent. Its launchers verify the staged runtime against the release hash embedded in the recipe. Runtime sources, service domains and kit build instructions should be reviewed before installation.
+
+Docker owns the service credential store. The VM receives placeholder credentials; Docker's proxy injects actual credentials for configured service domains. Do not copy host agent homes, credentials, browser profiles or secret values into this repository or sandbox image.
+
+The bundled Orca runtime is imported from distribution files and verified against their manifest. Each new project generates its own runtime identity, pairing keys and orchestration database; no initialized runtime is baked into the image. The guest daemon binds to guest loopback. Desktop loopback traffic is forwarded through Docker's native SSH using its configured host verification and Docker login. Pairing authenticates end to end, and pairing codes never enter ownership records or logs. Guest commands operate against their local daemon.
+
+On Windows, setup installs a per-user Startup VBS file that launches a hidden Node supervisor. Its launcher verifies the pinned manifest and executable dependency closure. The supervisor observes Orca through its public CLI and restores listeners while the desktop is running. An incoming connection wakes the sandbox through SSH. No administrator service, desktop-store patch, disabled SSH host-key verification or remote CLI permission grant is installed. Removing the Startup file disables future automatic startup; end the companion process to disable the current run.
+
+The clone and worktrees use the sandbox filesystem, with no host project bind mount. Project sandboxes are persistent and have no worktree destroy callback. Provisioning verifies both the project-derived name and Docker's sandbox ID. A new-workspace create may archive stale ownership and replace a sandbox absent from a successful provider inventory. It refuses a recorded provider ID still present under another name. Resume and reconnect never recreate a missing sandbox or adopt a replacement; resume rechecks the original provider ID under the provisioning lock. Retired transport listeners close when ownership changes. Failed fresh provisioning rolls back only the exact sandbox it created and retains archived metadata. Legacy feature cleanup still requires matching ownership and a verified worktree inventory. Removing a sandbox deletes its sandbox-local data.
+
+Report a vulnerability privately to the maintainer of your installed fork. This local Teck fork has no published security reporting endpoint.

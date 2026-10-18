@@ -1,0 +1,957 @@
+{
+  "source": "Teck.Paseo import with Orca lifecycle skills",
+  "files": [
+    {
+      "name": "building-admin-dashboard-customizations/references/data-loading.md",
+      "sha256": "8f394a141dc73c95eb83cd76169382006cce704e6d04130424b4f54a2cf6ef08"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/references/display-patterns.md",
+      "sha256": "4e9558317546cc9b5c8e1bed0b760e784d5db9c966011051157bd066746fc57d"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/references/forms.md",
+      "sha256": "6ccc790b8afd0dbb02ad382427b857daa0fd8739ea1493cdab1d2fd1dbd47955"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/references/navigation.md",
+      "sha256": "72d176888d4f0b60337a5c2d0ce81437060e38640b6f12c8b7f32bfa15c05eb8"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/references/table-selection.md",
+      "sha256": "3491ffde802e9617d9e931d9413a04b43caf69a13e71c74821a76cfa643ed642"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/references/typography.md",
+      "sha256": "48ac23c81bce178bd607fac29d79c46e9e5004e49ac69e7e62a137d185a05a16"
+    },
+    {
+      "name": "building-admin-dashboard-customizations/SKILL.md",
+      "sha256": "366c8469e4c85add6ff816601837fd3e7f2d8b1618796bc594e0c21218e9f3e2"
+    },
+    {
+      "name": "building-storefronts/references/frontend-integration.md",
+      "sha256": "9edbe922d81b1ddcf3c5cd1870342673b319612120a0bf604058ee7e75ce840d"
+    },
+    {
+      "name": "building-storefronts/SKILL.md",
+      "sha256": "e31485dfbf8135546d63d77c5993d03a55a22d783075cd769ee93adf1747e6fb"
+    },
+    {
+      "name": "building-with-medusa/reference/api-routes.md",
+      "sha256": "67b0259cc469feed8910adf39210e037ff32ec49368c18f30b080067abfef3ba"
+    },
+    {
+      "name": "building-with-medusa/reference/authentication.md",
+      "sha256": "523e85d36a6d9961b7981debe821b98ed030639f4cf8469adadacec8f0395bc1"
+    },
+    {
+      "name": "building-with-medusa/reference/custom-modules.md",
+      "sha256": "22d73fa1a0e801a07a00313519cf69ce057544b0d94fffa10b6c05ea18810daf"
+    },
+    {
+      "name": "building-with-medusa/reference/data-models.md",
+      "sha256": "b8accce2d95d920b49bf4f85a94ff0b5bc41b03c7001cd19581a88f5be83dbaf"
+    },
+    {
+      "name": "building-with-medusa/reference/error-handling.md",
+      "sha256": "1d14b0237006655358f50955ccfb0031ab13007baf436ca583e061fa2a0e3972"
+    },
+    {
+      "name": "building-with-medusa/reference/frontend-integration.md",
+      "sha256": "9edbe922d81b1ddcf3c5cd1870342673b319612120a0bf604058ee7e75ce840d"
+    },
+    {
+      "name": "building-with-medusa/reference/module-links.md",
+      "sha256": "e5263ef69623f8fc32107955349920bf10fb80953a90caaa7149ad6d8c056463"
+    },
+    {
+      "name": "building-with-medusa/reference/querying-data.md",
+      "sha256": "8df889cd0ffedb97a23c861d1ce1a14220a608865c470df6e30b1b178e3234d5"
+    },
+    {
+      "name": "building-with-medusa/reference/scheduled-jobs.md",
+      "sha256": "b77d23182b1c487009de2df9b6f9bc547e127aa32a774303f1e83d246a88ae0b"
+    },
+    {
+      "name": "building-with-medusa/reference/subscribers-and-events.md",
+      "sha256": "6f3feec6aa94f918bd89c6c96600333ed400de6526c0ec35f5bfd24422f6d70c"
+    },
+    {
+      "name": "building-with-medusa/reference/troubleshooting.md",
+      "sha256": "df604df82e6dbe0a85941e4fc92b29d68a8eef767c69c5bc04b2ac3ee1a81867"
+    },
+    {
+      "name": "building-with-medusa/reference/workflow-hooks.md",
+      "sha256": "fdb16ad7ed551dcb50f330a1adfe2e297b681717c7d78f79a971324780e1b7b9"
+    },
+    {
+      "name": "building-with-medusa/reference/workflows.md",
+      "sha256": "c841eea1613f7b3bf563513cefe2de18391468f431c4aa0b84aed777685a1b87"
+    },
+    {
+      "name": "building-with-medusa/SKILL.md",
+      "sha256": "148d3f383b4eb90c45f076bfd6f324ef6aafc8fe89c84050c404e29369c73399"
+    },
+    {
+      "name": "cms-migration/reference/PAYLOAD-FIELD-REFERENCE.md",
+      "sha256": "a716216645e2150d5c8d514dd8f54a78c120e97ebc20f9dd2f3f1b0d6f3f23cb"
+    },
+    {
+      "name": "cms-migration/SKILL.md",
+      "sha256": "f1799f2471e4d1a35189a6af406677ffb1bc1f83f0681ce0f6a6c7d0fc75c594"
+    },
+    {
+      "name": "crap-score/SKILL.md",
+      "sha256": "3a6dd399605afd70393a27be48d2edc1a2843be050011f733d09cd5ff6c5acbd"
+    },
+    {
+      "name": "dotnet-aot-compat/references/polyfills.md",
+      "sha256": "d60c955f0fc16fc0d90ac34242e7e14ac2c773a5405c2f53850dbe795b8fa31f"
+    },
+    {
+      "name": "dotnet-aot-compat/SKILL.md",
+      "sha256": "7971aab97bdd585def34e7548b81e7d8efb0f8362fea8e9015a40dbc21a90402"
+    },
+    {
+      "name": "dotnet-best-practices/SKILL.md",
+      "sha256": "777d4f7dd8cab645bb963def43fbc21824efd885f3182329e62033d96ca61a5f"
+    },
+    {
+      "name": "dotnet-design-pattern-review/SKILL.md",
+      "sha256": "e94f172c8e6cb96d962fe9f67d64c1b2b9886ef078eda4d41c9fc3e9dcbfa97b"
+    },
+    {
+      "name": "dotnet-integration-testing/SKILL.md",
+      "sha256": "8b4234fa8de43b2ec998a3299b509f2bab978687c2779e38ad63a50d61797305"
+    },
+    {
+      "name": "dotnet-test-execution/SKILL.md",
+      "sha256": "62a42c343cb9022f963087d1e19c0f35deada8c1f7396b41bd16f3b6bbcbf774"
+    },
+    {
+      "name": "dotnet-test-quality/SKILL.md",
+      "sha256": "3bd14804d7f4f38f83c5b27a16d1f637cc15716b080a6a3691acb9b8a8e3fd1a"
+    },
+    {
+      "name": "dotnet-unit-testing/SKILL.md",
+      "sha256": "ee9707a0fa61410cef7f3f7f8de85803e4a05c228dd99ece5fa4a93a4344d6b4"
+    },
+    {
+      "name": "dotnet-upgrade/SKILL.md",
+      "sha256": "9e3e789579cc333971b04deaa3627e4e6fadfa2ad237f60a63730c34e8554587"
+    },
+    {
+      "name": "github-execution-planning/references/issue-classification.md",
+      "sha256": "b52d8d4a66de8d254347bc7758ebdb79860eabd01fedf74769225eded5f9404b"
+    },
+    {
+      "name": "github-execution-planning/references/issue-relationship-bridge.md",
+      "sha256": "6ed6487920c777f64815a74b275f101e72d928b8396cacf807808bd8e8f05789"
+    },
+    {
+      "name": "github-execution-planning/references/issue-structure.md",
+      "sha256": "bca43973b8646cd664e844ea892e8ab7da119fcb3fb86ca9245f7884b504f982"
+    },
+    {
+      "name": "github-execution-planning/references/pr-stacks.md",
+      "sha256": "902f2fda47779b1db06b6735f389b156f5b1807202b3f7ab55c49fa95b13d534"
+    },
+    {
+      "name": "github-execution-planning/references/teck-monorepo-labels.json",
+      "sha256": "21089b6417803bda00ae7a22d280397adcd10cc1f2826442b02826261dbdbec7"
+    },
+    {
+      "name": "github-execution-planning/SKILL.md",
+      "sha256": "03c906cb7cac2efa82b2250b301f2702b3ea7fac2878049b9b224ca7ad907e5b"
+    },
+    {
+      "name": "github-publication/SKILL.md",
+      "sha256": "1ad8a96093aeb88d844297117cf773b79e309d6bf4cdcd0c53065cbc3ea740d6"
+    },
+    {
+      "name": "keycloak-administration/LICENSE.md",
+      "sha256": "d8ee072a1f6bafe833126b5ceecfba251bbbe0c0ba230840003d883c0f30e7a2"
+    },
+    {
+      "name": "keycloak-administration/references/authentication-sso.md",
+      "sha256": "319e12cc669e5351c498e9cb5224f2353eeb38093bd2f4bf0b0d03a81c5daf2d"
+    },
+    {
+      "name": "keycloak-administration/references/authorization-rbac.md",
+      "sha256": "26d4a004731052aa407bc79a11c2c897b59cd4deefcc440ffc5fe1bb2474e0d6"
+    },
+    {
+      "name": "keycloak-administration/references/client-configuration.md",
+      "sha256": "dfb34fcc1bafe877d3ddd3f39e555a2c52e720de5fc090111dab8f55925c35c5"
+    },
+    {
+      "name": "keycloak-administration/references/ha-scalability.md",
+      "sha256": "c006cd6b5097a6eb4f8366af8d247a43a3114b8fa1cdc936e65c9df86e2913aa"
+    },
+    {
+      "name": "keycloak-administration/references/integration-examples.md",
+      "sha256": "e1f4bc41ea4890ff6a2c0b2173b6614feb548d5cca492a8dcd5ce16048fa49f1"
+    },
+    {
+      "name": "keycloak-administration/references/realm-management.md",
+      "sha256": "bc798afa6ee2b1bc7089df3cac0a0c28b4e05bd8b06a60d53e2b55c025ab0ad7"
+    },
+    {
+      "name": "keycloak-administration/references/security-hardening.md",
+      "sha256": "3704eb2bb04e8e4976734f33b8a68dcc3ede29c23e197cddd1c57bbe557f6e12"
+    },
+    {
+      "name": "keycloak-administration/references/troubleshooting.md",
+      "sha256": "4092d8e8c91cf71cdb4cf414b71b09829e3efdeb6693b7f6ef56ddfedf0c2bd3"
+    },
+    {
+      "name": "keycloak-administration/references/user-federation.md",
+      "sha256": "f3f5b3643517fee244d80bf1071145ad776a7c82a31d659c2302d2f8d1736318"
+    },
+    {
+      "name": "keycloak-administration/SKILL.md",
+      "sha256": "1502d20262059e77529a600c0daaa6c80b17a005f0dcfd11c589fb35a401b64a"
+    },
+    {
+      "name": "next-cache-components-adoption/references/dev-only-validations.md",
+      "sha256": "57383f4216cf0409041cf0129f97bad0f489246f7c4fa9e7308576b6b843817f"
+    },
+    {
+      "name": "next-cache-components-adoption/references/per-page-decisions.md",
+      "sha256": "5064a7efdfe073bb644883edfa00ae919b60b8c76bf12d25b2e1e83b49913c83"
+    },
+    {
+      "name": "next-cache-components-adoption/SKILL.md",
+      "sha256": "20bd3022e370fff23f3c3956c7f02e79edcee451a6533aa8d98f7e0fce40e35e"
+    },
+    {
+      "name": "next-cache-components-optimizer/reference/patterns.md",
+      "sha256": "18342f107289cee068c68b1beae2fa8634864263468518a3d6ceeb400bb78c30"
+    },
+    {
+      "name": "next-cache-components-optimizer/reference/real-app-patterns.md",
+      "sha256": "4beddcc70ee153a0a804e10cd84220901a1ea2efa6d86214b831d84929374890"
+    },
+    {
+      "name": "next-cache-components-optimizer/reference/red-test-robustness.md",
+      "sha256": "71fa3a45a09fcaad676b0fcd6d07a19e92ef8fb587bdc129f71faeb3ddfcda28"
+    },
+    {
+      "name": "next-cache-components-optimizer/rig-template.md",
+      "sha256": "3f3a3bbfc44896cfa7f0ed642d76831e4a3fbd143822feb25882c32e7cc6a0ed"
+    },
+    {
+      "name": "next-cache-components-optimizer/SKILL.md",
+      "sha256": "f6e9c8deff1ae9864acffc83d8d261d487dcc66afbae1aee1feb4acbb636c30b"
+    },
+    {
+      "name": "next-cache-components-optimizer/test-template.md",
+      "sha256": "7e58cf538ce3c42dcbc084fa4ae702d5e8a42fc4015a0c1eda2305de4bc614d1"
+    },
+    {
+      "name": "next-dev-loop/SKILL.md",
+      "sha256": "ca45c937ae77b2dc39399ffbe5afbfabcc1862056a62fd50c76342a32e6f8375"
+    },
+    {
+      "name": "next-partial-prefetching-adoption/rig-template.md",
+      "sha256": "f7a94dde4a3e2f1b6ac2ad14aee51bf8aaea53f46d67def95dd476e6978efec4"
+    },
+    {
+      "name": "next-partial-prefetching-adoption/SKILL.md",
+      "sha256": "a37933780bc522d62e54b061a3f70a963dbadb4f77c892741fc986446a4ad6c2"
+    },
+    {
+      "name": "nx-generate/SKILL.md",
+      "sha256": "737ee7f49764d7190da4461bd1e518bdec407c84cf3a23d99c324ba0b7230c63"
+    },
+    {
+      "name": "nx-run-tasks/SKILL.md",
+      "sha256": "544e773afd7eb6d22b7768f8932a150f6767becb61b34608060d0f11bcb722f3"
+    },
+    {
+      "name": "nx-workspace/references/AFFECTED.md",
+      "sha256": "5c3243ced18c3cd7b3f330accbfd87df55e076c689f12ea0e4191a9604d6a8b9"
+    },
+    {
+      "name": "nx-workspace/SKILL.md",
+      "sha256": "e1a0c99a3f4528c2e5cc371ba24d6acc1d03af1c342b2beff62966712cc626df"
+    },
+    {
+      "name": "optimizing-ef-core-queries/SKILL.md",
+      "sha256": "674fe2a77386905c3a3bf7dfc823b54359afeed63ea87c51c9386fde303a7f83"
+    },
+    {
+      "name": "orca-cli/references/automations.md",
+      "sha256": "9e4ff221b4cb0ef6351ae4187143cedc20c8d651928c86a81ab13f052f85b770"
+    },
+    {
+      "name": "orca-cli/references/browser.md",
+      "sha256": "009a31a16b1c08b754f03d9372a4409b48b3cdf7a36851ef413616c2bddaa95e"
+    },
+    {
+      "name": "orca-cli/references/publishing.md",
+      "sha256": "6807b7d147ac0233b3731b6726c0c87479a8ffc74bb0a7aa754a08573882b976"
+    },
+    {
+      "name": "orca-cli/SKILL.md",
+      "sha256": "fb6eb80e55223e93ed4401fe3228ca0a840f06328f4029e694deaec70a8720cb"
+    },
+    {
+      "name": "orca-feature-workflow/references/review-gates.md",
+      "sha256": "5c8d2e5f8fdf402b100e6c64ecbe3335bc1b553c2ec398ef484c616ba118e7b4"
+    },
+    {
+      "name": "orca-feature-workflow/SKILL.md",
+      "sha256": "96384258d9b31fe4372603a536b6a3d8fabac2e4bed5a73f8953a1de824976d1"
+    },
+    {
+      "name": "orca-workers/SKILL.md",
+      "sha256": "53e49e1c150d0cc8e110ee6f048ce0634c28a2885df11759a21270c90fee5501"
+    },
+    {
+      "name": "orchestration/references/coordinator-loop.md",
+      "sha256": "4eb2229faf6179b4a4578840a0f461ce36923c2094f46ec48db7879f27259742"
+    },
+    {
+      "name": "orchestration/references/legacy-contract-migration.md",
+      "sha256": "a4a961937b601bc116ae8d658d13e95f61beed70026521fe4323654f8322ca42"
+    },
+    {
+      "name": "orchestration/references/low-level-topology.md",
+      "sha256": "a4b2aec2291f7856b48b188b803fc101ebd560a76bcf4c3d10706e0847c8f297"
+    },
+    {
+      "name": "orchestration/references/messaging-and-gates.md",
+      "sha256": "c201fe5da4ce4300e3c5f4d8784c69ff57cfb9c3bccaa1c487be914c1fdf872c"
+    },
+    {
+      "name": "orchestration/references/placement-and-remote.md",
+      "sha256": "52ff2c6cb1c93782a949cdb9457054266e68198441dc4e869d2d2048adf93e40"
+    },
+    {
+      "name": "orchestration/references/recovery-and-cleanup.md",
+      "sha256": "9b99dbf4d71863667090af7fe3e5781df1e2af10825e040a15ee2e51f3a32596"
+    },
+    {
+      "name": "orchestration/references/worker-contract.md",
+      "sha256": "8cad6c7540fa5fa6dbf264077492855710eff71c06b7f63c84854c7e943baa91"
+    },
+    {
+      "name": "orchestration/SKILL.md",
+      "sha256": "6c90f71d8d98899e5dd16e304db42c867f0b5df8a3e1c98eb6c6b694a66d5344"
+    },
+    {
+      "name": "payload/reference/ACCESS-CONTROL-ADVANCED.md",
+      "sha256": "baa547b6f671c6a9f6cdd0f0ec010ffdf2d29be3f034dcc6d0b32541f4f52633"
+    },
+    {
+      "name": "payload/reference/ACCESS-CONTROL.md",
+      "sha256": "f32e234324e6969d01fafa8ed2857e1218d828e04595c5206c56b97f4069fca3"
+    },
+    {
+      "name": "payload/reference/ADAPTERS.md",
+      "sha256": "4e4c4b8a84e98f5de106db6ba34c008e4437fc7b79d5cf6d51905e387e72c36d"
+    },
+    {
+      "name": "payload/reference/ADVANCED.md",
+      "sha256": "5baa80ba9b5206ea06c522e7a1e1969a750c069271c8271ac1045b7a93a91a6f"
+    },
+    {
+      "name": "payload/reference/COLLECTIONS.md",
+      "sha256": "0fe3dbfba631fa244eaeb708c39fc830f53bf2b89db651ad483f7727c2f0726d"
+    },
+    {
+      "name": "payload/reference/ENDPOINTS.md",
+      "sha256": "679e03a35d815db320b6f93704f5aacd073ae6206915f16efbd1c86bc03beba1"
+    },
+    {
+      "name": "payload/reference/FIELD-TYPE-GUARDS.md",
+      "sha256": "cb8a4eecb78a0cb5eb151345ff8079f33b05a5bb9ce4f182c598416e3bab3951"
+    },
+    {
+      "name": "payload/reference/FIELDS.md",
+      "sha256": "230ccb2911f08ae2f9b0edb4d7283eabaa4362c6eeec486b5b2f5c01676413da"
+    },
+    {
+      "name": "payload/reference/HOOKS.md",
+      "sha256": "c77dddf075e571818b87e1bd4056c634aae4fbf19bec36624dd11afd91aca6ef"
+    },
+    {
+      "name": "payload/reference/PLUGIN-DEVELOPMENT.md",
+      "sha256": "b65f6224ca63a763145a120f79bc556f942571caae74c4a05c169593036bff77"
+    },
+    {
+      "name": "payload/reference/QUERIES.md",
+      "sha256": "5f981becebaadd947a37a9cbe7071df2266fd417846e84b5e15ea7fefa1dd957"
+    },
+    {
+      "name": "payload/SKILL.md",
+      "sha256": "6e4ec5c53b6b0b3cc296aae9965bdcc005f89bddb092e26a0bc02990c797386d"
+    },
+    {
+      "name": "README.md",
+      "sha256": "96a4975c3d66337cc5bfc571ba5b202686a52a3fb260869f6f9d685f4e7864db"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/breadcrumbs.md",
+      "sha256": "baf256290ec38fb11b2b14851c5f30a6da28c018f791d6715ae818cd1100c1e1"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/cart-popup.md",
+      "sha256": "d7158b4d77f012222bbd534e915f8c82e39052b97d335647ca3d997a113bd5d5"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/country-selector.md",
+      "sha256": "d0004ff0b7d1fb928d81ad03d754ef1c2ae588f704fb7811d44c6aa1b2bd4145"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/footer.md",
+      "sha256": "476208c2b636bb6a1e9cfcb01692f8f61da8767e0cfdc863822e3d955b830315"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/hero.md",
+      "sha256": "43143f712d55b06a7c1be24efa9fbdb403173b7a54a8c4192830e551df9af4d1"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/megamenu.md",
+      "sha256": "1081228daddab533962f132d810ef4f59fb80f8afa40be8cb64277a6f244f246"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/navbar.md",
+      "sha256": "535bfaa6c8f7bdb63469706513d766581352f6c43a9e19bdbe935a2248bd1e60"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/popups.md",
+      "sha256": "d2b0120a234997a2848f643b84cc4fdc8a82e6ca5545b602d280d4e5c0866cf6"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/product-card.md",
+      "sha256": "4839cb5a1d16e93e95ef3c761d8088f89559775f21182a2b041646bd7e26d700"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/product-reviews.md",
+      "sha256": "79649df1a70a0fd0a53929fbc3985d85e07b07813c7307f6ae6c7b75cef4d657"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/product-slider.md",
+      "sha256": "ba7fa5550370cf04f89794f6cea96ac4b447afa94c90cf5209ba64e64e42edea"
+    },
+    {
+      "name": "storefront-best-practices/reference/components/search.md",
+      "sha256": "fc40e542971d6f4f94ebb4be5db1f8f5f223356ed16078ab158fbe0a4ab5593b"
+    },
+    {
+      "name": "storefront-best-practices/reference/connecting-to-backend.md",
+      "sha256": "4176d4993eba9267c12bc4ec6ee0cc1aa0de5bb4eeb3c9878a926946b3b6c3c2"
+    },
+    {
+      "name": "storefront-best-practices/reference/design.md",
+      "sha256": "dcb77723abef124c405e21a07d75708129944ff77e4fee107d20e97923c4ec61"
+    },
+    {
+      "name": "storefront-best-practices/reference/features/promotions.md",
+      "sha256": "54994a90bf2fe83e07a3d0fe2b7778ade488c43277d95d7a8fb150fccc724cf6"
+    },
+    {
+      "name": "storefront-best-practices/reference/features/wishlist.md",
+      "sha256": "a1a6bfd0d8211feb3b1ab89de03d9eb544735385241d618bcdd474d2fa5f4b31"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/account.md",
+      "sha256": "4cae49d18b385906e225eb0cb448eb5d1c54b0935adb4f38c4a862d845e5085a"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/cart.md",
+      "sha256": "7e57c5639bff17fb4d453cce34cf834675ef6dec2ca5b652ba0a04ecf2f2fbed"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/checkout.md",
+      "sha256": "80f39a670e0e88cbcce4e2fc7e45e3022f554a56d659464b4089d4c836d40134"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/home-page.md",
+      "sha256": "362cdb58fb9bfcf652100422d578944a0b21cf882908652a9cf71227bc8e947c"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/order-confirmation.md",
+      "sha256": "c2f7d853580d143782a85614cfa91b405c8992a886e43b00f6e79da7c28f1796"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/product-details.md",
+      "sha256": "71f8ec4dabd8385b529d2640d0a4f8bf9ff512893df752f6ca773870b31e9b41"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/product-listing.md",
+      "sha256": "b3801affa73fa88d39d069cc6bbfdfdc332ebe7f2b2b4101b68f591540c15820"
+    },
+    {
+      "name": "storefront-best-practices/reference/layouts/static-pages.md",
+      "sha256": "769c2dacd7dca7f9b5f6a440efae11dc62ba328610f79d059aa50356b7a9eeff"
+    },
+    {
+      "name": "storefront-best-practices/reference/medusa.md",
+      "sha256": "ec3c971933f5f7e288b1ba6cfdf268085cf46c12232c610edf198e8e1d34d0dc"
+    },
+    {
+      "name": "storefront-best-practices/reference/mobile-responsiveness.md",
+      "sha256": "a2e9f679dfc03b9b070de40976c5e3248763f794ca6280f946eab0b2401857b2"
+    },
+    {
+      "name": "storefront-best-practices/reference/seo.md",
+      "sha256": "d8f66ea6c51ab9e18a51f81b2635911851f8f8293fa1cb6fbc16989e6d834a8c"
+    },
+    {
+      "name": "storefront-best-practices/SKILL.md",
+      "sha256": "43294244fa5d6bf2c7c36483ee09d1f49c150c7867c1d113cea085be1a727051"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/_sections.md",
+      "sha256": "01c59969e4e867f0708c8f8ef9c6d87fab9a07d0586244f429ff84013db8a115"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/_template.md",
+      "sha256": "99df2a3ea088c6c22de2484ddc7e964d0e9923846f44c63380343ecc64455442"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/advanced-effect-event-deps.md",
+      "sha256": "55ed8f9f27a1bff803d6fa55828176207714b02123cbb97ddb8a90d88024a723"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/advanced-event-handler-refs.md",
+      "sha256": "a3097edeecfb2ff6851cd66ed8cdf0617c3c88180504bee824aa6e75a215bbbc"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/advanced-init-once.md",
+      "sha256": "3e4dc22173eb0e2b6dcf583e3babd862b8696328f8f59aee7c4d746c5bc05f6c"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/advanced-use-latest.md",
+      "sha256": "8a3f64dfe5a77d1564248faf17fe662ae75b55d497a243cb30b38eb07ccbbf9a"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-api-routes.md",
+      "sha256": "523338540d73427dc14c0cbb19f2741ebccdf8b105a7b2c1b33d2905cf237a42"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-cheap-condition-before-await.md",
+      "sha256": "03107c1f70a293cd58a8abc5474c5548e20ea4efdf01b6d45aae7ad0ac1cb32c"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-defer-await.md",
+      "sha256": "f3c142d090615abdcc99d31c123be37b31f0f1ed8d9ec9f7789a3bc6883ae0fb"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-dependencies.md",
+      "sha256": "16ef469f877e30c6b8e1e1b4bc3e527312fa3c6318cb785a4eca186ea236131a"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-parallel.md",
+      "sha256": "6d2f841896279e976dfcdc1ac89e70771ac188baadfd43c096b5706cb838b961"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/async-suspense-boundaries.md",
+      "sha256": "de05fedac2eb7ae563b887b5a424464ec3dfaf84e5b7797467ebe2a796ac8afc"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-analyzable-paths.md",
+      "sha256": "62090b5c815fd71bf1133dce754f51abc16a9456d0ccd025fd627de27726e92a"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-barrel-imports.md",
+      "sha256": "e648f6d54525f07a691357040ca5bff6ea3424788a91ff63812adb29622a671b"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-conditional.md",
+      "sha256": "09c8259c3efb04fc0abb8e412ccbda217c222ae8118516283e571c995fe3a7d4"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-defer-third-party.md",
+      "sha256": "3719fb47b191e8db4fe22686ec88448ad5af9e6838585425abbe103d0b642e37"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-dynamic-imports.md",
+      "sha256": "401817a7369f315fc5a68a1095742ff7d53d0461906880dc9d64a41495ee1986"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/bundle-preload.md",
+      "sha256": "d1f7cc28da7cd5ab249acd287edc5b761afcfb194e9cb62cd44c5f3543db2de2"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/client-event-listeners.md",
+      "sha256": "242a873349febc1ce685e85617994784dbab92c2eaa68aed7fed5a83e7680e93"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/client-localstorage-schema.md",
+      "sha256": "0fb7cdf9dc93fdf22f87e3669f953fb9d4ac9b0be42eec4a29fe9a2560610b88"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/client-passive-event-listeners.md",
+      "sha256": "1f35016f9053de69e884ee9be00654e37979c2ca85f5e57764dc2626ff7acb4b"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/client-swr-dedup.md",
+      "sha256": "644652c39c6cc00de8d1c77a7273612e868dc3f7edda30764164c12ec0f764a3"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-batch-dom-css.md",
+      "sha256": "480b891b9eaf96e929dc1e964274a4828e3a78009b7d00ccd965a0d425215959"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-cache-function-results.md",
+      "sha256": "3daaa11d24f4295cb6be8bc6f407f2ce83cc7b5bd1f0e68891ea8ab835721dc7"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-cache-property-access.md",
+      "sha256": "73e47431e74878a927061bf0ddc7cd91a7556cb35d2573f3421e82300d9ae311"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-cache-storage.md",
+      "sha256": "11b826b0433898c1ece2d3547010d8e77db9fb240185748c45db91493de9b6cc"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-combine-iterations.md",
+      "sha256": "71add08aeeb43091d4ff4c0b2842cce8b4bdef8ad3e732cc034bb5a84827e746"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-early-exit.md",
+      "sha256": "925ce5ce87f3347186ca62212f29cc6baa2b8c85a96d2720ad07c3d0abf781c0"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-flatmap-filter.md",
+      "sha256": "9e5b166a41914d975bef7635467f8fb32cd98b5c3126c0bc6f163490812fb5f0"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-hoist-regexp.md",
+      "sha256": "f9e9aef2f7c2307dd7310f283df85dcada45fc43e9bb941b0c3aa414dec21ec4"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-index-maps.md",
+      "sha256": "5df1bdc2cfabb2c98abd55d26762e5c18189535c2e686184f426082e62920391"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-length-check-first.md",
+      "sha256": "8b54a311c826b299272f29187fc58bc55772a04c4a72eeb29456ee96dc9fc624"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-min-max-loop.md",
+      "sha256": "87dfb67e2f39df6ad8bcfb5b78c5fb364d3c07554ad188a202408d99f3763421"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-request-idle-callback.md",
+      "sha256": "ee08f83905b4011abbc33d594033157d77561b5bbd9b36b04f0f409581ffec32"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-set-map-lookups.md",
+      "sha256": "a7fd781a6ba9ad49065961b6f9a90ef486bf6b648390e1a08704025f98e1642b"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/js-tosorted-immutable.md",
+      "sha256": "d0a5e1b0fec48a0a81397957e2f068e224329f7c42cb5feeed8aae6fa64025e8"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-activity.md",
+      "sha256": "1e5e7eaf3555e61d6a2e900089c676527d26259501db5594f59544b6c664f85a"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-animate-svg-wrapper.md",
+      "sha256": "9c6ae0ca7a51434e803887c64cded760956579a1452ccb80a461a03f9c937c77"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-conditional-render.md",
+      "sha256": "2ec2fa23c4148285144687050c52369adba3da2fbe3d486f8d3e0aad8f06f2bc"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-content-visibility.md",
+      "sha256": "64eee6d5b916fe74df33363994b27fc7f71bea3bcedc7ee04bda23107ca3e6e4"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-hoist-jsx.md",
+      "sha256": "93b229560fae92005ed9a2a829064607b39b2e984e92d221d05b2d41df2b7c0e"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-hydration-no-flicker.md",
+      "sha256": "dc7ab358c67c177bca6e6f360fbc935ebe4efa928c0ba3ebd3f9f3d9e2000ca3"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-hydration-suppress-warning.md",
+      "sha256": "915bacb934e2927d84b37a3f3d225a47b309ac8f9e494ed2bcb66ce07c5676a2"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-resource-hints.md",
+      "sha256": "351b1095d641717b930f1b2253282b7120af3023bc74e06c17675168d4286864"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-script-defer-async.md",
+      "sha256": "4cea07b7875ba7fc2c7465ff23b63a2bb334f90aaf2d9293d38d67b05fdb32ab"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-svg-precision.md",
+      "sha256": "ed468533f6e95f622859c884b122cf21f9f593ed6bb3d500a54de4b9f9bcb9fb"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rendering-usetransition-loading.md",
+      "sha256": "3a1249c3f13026b6f54ab5712c388df219d6af01b12aa542749acd99a46f4bc1"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-defer-reads.md",
+      "sha256": "234050a77faf50cb306be10a9e15bd4421134ab5907e75f13e6d78e2bd262dc9"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-dependencies.md",
+      "sha256": "17eb5830956fb56486fd3cfc7431f5849d39751730c05ad9e77dd4f0c27169c5"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-derived-state-no-effect.md",
+      "sha256": "cb11ec76f50aa7b6847269f02d79b120c889a30d9ecd2c1d578f75144419c77a"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-derived-state.md",
+      "sha256": "1c326bb67b01fb084eb00c8911b0a7cff54681c2315b629f88e49b64eaa6481d"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-functional-setstate.md",
+      "sha256": "5e68df6b2ae8058e67f476ff1ac67bde159f5a9d18df439e46eabcdeb7b52e58"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-lazy-state-init.md",
+      "sha256": "4ae844740f266fc8cbf050701230286624a2440ec5be67b9a63d9edc3c580573"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-memo-with-default-value.md",
+      "sha256": "81c47476564ad8a79fc68fc442734255ca7d6829424359464503fda0a9f9a0dd"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-memo.md",
+      "sha256": "1f258990c2f27ff6256b3cc5c43300631bb3f0d81f749aed08d07fcdcc131dd1"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-move-effect-to-event.md",
+      "sha256": "abc2cbf167bee056743023351e96806a411d3398da8802093620aecf0721f029"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-no-inline-components.md",
+      "sha256": "1cc32907a770272524ba682eef9e7efdd8ad4533b6f89b718a1fcd7d1d0eb6a3"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-simple-expression-in-memo.md",
+      "sha256": "5bdcf2d1558ba5204e643c887b7b4060f89630969425651eb68e96427d97f800"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-split-combined-hooks.md",
+      "sha256": "6f45d703343484ef9acef9388397f3642966ae6a5a258899a0cf1f9977cfbf6c"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-transitions.md",
+      "sha256": "60f4033909a62df5e5b8c601494f9e50a562e2f8c1c2d81eac24f38142265f1c"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-use-deferred-value.md",
+      "sha256": "8c3579576a61a949884167745dcfaf1d5426ba305cc61fd0a79602d70fda4909"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/rerender-use-ref-transient-values.md",
+      "sha256": "f1a649af9d1d0b5c762f6c9c4c1c70c90d7df82aa10296ee87aadb78c1b76c54"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-after-nonblocking.md",
+      "sha256": "d0b8d24a3db9f0f65f9e2bddbf230b0e03a5f60e1229d93a4a18f5e7a991c7c2"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-auth-actions.md",
+      "sha256": "a2ca8aa102839251c7971ec784560fab943c20b36fe6f80365d4110c13260c23"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-cache-lru.md",
+      "sha256": "1924b64561841923b88a657085097a0aeba3e0ba2d5470b9f5c15cc10d6ae70f"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-cache-react.md",
+      "sha256": "fddeea6c870bb3da4134b61d54b7d09b83d2603f929b7547cd3dc1dc269edd5c"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-dedup-props.md",
+      "sha256": "c2747424cdac46be62f835f245a0aa887b0090b416d28e2ac8676702645eeb37"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-hoist-static-io.md",
+      "sha256": "5abea4dd882b13661bd5f7dfb93f9e547d5f08176c61c448ade91b210ed5d49f"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-no-shared-module-state.md",
+      "sha256": "4d869bf1cd2f1632e5ca4c0e64b1cf0e71c5f5a0f940bc8a22174d205e735ed7"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-parallel-fetching.md",
+      "sha256": "569a2e9fc04f9606686cd75c5894ef8781b502786a7fffe241396846c7733472"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-parallel-nested-fetching.md",
+      "sha256": "ad5d9656984d4a959997a2367bf59cc6632297b4634a1dd13a087939d83f30b3"
+    },
+    {
+      "name": "vercel-react-best-practices/rules/server-serialization.md",
+      "sha256": "f4c7d68b29c82381baad059c4a7f09e868e71ec9c3115a26ad3ae7d24c0dfe1f"
+    },
+    {
+      "name": "vercel-react-best-practices/SKILL.md",
+      "sha256": "90bb5bf412c8ae5dadb85f37587bd52a904fdc76c4bf2052a62cebd30344cdb3"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/_sections.md",
+      "sha256": "21d7445e92bd7d393b420118c3fb9ebbf30aaf123a15143afb6c0b1b562cfdfd"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/_template.md",
+      "sha256": "99df2a3ea088c6c22de2484ddc7e964d0e9923846f44c63380343ecc64455442"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/animation-derived-value.md",
+      "sha256": "689228e9d59227934f296563963951aa9368be0afb2a188f650de161203b1862"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/animation-gesture-detector-press.md",
+      "sha256": "69408d4be669e74689d865c5f50a22fc3a802d521fe493371761abd20526e58e"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/animation-gpu-properties.md",
+      "sha256": "f885e4179445da27cbc225e0a4aa3ed9016fc3507ca6f864392ba7a9d0bd7516"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/design-system-compound-components.md",
+      "sha256": "dcb10900a58fcf57cca2e27c062d02df2325a7949e08fb45e9e05cc2b132b1a6"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/fonts-config-plugin.md",
+      "sha256": "b92568774064a604e7a479d4c8d7263aed5609740e9161d2f2764bfff761905d"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/imports-design-system-folder.md",
+      "sha256": "aa6337f7f2869a46a9141ec65e02c3da5c3bf051023899b82e0f0aef5bff8423"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/js-hoist-intl.md",
+      "sha256": "b4b08622465ffcd5e5961878eb8c6d7359aa242d16c990b59941c9111962fe46"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-callbacks.md",
+      "sha256": "db800e9dfe0080eb4954b96e2a362ee8344d08e08b1ed06bc8059450f3e6f0dd"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-function-references.md",
+      "sha256": "b54470e41d578b207ee3223f6853efb7fbf8e5f83d9aecf8da16989072f99544"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-images.md",
+      "sha256": "e88f16ac113c29230d674b7aa2c66c31d5772a74b1ea378d48a97b1143fe6c19"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-inline-objects.md",
+      "sha256": "e2a80aac0f29c6abaf0163c1cc273d09cc8a0030ec077ca2022bbf5c309e4625"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-item-expensive.md",
+      "sha256": "a68cc8ec5dba3c55761bd5df9dfd3d98485f63076868d3e03af15f1e58907ce3"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-item-memo.md",
+      "sha256": "38ec1d149ee485434d11c2b9e2101dfc914afadae4a0738ca905f26b05f708c1"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-item-types.md",
+      "sha256": "eed225f4e9e504bfa7db01f5395d1402545cc47de8adf1829a9408cd5d158cf6"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/list-performance-virtualize.md",
+      "sha256": "98cad308118acb4d6e8e975c0168ce56e2d48ca52ed47f23bc9a30667c066ada"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/monorepo-native-deps-in-app.md",
+      "sha256": "8368b109027fcec1b8a81bfb99718aef2b64edaba77107f73d7c465cc5a14217"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/monorepo-single-dependency-versions.md",
+      "sha256": "61c01b9eaab1e319bf078204231fb573bdfea3c43a6eb99e7ef73ee95d474ccc"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/navigation-native-navigators.md",
+      "sha256": "6642dedb57e72f0b56df5fbc3d5b8aaa91fc4456932c12712cfd076d393f32c6"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/react-compiler-destructure-functions.md",
+      "sha256": "8048926a4fa3fbd28fc0ecf4ba4c383a2f0ed06c2fd7330dd4a15d7f4e548044"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/react-compiler-reanimated-shared-values.md",
+      "sha256": "3174303a72b6849ff0eda5cd9f9650f26baa5f31ed28d35a75076af714fb2ffc"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/react-state-dispatcher.md",
+      "sha256": "7ec5b653e3ff8d9ca97d8d66981cce5590c0e49fa79ab708fd6324542b588870"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/react-state-fallback.md",
+      "sha256": "eb76e386d71680bfdfc0ab64dba1221f4d3d0fdcb4980bb4a871381d58e9e58b"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/react-state-minimize.md",
+      "sha256": "31b989de61defda1c61d8578c4700efd64a427218c3f3dbb7062a1666e1cbe43"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/rendering-no-falsy-and.md",
+      "sha256": "7300fa45ac3a4968db144727a21052421bc62de9b5e9f6f59e28bd16d2fff001"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/rendering-text-in-text-component.md",
+      "sha256": "fc67897b6126b6b5574f4d284a6c5b2282528fe89de8ec08e6cfd2a86ab5b235"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/scroll-position-no-state.md",
+      "sha256": "70aa1ee679e755556d7b01b326431fe898d3c23ddba40d0da6bdac23c87a1525"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/state-ground-truth.md",
+      "sha256": "9f3efc73d2e66a5deb3199c9774f42524cd6a0f69784af38301946be5d747cb5"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-expo-image.md",
+      "sha256": "c3c13cce3dd2cc7f8a9b4861e5743af98f62e28f5699f72f492e79a335cfae55"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-image-gallery.md",
+      "sha256": "b34d1ba03710ed9622187716541ae618968e7d03bc28895c2ac918d3cc5853f1"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-measure-views.md",
+      "sha256": "170d058abc4900ea9e851e54f5e8b437ffffc2c9d3847ae35e30a515c8990c3d"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-menus.md",
+      "sha256": "5964adbecfe9aeb28d736a4eaacec6469a1c4ca3f48779d243eb38b6d181cfe9"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-native-modals.md",
+      "sha256": "d803493b3046ad31cbb2c189f1fffb948fd0055050e3c322589bd548421e23a8"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-pressable.md",
+      "sha256": "52cdbad127d713d7d32c59ef74ab1bbd6dca211edc9b25993453f7f4545e79fa"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-safe-area-scroll.md",
+      "sha256": "3dd776caef2344d73529010940b50042861d06d31a192122a4df64bc06aed0e8"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-scrollview-content-inset.md",
+      "sha256": "89e4bbe5e9a602660f4155e9d4c0dee09db1adf21c73f47213cd67ec896e5a13"
+    },
+    {
+      "name": "vercel-react-native-skills/rules/ui-styling.md",
+      "sha256": "cdef4d8b1a097b844e5992ab78e66a2dc604faf1e90f8d325a0eb116e8ef6a7e"
+    },
+    {
+      "name": "vercel-react-native-skills/SKILL.md",
+      "sha256": "85abfeb16441745f4f0311d599a74a4582754c1aebeb16e0b68a1f28eaa4cfa9"
+    }
+  ]
+}
