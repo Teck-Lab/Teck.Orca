@@ -1,4 +1,0 @@
-appName: local-argocd
-destNamespace: argocd
-annotations:
-  argocd.argoproj.io/sync-wave: "0"
