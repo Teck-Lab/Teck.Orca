@@ -1,4 +1,0 @@
-appName: local-git
-destNamespace: teck-local-sources
-annotations:
-  argocd.argoproj.io/sync-wave: "1"
