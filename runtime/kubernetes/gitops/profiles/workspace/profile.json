@@ -1,9 +1,0 @@
-{
-  "name": "workspace",
-  "enabled": true,
-  "cni": "kindnet",
-  "mesh": "none",
-  "domain": "teck.test",
-  "gitAgentPort": 19418,
-  "securityValidation": false
-}
