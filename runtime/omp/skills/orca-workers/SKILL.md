@@ -19,7 +19,19 @@ A reviewer follows the [review contract](../orca-feature-workflow/references/rev
 instead of editing. Load that reference only for review work. The live preamble
 and execution-host orchestration guide own exact lifecycle flags and heartbeats.
 
+A technical planning/research assignment follows the
+[research contract](../orca-feature-workflow/references/technical-planning.md).
+Return evidence and a proposed plan to the coordinator; preserve read-only scope.
+The native `technical-planner` helper uses the slow role for bounded internal
+consultations; it does not replace the sidebar-visible implementation owner.
+
 ## Coordinator: dispatch
+
+Delegate when separate ownership, useful parallelism or specialist work helps.
+A contained change can be implemented by the lead directly; do not create an
+executor only to satisfy a role split. Every implementation owner follows the
+[test-first and coverage contract](../orca-feature-workflow/references/testing.md)
+and supplies its test/coverage evidence with delivery.
 
 Resolve the executable through [orca-cli](../orca-cli/SKILL.md). Before the first
 Orca operation, load that executable's version-matched compact orchestration
@@ -34,6 +46,19 @@ selector (bundled omniroute/teck-executor). Use the feature branch as base, with
 shared prerequisites committed before fan-out. Names/display names identify the
 execution issue and short task title. OMP accepts --model, not worker-start
 --effort. Do not pass cross-host --on or select the feature recipe again.
+
+The installed 1.4.237 CLI supports `--surface terminal` on `agent launch` and
+agent-backed `worktree create`. For a direct OMP terminal launch in an existing
+checkout, use `orca agent launch --agent omp --surface terminal --model <role-model> --json`
+with the exact worktree selector when needed. This starts OMP through
+Orca's launcher and keeps its terminal session recovery. Do not launch OMP again
+after Orca has already started it.
+
+`orchestration worker-start` has no `--surface` option. Keep its supervised launch
+path and follow the execution host's guide and returned receipt; read output
+through `worker-read --source auto` rather than assuming every worker handle is
+a terminal. Do not add the direct-launch flag to worker-start or bypass Dispatch
+to force a terminal.
 
 Verify readiness, exact worktree id, execution host and feature parentage.
 Link its assigned GitHub issue with worktree set --issue: in a single-issue run,

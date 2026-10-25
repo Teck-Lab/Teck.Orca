@@ -17,8 +17,9 @@ determines investigation, test depth and review expertise, not issue count.
 Research, test runs, reviews and revision rounds are Orca tasks/checklist items
 under the same issue unless they are independently scoped deliverables.
 
-Flow: issue -> executor -> integration and combined checks -> final independent
-review -> canonical PR. The review reference defines the exact gate.
+Flow: issue -> implementation with tests -> relevant combined checks -> one final
+independent review -> canonical PR. The lead can implement contained work; use an
+executor when delegation helps. The review reference defines the exact gate.
 
 ## Use a parent with execution sub-issues when useful
 
@@ -40,8 +41,10 @@ issue graph, and use one canonical integration PR unless the user asks otherwise
 An existing assigned sub-issue remains executable as assigned; do not create a
 new parent or nested issue tree merely to apply this default.
 
-Flow: parent plan -> ready child executors -> child reviews -> integration and
-combined checks -> final independent review -> canonical PR.
+Flow: parent plan -> ready child executors -> integration and combined checks ->
+one final independent review -> canonical PR. An early targeted review is added
+only for a concrete high-risk boundary or required contract acceptance gate;
+sub-issue count alone does not create additional review gates.
 
 ## Blockers
 

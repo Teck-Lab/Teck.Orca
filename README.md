@@ -167,3 +167,11 @@ During validation on 2026-10-10, expanding the builder to 20g and creating `C:\t
 ## Provenance
 
 Derived from [mattjohnson/orca-sbx-recipes](https://github.com/mattjohnson/orca-sbx-recipes), upstream commit `40f210f3f0d390cd66de7923de2d773ea82d9c96`, retaining its MIT license. Runtime assets were copied from the local Teck.Paseo checkout on 2026-10-10 and adapted without modifying that repository. Files under `docs/upstream` describe the original POSIX implementation and are historical references, not current setup instructions.
+
+## Native SSH and local Kubernetes preview
+
+The separate [native SSH preview](native-ssh/README.md) preserves the Run on GUI
+workflow and lets Orca manage its guest daemon. It supports a shared project KIND
+cluster with isolated worktree deployments and local delivery controllers. See
+[the profile plan](docs/plan-local-kubernetes-delivery.md) and
+[isolated validation](docs/validation-local-kubernetes-2026-10-25.md).

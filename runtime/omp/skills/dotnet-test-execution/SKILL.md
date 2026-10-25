@@ -50,6 +50,12 @@ when the matching configuration and sources have already built/restored.
 - A missing collector is a tooling prerequisite. Do not migrate the runner,
   suppress tests, install global tools, or add packages to bypass it without
   task authorization. Reuse a repository-provided converter for binary coverage.
+- For implementation delivery, retain comparable base and candidate reports for
+  the [coverage non-regression gate](../orca-feature-workflow/references/testing.md).
+  Report line/branch results separately for affected modules and measured aggregates.
+  Preserve filters, runner, configuration and source scope; a missing report or
+  changed denominator is not proof of improvement. Do not lower thresholds or
+  add ignores/exclusions to turn a regression into a pass.
 
 ## Diagnose the failed layer
 

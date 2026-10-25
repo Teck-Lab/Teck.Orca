@@ -1,10 +1,11 @@
 {
   "source": "Installed Orca CLI: skills get --full --json",
+  "orcaVersion": "1.4.237",
   "files": [
     {
       "skill": "orca-cli",
       "path": "SKILL.md",
-      "sha256": "fb6eb80e55223e93ed4401fe3228ca0a840f06328f4029e694deaec70a8720cb"
+      "sha256": "59b17f69676de725ea4cf7a8af2032101ffc5f393fffd9100c6b260e6b893c31"
     },
     {
       "skill": "orca-cli",

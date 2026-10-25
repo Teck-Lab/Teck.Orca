@@ -1,0 +1,15 @@
+{
+  "realm": "teck",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "public-gateway",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "secret": "__TECK_LOCAL_GATEWAY_SECRET__"
+    }
+  ]
+}

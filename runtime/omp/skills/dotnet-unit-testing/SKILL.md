@@ -11,6 +11,11 @@ library. An xunit.v3 package can have a 4.x package version; do not infer the
 framework generation from the package major alone. Do not migrate frameworks or
 add a mocking/assertion package just to follow an example.
 
+For feature work, follow the shared [test-first and coverage contract](../orca-feature-workflow/references/testing.md):
+new behavior needs behavioral tests, bug fixes need a reproducing regression,
+and RED must fail for the intended behavior before the implementation turns it
+GREEN. Use existing tests for well-covered refactors and preserve coverage.
+
 ## Choose a useful test
 
 - Use unit tests for decisions, calculations, validation, and orchestration

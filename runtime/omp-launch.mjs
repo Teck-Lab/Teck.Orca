@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
+import { reviewLaunchArgs } from './omp-launch-policy.mjs';
+import { preserveProjectName } from './project-name.mjs';
 import { bootId, identity, recordPath, readRecord, writeRecord, recoveryMode,
   interactiveLaunch, explicitSession, reusableArgs, resumeArgs, claimPane } from './omp-session.mjs';
 
@@ -16,6 +18,10 @@ if (recoveryOnly && (!process.stdin.isTTY || process.env.ORCA_AGENT_LAUNCH_TOKEN
 
 // Scope recording to real interactive OMP panes, including direct CLI-created workers.
 const tracked = owner && process.stdin.isTTY && interactiveLaunch(args);
+if (tracked) {
+  try { await preserveProjectName(); }
+  catch { process.stderr.write('Teck: could not preserve the project display name; check Orca project metadata.\n'); }
+}
 if (tracked && !explicitSession(args) && recovery) {
   args = resumeArgs(saved, recovery);
   process.stderr.write(recovery === 'fresh' ? 'Teck: reopening this terminal\'s unused OMP session.\n' :
@@ -31,7 +37,7 @@ if (tracked) {
   // Explicit loading still works when ambient extension discovery is disabled.
   args.push('--extension', '/usr/local/lib/teck-orca/omp-session-extension.ts');
 }
-const child = spawn('/opt/paseo-omp/bin/omp', args, { stdio: 'inherit', env: {
+const child = spawn('/opt/paseo-omp/bin/omp', reviewLaunchArgs(args), { stdio: 'inherit', env: {
   ...process.env, ...(tracked ? { TECK_ORCA_OMP_RECORD: path, TECK_ORCA_OMP_TOKEN: token } : {}),
 } });
 // Ctrl-C from the terminal already reaches the child process group. Do not

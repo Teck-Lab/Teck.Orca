@@ -1,0 +1,11 @@
+{
+  "apiVersion": "kustomize.config.k8s.io/v1beta1",
+  "kind": "Kustomization",
+  "namespace": "teck-local-edge",
+  "resources": [
+    "0-issuer.json",
+    "1-certificate.json",
+    "2-issuer.json",
+    "3-certificate.json"
+  ]
+}

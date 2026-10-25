@@ -27,8 +27,14 @@ const workloadPath = join(repositoryRoot, 'runtime/kits/workload/workload.yaml')
 const workload = readFileSync(workloadPath, 'utf8')
   .replace(/"dotnet@[^"\n]+"/, `"dotnet@${toolkit.dotnet.version}"`)
   .replace(/"typescript@[^"\n]+"/, `"typescript@${toolkit.npm.typescript}"`)
+  .replace(/"kind@[^"\n]+"/, `"kind@${toolkit.native.kind.version}"`)
+  .replace(/"kubectl@[^"\n]+"/, `"kubectl@${toolkit.native.kubectl.version}"`)
+  .replace(/(test "\$\(kind version \| cut -d ' ' -f 2\)" = "v)[^"]+"/, `$1${toolkit.native.kind.version}"`)
+  .replace(/(clientVersion.gitVersion'\)" = "v)[^"]+"/, `$1${toolkit.native.kubectl.version}"`)
   .replace(/(test "\$\(dotnet --version\)" = ")[^"]+"/, `$1${toolkit.dotnet.version}"`);
 writeFileSync(workloadPath, workload);
+// The optional standalone image shares the same Kubernetes installer and pins.
+for (const name of ['devtools.json', 'kubernetes-tools.mjs']) writeFileSync(join(repositoryRoot, 'sandbox/image', name), readFileSync(join(repositoryRoot, 'runtime/kits/workload', name)));
 const catalogue = files(join(repositoryRoot, 'runtime/omp/skills')).map(({ name, path }) => ({ name, sha256: sha256(readFileSync(path)) })).sort((a, b) => a.name.localeCompare(b.name));
 writeFileSync(join(repositoryRoot, 'runtime/omp/skill-snapshots.json'), JSON.stringify({ source: 'Teck.Paseo import with Orca lifecycle skills', files: catalogue }, null, 2) + '\n');
 console.log('Refreshed canonical runtime assets and skill catalogue.');

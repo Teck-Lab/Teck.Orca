@@ -1,0 +1,69 @@
+{
+  "dotnet": {
+    "version": "10.0.401",
+    "sha512": {
+      "x64": "51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b",
+      "arm64": "58ace73ced6b4360754689a686bdfb8a317f4da6cb8bb416dbc7d0ba9f47e43e3c09f5eb1f1a1cfaacbd10df9558da4882bf2a5e195d6ab56a02c1f9f76102ed"
+    }
+  },
+  "npm": {
+    "typescript": "5.9.3",
+    "typescript-language-server": "4.4.1",
+    "next-devtools-mcp": "0.4.0",
+    "@biomejs/biome": "2.5.14",
+    "vscode-langservers-extracted": "4.10.0",
+    "@tailwindcss/language-server": "0.16.0",
+    "pyright": "1.1.414",
+    "bash-language-server": "5.8.0",
+    "yaml-language-server": "1.24.0",
+    "dockerfile-language-server-nodejs": "0.15.0"
+  },
+  "native": {
+    "kind": {
+      "version": "0.33.0",
+      "sha256": {
+        "x64": "aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d",
+        "arm64": "20022bee6cfcd5086cb7234d218e3454e6090022f2a8f55d1fa7fcf42c3867a2"
+      }
+    },
+    "kubectl": {
+      "version": "1.37.1",
+      "sha256": {
+        "x64": "65691ff77eb6fa44c908b77a1082c9f092c3b9733b5cefabec0d1104890e21a8",
+        "arm64": "ff749f4b78d9c4f1ec87307df9b50119ed819e2094aa9810cb9acffc3286c8c7"
+      }
+    },
+    "omnisharp": {
+      "version": "1.40.0",
+      "sha256": {
+        "x64": "a5c68aed11a4f51c1e815cfc6dbefe30d7f302297b826370e32403546b57da65",
+        "arm64": "e82abcb5fbf5b5b696ed6bfaa14d473668ea14866e549b082daf7f7cc396e061"
+      }
+    },
+    "marksman": {
+      "version": "2024-12-18",
+      "sha256": {
+        "x64": "b9cb666c643dfd9b699811fdfc445ed4c56be65c1d878c21d46847f0d7b0e475",
+        "arm64": "b8d6972a56f3f9b7bbbf7c77ef8998e3b66fa82fb03c01398e224144486c9e73"
+      }
+    },
+    "terraform": {
+      "version": "0.39.0",
+      "sha256": {
+        "x64": "7750edc736845fd8c04ff0fc6332423c12d8275b358668c8c17e8aedc43ef971",
+        "arm64": "62f32ea22cb78e5e5667ed638ad6e0fbde30ab59228d073c3c9bb249f89c7f5a"
+      }
+    },
+    "helm": {
+      "version": "0.5.4",
+      "sha256": {
+        "x64": "5d857ba25c461d3218bb98d9e98cb61bc948bfa92b124667d7e6ed695fe2da5f",
+        "arm64": "565d4a298d15e69a1bc7275a7fcf287d364668e53fdf09110d76aac5c820f78c"
+      }
+    }
+  },
+  "chrome": {
+    "version": "153.0.8010.36-1",
+    "sha256": "9bb44e33031c2f2857cf36b4343051a12f93058e4b781e3c76313df87f6c8d32"
+  }
+}

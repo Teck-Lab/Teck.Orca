@@ -5,6 +5,7 @@ import { command } from './lifecycle.mjs';
 import { repositoryRoot, sha256 } from './release.mjs';
 
 const executable = process.env.ORCA_CLI_COMMAND || (process.env.ORCA_DEV_REPO_ROOT ? 'orca-dev' : process.platform === 'linux' ? 'orca-ide' : 'orca');
+const orcaVersion = command(executable, ['--version']).trim();
 const snapshots = [];
 for (const name of ['orca-cli', 'orchestration']) {
   const guide = JSON.parse(command(executable, ['skills', 'get', name, '--full', '--json'], { timeout: 30_000 }));
@@ -28,4 +29,4 @@ for (const name of ['orca-cli', 'orchestration']) {
   }
   console.log(`Bundled ${name} and its references.`);
 }
-writeFileSync(join(repositoryRoot, 'runtime', 'omp', 'orca-guides.json'), JSON.stringify({ source: 'Installed Orca CLI: skills get --full --json', files: snapshots }, null, 2) + '\n');
+writeFileSync(join(repositoryRoot, 'runtime', 'omp', 'orca-guides.json'), JSON.stringify({ source: 'Installed Orca CLI: skills get --full --json', orcaVersion, files: snapshots }, null, 2) + '\n');

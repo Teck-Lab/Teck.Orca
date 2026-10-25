@@ -8,7 +8,7 @@ ARG OMP_VERSION
 RUN npm config set fetch-retries 5 \
     && npm config set fetch-retry-mintimeout 2000 \
     && npm config set fetch-retry-maxtimeout 120000 \
-    && npm install --global --prefix /out/opt/paseo-omp --no-audit --no-fund \
+    && ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm install --global --prefix /out/opt/paseo-omp --no-audit --no-fund \
       "bun@${BUN_VERSION}" \
       "@oh-my-pi/pi-coding-agent@${OMP_VERSION}"
 

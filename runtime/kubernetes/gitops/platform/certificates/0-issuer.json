@@ -1,0 +1,13 @@
+{
+  "apiVersion": "cert-manager.io/v1",
+  "kind": "Issuer",
+  "metadata": {
+    "name": "local-selfsigned",
+    "annotations": {
+      "argocd.argoproj.io/sync-wave": "0"
+    }
+  },
+  "spec": {
+    "selfSigned": {}
+  }
+}

@@ -3,7 +3,7 @@ set -eu
 
 test "$(dotnet --version)" = "10.0.300"
 test "$(bun --version)" = "1.4.0"
-test "$(omp --version)" = "omp/18.11.3"
+test "$(omp --version)" = "omp/18.12.5"
 test "$(typescript-language-server --version)" = "4.4.1"
 test "$(tsc --version)" = "Version 5.9.3"
 test "$(npm list --global --depth=0 --json | jq -r '.dependencies["next-devtools-mcp"].version')" = "0.4.0"

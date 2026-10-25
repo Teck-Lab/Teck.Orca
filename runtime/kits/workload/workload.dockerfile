@@ -8,7 +8,7 @@ RUN npm config set fetch-retries 5 \
     && npm config set fetch-retry-maxtimeout 120000 \
     && npm install --global --prefix /opt/paseo-bun --no-audit --no-fund \
       "bun@${BUN_VERSION}" \
-    && npm install --global --prefix /opt/paseo-omp --no-audit --no-fund --omit=optional \
+    && ONNXRUNTIME_NODE_INSTALL_CUDA=skip npm install --global --prefix /opt/paseo-omp --no-audit --no-fund --omit=optional \
       "@oh-my-pi/pi-coding-agent@${OMP_VERSION}" \
     && omp_modules=/opt/paseo-omp/lib/node_modules/@oh-my-pi/pi-coding-agent/node_modules \
     && rm -rf \
@@ -37,7 +37,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl unzip libicu72 libgssapi-krb5-2 \
     && rm -rf /var/lib/apt/lists/*
-COPY devtools.json install-devtools.mjs /usr/local/lib/teck-devtools/
+COPY devtools.json install-devtools.mjs kubernetes-tools.mjs /usr/local/lib/teck-devtools/
 RUN node /usr/local/lib/teck-devtools/install-devtools.mjs --pack
 
 # Retain the exact full source base: Go/Java/uv/pip, Docker/Compose/Buildx and shell utilities.
@@ -112,7 +112,7 @@ RUN apt-get update \
     && git lfs install --system
 
 # Full feature toolchain; pins and architecture-specific hashes live in devtools.json.
-COPY devtools.json install-devtools.mjs devtools-smoke.mjs /usr/local/lib/teck-devtools/
+COPY devtools.json install-devtools.mjs kubernetes-tools.mjs devtools-smoke.mjs /usr/local/lib/teck-devtools/
 COPY --from=devtools-build /tmp/teck-devtools-runtime.tar.gz /usr/share/teck-devtools/runtime.tar.gz
 RUN node /usr/local/lib/teck-devtools/install-devtools.mjs --chrome
 

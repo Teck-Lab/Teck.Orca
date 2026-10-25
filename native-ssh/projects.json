@@ -1,0 +1,10 @@
+[
+  {
+    "id": "github:teck-lab/teck.monorepo",
+    "name": "Teck.Monorepo",
+    "cloneUrl": "https://github.com/Teck-Lab/Teck.Monorepo.git",
+    "cpus": 8,
+    "memory": "16g",
+    "kubernetes": "workspace"
+  }
+]

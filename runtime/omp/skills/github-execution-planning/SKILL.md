@@ -17,6 +17,11 @@ PR. Research/review helpers also use existing issues.
 
 ## Before implementation
 
+When technical uncertainty could materially change the approach, use the
+[technical planning and research contract](../orca-feature-workflow/references/technical-planning.md)
+and the `technical-planner` agent. The lead adopts its evidence-backed proposal
+into the canonical plan; straightforward work needs no specialist pass.
+
 Create/reuse one GitHub issue for executable implementation/repair work; read-only
 diagnosis and brainstorming need no new issue. Read
 [issue structure and blockers](references/issue-structure.md) to select and briefly
@@ -25,7 +30,9 @@ before issue/status writes. Load its repository label catalog only when selectin
 labels for that repository, and verify chosen labels through live lookups.
 
 Record the cause/hypothesis, proposed approach, scope/non-goals, acceptance
-criteria, relevant validation, risk and owner. Scale detail to the work: a small
+criteria, behavioral test cases, baseline/coverage evidence, risk and owner.
+Use the [test-first contract](../orca-feature-workflow/references/testing.md).
+Scale detail to the work: a small
 fix needs a concise usable plan, not a feature template. Keep implementation,
 its regression tests and directly related documentation together unless they
 are separately scoped deliverables.

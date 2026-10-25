@@ -1,0 +1,4 @@
+# Applied only to bundled advisor-model sessions by the Teck OMP launcher.
+# Keep model, tools, user overlays and session persistence unchanged.
+advisor:
+  enabled: false

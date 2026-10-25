@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {test} from 'node:test';
+import {fileURLToPath} from 'node:url';
+import {deliveryResources} from '../runtime/kubernetes/promotion.mjs';
+import {worktreeIdentity} from '../runtime/kubernetes/resources.mjs';
+import {appRepository,platformRepository} from '../runtime/kubernetes/local-git.mjs';
+import {loadBundle} from '../runtime/kubernetes/bundle.mjs';
+const context={projectId:'project-a',worktreeId:'repo::/checkout/a'};
+test('promotion sources and destinations are local and separate from iteration',()=>{
+ const bundle=loadBundle(fileURLToPath(new URL('../runtime/kubernetes/gitops',import.meta.url)));
+ const resources=deliveryResources(context,bundle),id=worktreeIdentity(context.projectId,context.worktreeId);
+ const warehouse=resources.find(r=>r.kind==='Warehouse'),stage=resources.find(r=>r.kind==='Stage');
+ assert.equal(warehouse.spec.subscriptions[0].git.repoURL,appRepository);
+ assert.equal(warehouse.spec.subscriptions[0].git.branch,'worktrees/'+id.hash);
+ const update=stage.spec.promotionTemplate.spec.steps.find(s=>s.uses==='argocd-update');
+ assert.equal(update.config.apps[0].name,id.application+'-promotion');
+ assert.equal(update.config.apps[0].sources[0].repoURL,platformRepository);
+ assert.equal(JSON.stringify(resources).includes('__WORKTREE__'),false);
+ assert.equal(JSON.stringify(resources).includes('github.com'),false);
+});
