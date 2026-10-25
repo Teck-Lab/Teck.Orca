@@ -1,4 +1,4 @@
-# Native SSH preview 0.1.4 Kubernetes pilot - 2026-10-25
+# Native SSH preview 0.1.5 Kubernetes pilot - 2026-10-25
 
 The native provider suite passes 21 tests, including shared project reuse,
 non-blocking Kubernetes startup failures, and new VM disk sizing. The managed

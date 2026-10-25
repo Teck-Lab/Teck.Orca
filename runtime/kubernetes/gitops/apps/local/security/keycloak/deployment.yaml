@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: render-realm
+          image: quay.io/argoproj/argocd:v3.5.6
+          command:
+            - sh
+            - -ec
+          args:
+            - helm template local-realm /template --set-file clientSecret=/client-secret/client-secret --set-string hostname="$LOCAL_HOSTNAME" > /import/realm.rendered && sed -e "/^#/d" -e "/^---$/d" /import/realm.rendered > /import/teck-cloud-local-realm.json
+          env:
+            - name: LOCAL_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['teck.orca.io/hostname']
+          volumeMounts:
+            - name: template
+              mountPath: /template
+              readOnly: true
+            - name: import
+              mountPath: /import
+            - name: client-secret
+              mountPath: /client-secret
+              readOnly: true
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:26.8.1@sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b
+          args:
+            - start-dev
+            - --import-realm
+            - --health-enabled=true
+          env:
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: management
+              containerPort: 9000
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 90
+            periodSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 9000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /opt/keycloak/data
+            - name: import
+              mountPath: /opt/keycloak/data/import
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: keycloak-data
+        - name: template
+          configMap:
+            name: keycloak-realm-source
+            items:
+              - key: Chart.yaml
+                path: Chart.yaml
+              - key: realm-template.yaml
+                path: templates/realm.json
+              - key: realm.yaml
+                path: realm.yaml
+              - key: gateway-client.yaml
+                path: gateway-client.yaml
+        - name: import
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Mi
+        - name: client-secret
+          secret:
+            secretName: gateway-public-auth

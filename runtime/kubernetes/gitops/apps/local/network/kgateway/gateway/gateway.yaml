@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  gatewayClassName: teck-local
+  listeners:
+    - name: https
+      hostname: "*.teck.test"
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: local-ingress-tls
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              teck.orca.io/local-worktree: "true"

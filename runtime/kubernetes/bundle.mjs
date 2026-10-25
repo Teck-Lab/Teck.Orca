@@ -1,10 +1,13 @@
 import {createHash} from 'node:crypto';
 import {lstatSync,readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
+import {parseYaml} from './layout.mjs';
 
 export const checksum=value=>createHash('sha256').update(value).digest('hex');
 export function bootstrapRevision(bundle){
-  const files=Object.fromEntries(Object.entries(bundle.files).filter(([name])=>name==='components.lock.json'||name.startsWith('profiles/workspace/')||(name.startsWith('platform/')&&!name.startsWith('platform/dependencies/'))));
+  // Ordinary GitOps resource/template changes reconcile in Argo. Only the
+  // pinned runtime/topology/controller configuration requires explicit migration.
+  const files=Object.fromEntries(Object.entries(bundle.files).filter(([name])=>name==='bootstrap/local/components.lock.json'||name.startsWith('bootstrap/local/workspace/')||(name.startsWith('apps/local/')&&name.endsWith('/values.yaml'))));
   return checksum(JSON.stringify(files));
 }
 const validPath=name=>typeof name==='string'&&/^[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*$/.test(name)&&!name.split('/').some(n=>['.','..'].includes(n))&&/\.(?:json|yaml|md|pl)$/.test(name)&&name!=='snapshot.json';
@@ -39,5 +42,6 @@ export function loadBundle(root){
   const contents=Object.fromEntries(names.map(name=>{if(!validPath(name))throw Error('Invalid bundle path');return [name,readFileSync(join(root,name))];}));
   const actual=bundleSnapshot({files:contents,revision:manifest.revision,dirty:manifest.dirty});
   if(actual.repository!==manifest.repository||actual.contentSha256!==manifest.contentSha256||Object.entries(actual.files).some(([name,hash])=>manifest.files[name]!==hash))throw Error('Bundle checksum mismatch');
-  return {...actual,root,read:name=>{if(!Object.hasOwn(contents,name))throw Error('File not in verified bundle');return contents[name].toString('utf8');},json:name=>JSON.parse(contents[name]?.toString('utf8')??'null')};
+  const read=name=>{if(!Object.hasOwn(contents,name))throw Error('File not in verified bundle');return contents[name].toString('utf8');};
+  return {...actual,root,read,json:name=>JSON.parse(read(name)),yaml:name=>parseYaml(read(name))};
 }

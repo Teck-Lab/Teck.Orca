@@ -2,10 +2,11 @@ import {existsSync} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
+import {paths} from './layout.mjs';
 import {loadBundle,bootstrapRevision} from './bundle.mjs';
 import {ensureProjectCluster,projectClusterName} from './cluster.mjs';
 import {command} from './command.mjs';
-import {bootstrapWorkspace} from './platform.mjs';
+import {bootstrapWorkspace,takeoverPlatform} from './platform.mjs';
 import {readJson,processIdentity} from './state.mjs';
 import {launchBootstrap,startProject} from './startup.mjs';
 import {seedPlatformSource} from './local-git.mjs';
@@ -16,13 +17,13 @@ import {currentWorktree} from './render.mjs';
 
 const entry=fileURLToPath(import.meta.url),assetRoot=dirname(entry);
 export async function ensureConfiguredProject(config,{run=command}={}){
-  const bundle=loadBundle(join(assetRoot,'gitops')),profile=bundle.json('profiles/workspace/profile.json');
+  const bundle=loadBundle(join(assetRoot,'gitops')),profile=bundle.json(paths.profile);
   if(config.profile!=='workspace'||!profile.enabled)throw Error('Only the validated workspace profile can be provisioned in Docker Sandboxes');
   const deadline=Date.now()+60_000;
   for(;;){try{await run('docker',['info','--format','{{.ServerVersion}}']);break;}catch(error){if(Date.now()>=deadline)throw error;await delay(2000);}}
   return ensureProjectCluster({projectId:config.projectId,profile:'workspace',root:config.root,
-    config:bundle.json('profiles/workspace/kind.json'),nodeImage:bundle.json('components.lock.json').kubernetes.nodeImage,revision:bootstrapRevision(bundle),runtimeRevision:config.assetDigest,run,
-    bootstrap:async options=>{await bootstrapWorkspace({...options,bundle});await seedPlatformSource({...options,bundle});}});
+    config:bundle.yaml(paths.kind),nodeImage:bundle.json(paths.lock).kubernetes.nodeImage,revision:bootstrapRevision(bundle),runtimeRevision:config.assetDigest,run,
+    bootstrap:async options=>{await bootstrapWorkspace({...options,bundle});await seedPlatformSource({...options,bundle});await takeoverPlatform({...options,bundle});}});
 }
 export async function main(args=process.argv.slice(2)){
   if(process.platform!=='linux'||process.getuid?.()!==0)throw Error('Use the installed teck-kube command inside the project sandbox');
@@ -45,7 +46,7 @@ export async function main(args=process.argv.slice(2)){
   if(action==='status'){
     const state=existsSync(path)?readJson(path):null,bundle=loadBundle(join(assetRoot,'gitops'));
     return {name,profile:'workspace',phase:state?.phase??'not-started',mesh:'none',securityValidation:false,
-      configuredVersions:bundle.json('components.lock.json').charts.map(({name,version})=>({name,version})),
+      configuredVersions:bundle.json(paths.lock).charts.map(({name,version})=>({name,version})),
       components:existsSync(join(folder,'components.json'))?readJson(join(folder,'components.json')):{},
       nodes:state?.nodes??[],log:join(config.root,'bootstrap.log')};
   }

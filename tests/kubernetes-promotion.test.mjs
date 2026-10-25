@@ -12,9 +12,11 @@ test('promotion sources and destinations are local and separate from iteration',
  const warehouse=resources.find(r=>r.kind==='Warehouse'),stage=resources.find(r=>r.kind==='Stage');
  assert.equal(warehouse.spec.subscriptions[0].git.repoURL,appRepository);
  assert.equal(warehouse.spec.subscriptions[0].git.branch,'worktrees/'+id.hash);
- const update=stage.spec.promotionTemplate.spec.steps.find(s=>s.uses==='argocd-update');
- assert.equal(update.config.apps[0].name,id.application+'-promotion');
- assert.equal(update.config.apps[0].sources[0].repoURL,platformRepository);
+ const update=stage.spec.promotionTemplate.spec.steps[0];
+ assert.equal(update.task.kind,'ClusterPromotionTask');
+ assert.equal(update.task.name,'local-worktree-release');
+ assert.equal(update.vars.find(v=>v.name==='application').value,id.application+'-promotion');
+ assert.equal(update.vars.find(v=>v.name==='gitopsRepo').value,platformRepository);
  assert.equal(JSON.stringify(resources).includes('__WORKTREE__'),false);
  assert.equal(JSON.stringify(resources).includes('github.com'),false);
 });

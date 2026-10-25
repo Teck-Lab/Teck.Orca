@@ -1,0 +1,4 @@
+appName: local-certificates
+destNamespace: teck-local-edge
+annotations:
+  argocd.argoproj.io/sync-wave: "1"

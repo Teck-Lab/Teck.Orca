@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.4.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.5.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 
@@ -8,7 +8,7 @@ Project names are retained across recipe resume and repaired automatically in
 managed terminal/OMP startup if Orca falls back to the checkout label `project`.
 The hook uses Orca's public metadata API, preserves intentional custom names,
 and never moves folders or changes worktree IDs. Refresh this preview plugin
-after updating to 0.1.4; no manual project rename is part of the workflow.
+after updating to 0.1.5; no manual project rename is part of the workflow.
 An older preview sandbox receives the missing naming hook on its next normal
 recipe reuse/resume; its OMP profile and sessions are retained.
 
@@ -101,7 +101,7 @@ than resizing or deleting data. An installed configuration change may reconcile
 helper/dependency code, but controller/topology pin changes require an explicit
 migration. No automatic upgrade or cluster replacement runs on reconnect.
 
-GitOps owns local/ profiles and component pins. Refresh the packaged snapshot
+GitOps uses apps/local/ categories, cluster-resources/local/, bootstrap/local/ pins and projects/local/ ApplicationSets. Refresh the packaged snapshot
 explicitly with npm run bundle:kubernetes -- --gitops ../Teck.GitOps, then build,
 check and install the preview. Runtime startup does not fetch remote GitOps HEAD.
 See ../docs/validation-local-kubernetes-2026-10-25.md for isolated live results.
@@ -146,3 +146,11 @@ Workflow reference: [mattjohnson/orca-sbx-recipes](https://github.com/mattjohnso
 That pack documents the project-shared Run on recipe pattern; its current shell
 implementation is macOS/Linux-only and uses its own sshd. This preview uses
 Node on Windows and Docker-managed `.sbx` SSH with our existing workload.
+
+The GitOps layout now follows apps/local categories, cluster-resources/local,
+bootstrap/local and projects/local. Existing category templates are reused and
+remote generators exclude local. Argo CD owns platform reconciliation after
+bootstrap. Keycloak derives its local import from the existing canonical realm
+and client YAML; Kargo uses the ordinary ClusterPromotionTask pattern. A cluster
+created by the earlier draft layout is retained and requires an explicit migration;
+the plugin never deletes its data or silently adopts changed ownership.

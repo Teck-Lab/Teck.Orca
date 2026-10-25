@@ -59,8 +59,9 @@ Applications describe environments, not cluster inventories. Multiple production
 clusters reference the same versioned prod overlay. Cluster overrides belong in
 GitOps; do not fork application manifests into workspace/full copies.
 
-Add a dedicated GitOps local/ entry point with shared definitions and thin
-workspace/full profiles. It owns kind.yaml, networking and component pins.
+Use apps/local/{network,platform,security,system} for local app overlays,
+cluster-resources/local for prerequisites, bootstrap/local for KIND/profile pins,
+and projects/local to adapt the existing category ApplicationSets.
 Do not bootstrap remote root ApplicationSets. Package a pinned configuration
 snapshot in the immutable Orca runtime and seed a local Git service from it.
 Snapshot upgrades are explicit, not fetches of HEAD at every startup.

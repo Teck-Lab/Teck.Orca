@@ -1,0 +1,4 @@
+appName: local-gateway-api
+destNamespace: kgateway-system
+annotations:
+  argocd.argoproj.io/sync-wave: "-2"

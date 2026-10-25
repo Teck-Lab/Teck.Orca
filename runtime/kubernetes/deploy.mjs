@@ -1,3 +1,4 @@
+import {paths} from './layout.mjs';
 import {randomBytes} from 'node:crypto';
 import {existsSync,lstatSync,mkdirSync,readFileSync,rmSync,writeFileSync} from 'node:fs';
 import {dirname,join,resolve,relative} from 'node:path';
@@ -72,10 +73,10 @@ async function buildImages({context,config,source,run}){
 }
 async function render({context,bundle,config,images,folder,k}){
   const id=worktreeIdentity(context.projectId,context.worktreeId),overlay=directory(join(folder,'render'));
-  const dependencies=config.dependencies??[];
-  if(!Array.isArray(dependencies)||dependencies.some(name=>!/^[a-z0-9-]+$/.test(name)||!Object.hasOwn(bundle.files,`platform/dependencies/${name}/kustomization.yaml`)))throw Error('Unknown local dependency');
+  const dependencies=config.dependencies??[],available=bundle.json(paths.profile).dependencies??{};
+  if(!Array.isArray(dependencies)||dependencies.some(name=>!/^[a-z0-9-]+$/.test(name)||!available[name]||!Object.hasOwn(bundle.files,`${available[name]}/kustomization.yaml`)))throw Error('Unknown local dependency');
   const spec={apiVersion:'kustomize.config.k8s.io/v1beta1',kind:'Kustomization',namespace:id.namespace,
-    resources:[insideCheckout(context.root,'deployment/local'),...dependencies.map(name=>join(bundle.root,'platform/dependencies',name))].map(path=>relative(overlay,path)),
+    resources:[insideCheckout(context.root,'deployment/local'),...dependencies.map(name=>join(bundle.root,available[name]))].map(path=>relative(overlay,path)),
     images:images.map(({canonical,image})=>({name:canonical,newName:image.split('@')[0],digest:image.split('@')[1]}))};
   writeJson(join(overlay,'kustomization.yaml'),spec);
   const yaml=await k(['kustomize','--load-restrictor=LoadRestrictionsNone',overlay]);
@@ -83,6 +84,7 @@ async function render({context,bundle,config,images,folder,k}){
   const resources=parseResources(json).map(resource=>{
     delete resource.status;for(const key of ['creationTimestamp','resourceVersion','generation','uid','managedFields'])delete resource.metadata[key];
     resource.metadata.labels={...resource.metadata.labels,...ownerLabels(context)};
+    if(resource.spec?.template?.metadata)resource.spec.template.metadata.annotations={...resource.spec.template.metadata.annotations,'teck.orca.io/hostname':id.hostname};
     if(resource.kind==='HTTPRoute'){resource.spec.hostnames=[id.hostname];resource.spec.parentRefs=[{name:'edge',namespace:'teck-local-edge'}];}
     return resource;
   });
@@ -108,6 +110,7 @@ export async function publishRelease({context,folder,source,manifests,run,checks
   await localGit(run,repo,['config','remote.origin.url','http://127.0.0.1:19418/apps.git']);
   const promotion=structuredClone(manifests).map(r=>{
     r.metadata.namespace=id.namespace+'-promotion';
+    if(r.spec?.template?.metadata)r.spec.template.metadata.annotations={...r.spec.template.metadata.annotations,'teck.orca.io/hostname':'promote-'+id.hash+'.teck.test'};
     const routing=r.spec?.strategy?.canary?.trafficRouting?.plugins?.['argoproj-labs/gatewayAPI'];if(routing?.namespace)routing.namespace=id.namespace+'-promotion';
     if(r.kind==='HTTPRoute')r.spec.hostnames=['promote-'+id.hash+'.teck.test'];return r;
   });

@@ -3,6 +3,8 @@ import {chmodSync,existsSync,readFileSync,renameSync,writeFileSync} from 'node:f
 import {join} from 'node:path';
 import {checksum} from './bundle.mjs';
 import {directory,readJson,writeJson} from './state.mjs';
+import {paths,chartDeclaration} from './layout.mjs';
+import {setTimeout as delay} from 'node:timers/promises';
 
 const dns=value=>typeof value==='string'&&/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(value);
 const pinned=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
@@ -104,17 +106,19 @@ async function configureDNS(k){
   if(original!==clean+block)await k('-n','kube-system','patch','configmap','coredns','--type=merge','-p',JSON.stringify({data:{Corefile:clean+block}}));
 }
 export async function bootstrapWorkspace({bundle,name,folder,nodes,kubeconfig,run}){
-  const lock=bundle.json('components.lock.json');
+  const lock=bundle.json(paths.lock),managed=existsSync(join(folder,'gitops-managed.json'));
   if(lock?.schemaVersion!==1||!Array.isArray(lock.charts))throw Error('A verified platform component lock is required');
   const cache=directory(join(folder,'cache')),helm=await helmTool(lock,cache,run);
   const k=(...args)=>run('kubectl',['--kubeconfig',kubeconfig,...args]);
   const apply=path=>k('apply','-k',join(bundle.root,path));
   await installNodeProxyCA({nodes,run});
   const gatewayAPI=await artifact(lock.gatewayAPI,join(cache,'gateway-api.yaml'),run);
-  await k('apply','--server-side','--field-manager=teck-local-platform','-f',gatewayAPI);
+  if(!managed)await k('apply','--server-side','--field-manager=teck-local-platform','-f',gatewayAPI);
   const recordsPath=join(folder,'components.json'),records=existsSync(recordsPath)?readJson(recordsPath):{};
   for(const pin of lock.charts){
+    chartDeclaration(bundle,pin);
     if(!dns(pin.name)||!dns(pin.namespace)||!pinned(pin.sha256)||!/^[a-z0-9.-]+\.tgz$/.test(pin.archive)||!/^v?\d+\.\d+\.\d+$/.test(pin.version)||!Object.hasOwn(bundle.files,pin.values))throw Error('Invalid platform chart pin');
+    if(managed)continue; // After takeover, Argo CD is the sole reconciler.
     const existing=JSON.parse(await run(helm,['list','--kubeconfig',kubeconfig,'-n',pin.namespace,'--all','--filter','^'+pin.name+'$','-o','json']));
     const expectedChart=pin.archive.slice(0,-4);
     if(existing.length&&(!records[pin.name]||existing.length!==1||existing[0].chart!==expectedChart||records[pin.name].sha256!==pin.sha256))throw Error('Unowned or changed platform release: '+pin.name);
@@ -131,14 +135,12 @@ export async function bootstrapWorkspace({bundle,name,folder,nodes,kubeconfig,ru
     await run(helm,['upgrade','--install',pin.name,archive,'--kubeconfig',kubeconfig,'--namespace',pin.namespace,'--create-namespace','--values',join(bundle.root,pin.values),'--wait','--timeout','300s','--history-max','3']);
     records[pin.name]={sha256:pin.sha256,phase:'ready'};writeJson(recordsPath,records);
   }
-  await apply('platform/namespaces');
-  await apply('platform/certificates');
+  if(!managed){await apply(paths.namespaces);await apply(paths.certificates);}
   await k('-n','teck-local-edge','wait','certificate','local-ca','local-ingress','--for=condition=Ready','--timeout=180s');
   await trustIngressCA({k,run,name});
-  await apply('platform/gateway');
+  if(!managed)await apply(paths.gateway);
   await k('-n','teck-local-edge','wait','gateway','edge','--for=condition=Programmed','--timeout=180s');
-  await apply('platform/rollouts-rbac');
-  await apply('platform/sources');
+  if(!managed){await apply(paths.rbac);await apply(paths.sources);}
   await k('-n','teck-local-sources','rollout','status','deployment/git','--timeout=180s');
   await ensureRegistry({name,folder,nodes,lock,run,kubeconfig});
   await configureDNS(k);
@@ -149,4 +151,20 @@ export async function bootstrapWorkspace({bundle,name,folder,nodes,kubeconfig,ru
     for(const row of rows)await k('-n',namespace,'rollout','status',row.kind.toLowerCase()+'/'+row.metadata.name,'--timeout=180s');
   }
   return {profile:'workspace',gateway:'https://*.teck.test',git:'http://127.0.0.1:19418',registry:'localhost:5001',mesh:'none'};
+}
+
+export async function takeoverPlatform({bundle,folder,kubeconfig,run}){
+  const k=(...args)=>run('kubectl',['--kubeconfig',kubeconfig,...args]);
+  await k('apply','-f',join(bundle.root,paths.root));
+  const expected=Object.keys(bundle.files).filter(p=>p.startsWith('apps/local/')&&p.endsWith('/config.yaml'))
+    .map(p=>bundle.yaml(p)).filter(c=>!c.worktreeScoped).map(c=>c.appName);
+  const deadline=Date.now()+360_000;
+  for(;;){
+    const apps=JSON.parse(await k('-n','argocd','get','applications','-o','json')).items;
+    const ready=expected.every(name=>{const app=apps.find(a=>a.metadata.name===name);return app?.status?.sync?.status==='Synced'&&app.status?.health?.status==='Healthy';});
+    if(ready)break;
+    if(Date.now()>=deadline){const pending=expected.map(name=>{const a=apps.find(a=>a.metadata.name===name);return {name,sync:a?.status?.sync?.status,health:a?.status?.health?.status,conditions:a?.status?.conditions};});throw Error('Local category Applications did not become healthy: '+JSON.stringify(pending));}
+    await delay(2000);
+  }
+  writeJson(join(folder,'gitops-managed.json'),{version:1,root:'local-root',applications:expected});
 }

@@ -1,0 +1,184 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../network.yaml
+  - ../platform.yaml
+  - ../security.yaml
+  - ../system.yaml
+patches:
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: network
+    patch: |
+      - op: replace
+        path: /spec/generators/0/git/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/generators/0/git/revision
+        value: main
+      - op: replace
+        path: /spec/generators/0/git/files
+        value:
+          - path: apps/local/network/**/config.yaml
+          - path: apps/local/network/**/charts/**/config.yaml
+            exclude: true
+      - op: replace
+        path: /spec/template/spec/destination
+        value:
+          server: https://kubernetes.default.svc
+          namespace: "{{ default .values.name .destNamespace }}"
+      - op: replace
+        path: /spec/template/spec/source/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: AppProject
+      name: network
+    patch: |
+      - op: replace
+        path: /spec/sourceRepos
+        value:
+          - http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/destinations
+        value:
+          - namespace: "*"
+            server: https://kubernetes.default.svc
+      - op: remove
+        path: /spec/destinationServiceAccounts
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: platform
+    patch: |
+      - op: replace
+        path: /spec/generators/0/git/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/generators/0/git/revision
+        value: main
+      - op: replace
+        path: /spec/generators/0/git/files
+        value:
+          - path: apps/local/platform/**/config.yaml
+          - path: apps/local/platform/**/charts/**/config.yaml
+            exclude: true
+      - op: replace
+        path: /spec/template/spec/destination
+        value:
+          server: https://kubernetes.default.svc
+          namespace: "{{ default .values.name .destNamespace }}"
+      - op: replace
+        path: /spec/template/spec/source/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: AppProject
+      name: platform
+    patch: |
+      - op: replace
+        path: /spec/sourceRepos
+        value:
+          - http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/destinations
+        value:
+          - namespace: "*"
+            server: https://kubernetes.default.svc
+      - op: remove
+        path: /spec/destinationServiceAccounts
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: security
+    patch: |
+      - op: replace
+        path: /spec/generators/0/git/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/generators/0/git/revision
+        value: main
+      - op: replace
+        path: /spec/generators/0/git/files
+        value:
+          - path: apps/local/security/**/config.yaml
+          - path: apps/local/security/keycloak/**/config.yaml
+            exclude: true
+          - path: apps/local/security/keycloak/config.yaml
+            exclude: true
+          - path: apps/local/security/**/charts/**/config.yaml
+            exclude: true
+      - op: replace
+        path: /spec/template/spec/destination
+        value:
+          server: https://kubernetes.default.svc
+          namespace: "{{ default .values.name .destNamespace }}"
+      - op: replace
+        path: /spec/template/spec/source/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: AppProject
+      name: security
+    patch: |
+      - op: replace
+        path: /spec/sourceRepos
+        value:
+          - http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/destinations
+        value:
+          - namespace: "*"
+            server: https://kubernetes.default.svc
+      - op: remove
+        path: /spec/destinationServiceAccounts
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: system
+    patch: |
+      - op: replace
+        path: /spec/generators/0/git/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/generators/0/git/revision
+        value: main
+      - op: replace
+        path: /spec/generators/0/git/files
+        value:
+          - path: apps/local/system/**/config.yaml
+          - path: apps/local/system/**/charts/**/config.yaml
+            exclude: true
+      - op: replace
+        path: /spec/template/spec/destination
+        value:
+          server: https://kubernetes.default.svc
+          namespace: "{{ default .values.name .destNamespace }}"
+      - op: replace
+        path: /spec/template/spec/source/repoURL
+        value: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: AppProject
+      name: system
+    patch: |
+      - op: replace
+        path: /spec/sourceRepos
+        value:
+          - http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+      - op: replace
+        path: /spec/destinations
+        value:
+          - namespace: "*"
+            server: https://kubernetes.default.svc
+      - op: remove
+        path: /spec/destinationServiceAccounts

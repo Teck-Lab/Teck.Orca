@@ -1,5 +1,8 @@
 # Local Kubernetes workspace validation - 2026-10-25
 
+Layout correction: the initial GitOps paths in this historical report are superseded
+by [the canonical layout validation](validation-gitops-layout-2026-10-25.md).
+
 The workspace profile is implemented and tested in isolated Docker Sandboxes:
 one persistent kind cluster per project, separate worktree namespaces, kindnet
 and no Istio/Cilium. The full WSL2/Linux profile is explicitly disabled; it is a
@@ -157,17 +160,3 @@ host uncommitted application files are not copied by the production plugin.
 Sanitized traffic/source/image/concurrency/restart receipts and exact test VM
 ownership live under ignored .artifacts/kubernetes-lab/. No kubeconfig, private CA
 key, real token or initialized OMP profile is copied into the repository.
-
-## Scoped PR snapshot validation
-
-The review PR excludes earlier unrelated original-daemon/plugin maintenance. Its
-clean main-based snapshot passed build/test/check with 116 root tests and 21 native
-tests. Its native runtime files are byte-identical to the live restart-tested
-installed native snapshot described above. The original working-tree validation
-above also covered one additional earlier project-lifecycle regression test.
-
-At publication, Teck.Monorepo main had advanced from the tested checkout
-0eea6303d7ad4211eb3b719251a2af7cef622232 to fc31724ea7762b4a8215cb55f72b5853745fcdb5,
-retiring Gateway.Public in favor of web gateways. The application PR is a draft
-for review and requires adapting that pilot/build path and smoke fixture before
-merge. No validation against the newer gateway layout is claimed.

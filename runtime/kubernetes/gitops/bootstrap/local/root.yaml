@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: http://git.teck-local-sources.svc.cluster.local:9418/gitops.git
+    targetRevision: main
+    path: projects/local
+    kustomize: {}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true

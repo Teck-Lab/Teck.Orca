@@ -25,7 +25,7 @@ one persistent kind cluster shared by this project's worktrees. Use teck-kube
 status, deploy, promote, cleanup and kubectl; the helper always supplies its own
 kubeconfig. Deploy/promote run from the real Orca worktree terminal. Separate
 worktrees get separate namespaces, images and HTTPS hostnames. Application
-manifests belong in deployment/; GitOps local/ owns the platform. Never delete
+manifests belong in deployment/; GitOps apps/local/ and bootstrap/local/ own the platform. Never delete
 the shared cluster when finishing one task. Run teck-kube cleanup before removing
 that workspace, or use cleanup --worktree with its exact saved Orca identity.
 

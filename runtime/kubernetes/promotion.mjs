@@ -1,3 +1,4 @@
+import {paths} from './layout.mjs';
 import {existsSync,writeFileSync} from 'node:fs';
 import {join,dirname} from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -9,14 +10,14 @@ import {application,assertOwner,ensureEnvironment,ensureHostname,kubernetes,loca
 export function deliveryResources(context,bundle){
   const id=targetIdentity(context),promotion=targetIdentity(context,'promotion'),labels=ownerLabels(context);
   const namespace='teck-delivery-'+labels['teck.orca.io/project'],name='wt-'+id.hash,warehouse='release-'+id.hash;
-  const raw=JSON.stringify(bundle.json('delivery/promotion-template.json'));
-  const replacements={__APP_REPO__:appRepository,__GITOPS_REPO__:platformRepository,__WORKTREE__:id.hash,__APPLICATION__:promotion.application};
-  const template=JSON.parse(raw.replace(/__(?:APP_REPO|GITOPS_REPO|WORKTREE|APPLICATION)__/g,key=>replacements[key]));
+  const task=bundle.yaml(paths.promotion),template=task.spec;
   const allowed=['git-clone','yaml-update','git-commit','git-push','argocd-update'];
   if(!Array.isArray(template.steps)||template.steps.some(s=>!allowed.includes(s.uses))||JSON.stringify(template).includes('github.com'))throw Error('Promotion template must remain local-only');
+  if(task.kind!=='ClusterPromotionTask'||task.metadata.name!=='local-worktree-release')throw Error('Unexpected local promotion task');
+  const call={steps:[{task:{kind:task.kind,name:task.metadata.name},vars:[{name:'appRepo',value:appRepository},{name:'gitopsRepo',value:platformRepository},{name:'worktree',value:id.hash},{name:'application',value:promotion.application}]}]};
   return [
     {apiVersion:'kargo.akuity.io/v1alpha1',kind:'Warehouse',metadata:{name:warehouse,namespace,labels},spec:{interval:'30s',freightCreationPolicy:'Automatic',subscriptions:[{git:{repoURL:appRepository,branch:'worktrees/'+id.hash,discoveryLimit:10}}]}},
-    {apiVersion:'kargo.akuity.io/v1alpha1',kind:'Stage',metadata:{name,namespace,labels},spec:{requestedFreight:[{origin:{kind:'Warehouse',name:warehouse},sources:{direct:true}}],promotionTemplate:{spec:template}}},
+    {apiVersion:'kargo.akuity.io/v1alpha1',kind:'Stage',metadata:{name,namespace,labels},spec:{requestedFreight:[{origin:{kind:'Warehouse',name:warehouse},sources:{direct:true}}],promotionTemplate:{spec:call}}},
   ];
 }
 async function ensureObject({k,context,state,field,resource,path}){
@@ -71,16 +72,16 @@ export async function promoteWorktree({context,cluster,bundle,run}){
       }
       stage.spec.verification={analysisTemplates:names,args:[{name:'namespace',value:target.namespace}]};
     }
-    const gitops=await syncLocalGitOps(projectFolder,run),appPath=join(gitops,'applications',id.hash);
+    const gitops=await syncLocalGitOps(projectFolder,run),appPath=join(gitops,'apps/local/teck-cloud/teck-cloud-core/worktrees',id.hash,'promotion');
     if(!existsSync(join(appPath,'kustomization.yaml'))){
       directory(join(appPath,'empty'));writeJson(join(appPath,'empty/kustomization.yaml'),{apiVersion:'kustomize.config.k8s.io/v1beta1',kind:'Kustomization',resources:[]});
       // Kargo's YAML updater preserves flow style; URLs containing '?' must use a block sequence.
       writeFileSync(join(appPath,'kustomization.yaml'),'apiVersion: kustomize.config.k8s.io/v1beta1\nkind: Kustomization\nresources:\n  - empty\n');
-      await localGit(run,gitops,['add','applications/'+id.hash]);await localGit(run,gitops,['commit','-m','chore(local): prepare promotion '+id.hash]);
+      await localGit(run,gitops,['add','apps/local/teck-cloud/teck-cloud-core/worktrees/'+id.hash+'/promotion']);await localGit(run,gitops,['commit','-m','chore(local): prepare promotion '+id.hash]);
       await localGit(run,gitops,['push','origin','HEAD:refs/heads/main']);
     }
     const app=application(context,'main',promoted,{mode:'promotion'});
-    app.spec.source={repoURL:platformRepository,targetRevision:'main',path:'applications/'+id.hash};
+    app.spec.source={repoURL:platformRepository,targetRevision:'main',path:'apps/local/teck-cloud/teck-cloud-core/worktrees/'+id.hash+'/promotion'};
     app.metadata.annotations={'kargo.akuity.io/authorized-stage':namespace+':'+stage.metadata.name};
     state=await ensureObject({k,context,state,field:'applicationUid',resource:app,path});
     state=await ensureObject({k,context,state,field:'warehouseUid',resource:warehouse,path});

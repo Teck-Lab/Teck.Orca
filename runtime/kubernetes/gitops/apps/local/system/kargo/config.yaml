@@ -1,0 +1,4 @@
+appName: local-kargo
+destNamespace: kargo
+annotations:
+  argocd.argoproj.io/sync-wave: "0"

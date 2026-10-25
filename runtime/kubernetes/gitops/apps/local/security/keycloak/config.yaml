@@ -1,0 +1,6 @@
+appName: local-keycloak
+worktreeScoped: true
+autoSync: false
+destNamespace: supplied-by-worktree
+annotations:
+  argocd.argoproj.io/sync-wave: "2"
