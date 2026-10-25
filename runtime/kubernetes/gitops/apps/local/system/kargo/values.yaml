@@ -1,4 +1,0 @@
-api:
-  enabled: false
-externalWebhooksServer:
-  enabled: false
