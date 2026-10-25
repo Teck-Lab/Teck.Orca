@@ -5,6 +5,7 @@ import {checksum} from './bundle.mjs';
 import {directory,readJson,writeJson} from './state.mjs';
 import {paths,chartDeclaration} from './layout.mjs';
 import {setTimeout as delay} from 'node:timers/promises';
+import {localGit} from './local-git.mjs';
 
 const dns=value=>typeof value==='string'&&/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(value);
 const pinned=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
@@ -155,16 +156,28 @@ export async function bootstrapWorkspace({bundle,name,folder,nodes,kubeconfig,ru
 
 export async function takeoverPlatform({bundle,folder,kubeconfig,run}){
   const k=(...args)=>run('kubectl',['--kubeconfig',kubeconfig,...args]);
+  const marker=join(folder,'gitops-managed.json'),previous=existsSync(marker)?readJson(marker):null;
+  const changed=previous?.contentSha256!==bundle.contentSha256;
+  let revision;
+  if(changed){
+    revision=(await localGit(run,join(folder,'local-gitops'),['ls-remote','origin','refs/heads/main'])).trim().split(/\s+/)[0];
+    if(!/^[a-f0-9]{40}$/.test(revision))throw Error('Cannot verify seeded GitOps revision');
+  }
   await k('apply','-f',join(bundle.root,paths.root));
   const expected=Object.keys(bundle.files).filter(p=>p.startsWith('apps/local/')&&p.endsWith('/config.yaml'))
     .map(p=>bundle.yaml(p)).filter(c=>!c.worktreeScoped).map(c=>c.appName);
+  if(changed){
+    const current=JSON.parse(await k('-n','argocd','get','applications','-o','json')).items;
+    for(const name of ['local-root',...expected].filter(name=>current.some(a=>a.metadata.name===name)))
+      await k('-n','argocd','annotate','application',name,'argocd.argoproj.io/refresh=hard','--overwrite');
+  }
   const deadline=Date.now()+360_000;
   for(;;){
     const apps=JSON.parse(await k('-n','argocd','get','applications','-o','json')).items;
-    const ready=expected.every(name=>{const app=apps.find(a=>a.metadata.name===name);return app?.status?.sync?.status==='Synced'&&app.status?.health?.status==='Healthy';});
+    const ready=expected.every(name=>{const app=apps.find(a=>a.metadata.name===name);return app?.status?.sync?.status==='Synced'&&app.status?.health?.status==='Healthy'&&(!changed||app.status.sync.revision===revision);});
     if(ready)break;
     if(Date.now()>=deadline){const pending=expected.map(name=>{const a=apps.find(a=>a.metadata.name===name);return {name,sync:a?.status?.sync?.status,health:a?.status?.health?.status,conditions:a?.status?.conditions};});throw Error('Local category Applications did not become healthy: '+JSON.stringify(pending));}
     await delay(2000);
   }
-  writeJson(join(folder,'gitops-managed.json'),{version:1,root:'local-root',applications:expected});
+  writeJson(marker,{version:1,root:'local-root',applications:expected,contentSha256:bundle.contentSha256});
 }

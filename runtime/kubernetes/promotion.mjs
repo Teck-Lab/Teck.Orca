@@ -14,6 +14,7 @@ export function deliveryResources(context,bundle){
   const allowed=['git-clone','yaml-update','git-commit','git-push','argocd-update'];
   if(!Array.isArray(template.steps)||template.steps.some(s=>!allowed.includes(s.uses))||JSON.stringify(template).includes('github.com'))throw Error('Promotion template must remain local-only');
   if(task.kind!=='ClusterPromotionTask'||task.metadata.name!=='local-worktree-release')throw Error('Unexpected local promotion task');
+  if(/\$\{\{\s*outputs[.\[]/.test(JSON.stringify(template)))throw Error('Reusable promotion steps must use task-scoped outputs');
   const call={steps:[{task:{kind:task.kind,name:task.metadata.name},vars:[{name:'appRepo',value:appRepository},{name:'gitopsRepo',value:platformRepository},{name:'worktree',value:id.hash},{name:'application',value:promotion.application}]}]};
   return [
     {apiVersion:'kargo.akuity.io/v1alpha1',kind:'Warehouse',metadata:{name:warehouse,namespace,labels},spec:{interval:'30s',freightCreationPolicy:'Automatic',subscriptions:[{git:{repoURL:appRepository,branch:'worktrees/'+id.hash,discoveryLimit:10}}]}},

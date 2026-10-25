@@ -3,7 +3,7 @@
   "repository": "https://github.com/Teck-Lab/Teck.GitOps",
   "revision": "1b2b8cbca7485e9797d53f9a8b0cb803b9d256ed",
   "dirty": true,
-  "contentSha256": "6bdefab3dbc1e70aaa001270b83c017645f935dd98468a107377c01c4e24552c",
+  "contentSha256": "9d5b841a56e08bf2cb5d66db7c1a59062f7a8e956a8f6eaf2d6c8269ce7c4480",
   "files": {
     "AGENTS.md": "8dc2f00cd5674736588ae0f43f9f0038be63c13a111a6e03531d8e14fcf0e74d",
     "apps/AGENTS.md": "ddc76a6d17e0e8933a10ca00ecd3a5467077a6c4e152c4fb5f95b9dde9614a7b",
@@ -52,7 +52,7 @@
     "apps/local/system/kargo/config.yaml": "974cdf9cfc1fa05a3129669a6e6a863960e5dbd81053686300c755a741348e07",
     "apps/local/system/kargo/kustomization.yaml": "4b28008e600ab073bf8beb47ea9278aa0af1a9d3553eb9e4e0f5608215a72fd4",
     "apps/local/system/kargo/teck-cloud/kustomization.yaml": "901aa0674a9901f04d449a67469bf73af0f51b4d41514291c547400a68d5ae50",
-    "apps/local/system/kargo/teck-cloud/promotion-task.yaml": "5299c578eb86b5dbe124182ca22f741107a96ac96d0a057f183d05331fd37976",
+    "apps/local/system/kargo/teck-cloud/promotion-task.yaml": "cb42aeca82af8b27739d326ca7886558a664330d43dfc7c44be54a6ecd1541c4",
     "apps/local/system/kargo/values.yaml": "22e2809e825a356879b0e6a47fbd2893f6f51bf412d13f68ab32344b064bb55a",
     "bootstrap/local/argo-cd/kustomization.yaml": "c542fa36c4249460d82a2b32816db77278452d600912edfa8acb58f74a47fc1d",
     "bootstrap/local/components.lock.json": "8d93829c440aecf5b40a3ac5a4d7626a37f6a1b829b0fd065718e53bebb3dc2e",

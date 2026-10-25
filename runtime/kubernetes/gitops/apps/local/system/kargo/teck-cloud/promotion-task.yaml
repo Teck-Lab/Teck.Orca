@@ -36,7 +36,7 @@ spec:
             namespace: argocd
             sources:
               - repoURL: ${{ vars.gitopsRepo }}
-                desiredRevision: ${{ outputs.commit.commit }}
+                desiredRevision: ${{ task.outputs.commit.commit }}
       retry:
         errorThreshold: 3
         timeout: 6m
