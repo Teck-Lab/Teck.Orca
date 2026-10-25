@@ -18,16 +18,11 @@ test('every bundled Kustomize reference resolves without duplicate resource file
  }
 });
 
-test('local apps use canonical category entry points and cannot enter remote ApplicationSets',()=>{
+test('bare startup bundles optional category add-ons without delivery services',()=>{
  const b=bundle();assert.equal(Object.keys(b.files).some(p=>p.startsWith('local/')),false);
- for(const group of ['network','platform','security','system']){
-  const set=docs(b,'projects/'+group+'.yaml').find(d=>d.kind==='ApplicationSet');
-  assert.ok(set.spec.generators[0].git.files.some(f=>f.exclude===true&&f.path===`apps/local/${group}/**/config.yaml`));
- }
- const local=YAML.parse(b.read('projects/local/kustomization.yaml'));
- assert.deepEqual(local.resources,['../network.yaml','../platform.yaml','../security.yaml','../system.yaml']);
- assert.equal(Object.keys(b.files).some(p=>p==='apps/local/security/keycloak/kustomization.yaml'),true);
- assert.equal(Object.keys(b.files).some(p=>p.includes('/dependencies/')),false);
+ for(const name of ['git','argo-cd','kargo'])assert.equal(Object.keys(b.files).some(p=>p.startsWith('apps/local/system/'+name+'/')),false);
+ assert.equal(b.json(paths.profile).workflow,'kubectl');assert.deepEqual(b.json(paths.profile).defaultAddons,[]);
+ assert.ok(b.files['apps/local/platform/cnpg-operator/kustomization.yaml']);assert.equal(Object.keys(b.files).some(p=>p.startsWith('projects/local/')),false);
 });
 
 test('bootstrap artifact pins cannot drift from the ordinary app chart declarations',()=>{

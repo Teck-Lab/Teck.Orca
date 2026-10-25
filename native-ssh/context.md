@@ -15,23 +15,13 @@ proxy-managed by Docker Sandboxes; never print, copy or persist real values.
 
 Use agent-browser and the installed Chromium for sandbox browser automation.
 Keep TLS validation enabled and use a separate browser session per task. Node,
-Bun, .NET, Git/LFS, Docker Engine/Compose, kind 0.33.0, kubectl 1.37.1,
+Bun, .NET, Git/LFS, Docker Engine/Compose, kind 0.33.0, kubectl 1.35.8,
 development tools and language servers
 are available. Docker Engine runs project/test containers; Docker Sandboxes
 manages this VM and its SSH transport.
 
-When /etc/teck-orca/kubernetes.json exists, Kubernetes starts automatically in
-one persistent kind cluster shared by this project's worktrees. Use teck-kube
-status, deploy, promote, cleanup and kubectl; the helper always supplies its own
-kubeconfig. Deploy/promote run from the real Orca worktree terminal. Separate
-worktrees get separate namespaces, images and HTTPS hostnames. Application
-manifests belong in deployment/; GitOps apps/local/ and bootstrap/local/ own the platform. Never delete
-the shared cluster when finishing one task. Run teck-kube cleanup before removing
-that workspace, or use cleanup --worktree with its exact saved Orca identity.
+When /etc/teck-orca/kubernetes.json exists, one persistent KIND cluster starts for this project. Default startup has no Argo CD, Kargo, Git service or registry. Use the official Docker build -> kind load docker-image -> kubectl apply workflow. teck-kube deploy wraps that sequence for deployment/local/builds.json; it requires the current Orca worktree terminal and records image/source identities, rendered manifests and readiness. Use teck-kube addon cnpg|rollouts|gateway only when required. Each worktree gets a namespace and its own databases/dependencies.
 
-The workspace profile uses kindnet with no Istio or Cilium. It supports local
-Argo CD, Rollouts/Gateway API and Kargo tests; success does not validate production
-mTLS or network authorization. The optional full WSL2/Linux profile is disabled
-until separately validated. Without the managed configuration, kind remains an
-on-demand tool: use an explicit task kubeconfig/name and clean up only your own
-cluster. Never silently replace an owned cluster after a configuration change.
+Use teck-kube kubectl for direct commands with the dedicated kubeconfig; do not change the default context. Run real connectivity/migration/test Jobs and inspect failures, rather than treating apply success as test success. teck-kube cleanup deletes only the recorded worktree namespace with UID checks and keeps the shared cluster/operators.
+
+Application manifests belong in deployment/; platform definitions remain apps/local/ and bootstrap/local/ in Teck.GitOps. The workspace uses kindnet without Istio/Cilium; it does not validate production mesh, HA or GitOps delivery. Never silently replace an owned cluster after topology/pin changes. Existing draft delivery clusters require explicit migration.

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "kubernetes": {
-    "version": "1.36.4",
-    "nodeImage": "kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed"
+    "version": "1.35.8",
+    "nodeImage": "kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0"
   },
   "helm": {
     "version": "3.22.1",
@@ -15,10 +15,6 @@
     "version": "1.5.1",
     "url": "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml",
     "sha256": "64ec76609a6ac885e0405dea79ca509c229fa019d342f0857aa8b6bdc8b8ba92"
-  },
-  "registry": {
-    "image": "registry:3.0.0@sha256:6c5666b861f3505b116bb9aa9b25175e71210414bd010d92035ff64018f9457e",
-    "port": 5001
   },
   "charts": [
     {
@@ -53,17 +49,6 @@
       "source": "apps/local/network/kgateway"
     },
     {
-      "name": "argocd",
-      "namespace": "argocd",
-      "chart": "argo-cd",
-      "repository": "https://argoproj.github.io/argo-helm",
-      "version": "10.11.1",
-      "archive": "argo-cd-10.11.1.tgz",
-      "sha256": "dbb92a8c7855d4c564b87ab70e70bc36f5b17fd2bd30fa041a31e80dbea99c38",
-      "values": "apps/local/system/argo-cd/values.yaml",
-      "source": "apps/local/system/argo-cd"
-    },
-    {
       "name": "argo-rollouts",
       "namespace": "argo-rollouts",
       "chart": "argo-rollouts",
@@ -75,14 +60,15 @@
       "source": "apps/local/system/argo-rollouts"
     },
     {
-      "name": "kargo",
-      "namespace": "kargo",
-      "chart": "oci://ghcr.io/akuity/kargo-charts/kargo",
-      "version": "1.12.4",
-      "archive": "kargo-1.12.4.tgz",
-      "sha256": "e11542b7dddf0af8fab27be819bae6dc4b0fc8d65b2314c427e1b75ca769e3fb",
-      "values": "apps/local/system/kargo/values.yaml",
-      "source": "apps/local/system/kargo"
+      "name": "cloudnative-pg",
+      "namespace": "cnpg-system",
+      "chart": "cloudnative-pg",
+      "repository": "https://cloudnative-pg.github.io/charts",
+      "version": "0.28.0",
+      "archive": "cloudnative-pg-0.28.0.tgz",
+      "sha256": "81d37894f3606df9bd91c5519053f41a79e833d28aca252ffb39294cb9cb19ae",
+      "values": "apps/local/platform/cnpg-operator/values.yaml",
+      "source": "apps/local/platform/cnpg-operator"
     }
   ]
 }

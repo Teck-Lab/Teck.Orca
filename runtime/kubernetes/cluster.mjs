@@ -32,7 +32,7 @@ export async function prepareDocker({folder,run,config}){
   const disk=statfsSync(folder);if(disk.bavail*disk.bsize<8*1024**3)throw Error('Project cluster needs at least 8 GiB free in its state filesystem');
   const dockerDisk=await run('df',['-B1','--output=avail','/var/lib/docker']);
   const available=Number(dockerDisk.trim().split(/\s+/).at(-1));if(!Number.isFinite(available)||available<12*1024**3)throw Error('Project cluster needs at least 12 GiB free in Docker storage');
-  const ports=[config.networking?.apiServerPort,5001,...config.nodes.flatMap(node=>(node.extraPortMappings??[]).map(p=>p.hostPort))];
+  const ports=[config.networking?.apiServerPort,...config.nodes.flatMap(node=>(node.extraPortMappings??[]).map(p=>p.hostPort))];
   for(const port of new Set(ports)){
     if(!Number.isInteger(port)||port<1||port>65535)throw Error('Invalid local cluster port');
     await new Promise((resolve,reject)=>{const server=createServer();server.once('error',()=>reject(Error('Local Kubernetes requires free loopback port '+port)));server.listen({host:'127.0.0.1',port,exclusive:true},()=>server.close(resolve));});

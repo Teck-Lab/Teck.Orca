@@ -1,0 +1,17 @@
+# Official KIND workflow validation � 2026-10-25
+
+This supersedes the earlier local Argo CD/Kargo delivery design. The default is one persistent single-node KIND cluster per project with no delivery services, local Git server, registry or OCI promotion pipeline. Optional pinned add-ons are CNPG, Rollouts and Gateway API/kgateway/TLS. Definitions retain the existing apps/local categories, cluster-resources/local and bootstrap/local hierarchy; remote ApplicationSets exclude local. No local ApplicationSet is used.
+
+The helper uses Docker build, image-content tags, kind load docker-image, Kustomize rendering, API dry-run and normal kubectl apply. It journals owned resource UIDs, waits for rollout completion and CNPG readiness, rejects failed Jobs, and keeps namespace cleanup separate from shared operators. No synthetic local Git commits or remote publication occur. Direct kubectl remains available with the dedicated kubeconfig.
+
+Portable root and native build/test/check suites passed. Regression checks cover registry-free loading, ownership rejection before apply, reused namespace setup, absence of default dependency installation, failed CNPG/Job verification, official rollout-status waits, manifest scope and source/image matching, startup identity and namespace UID cleanup.
+
+Live tests used only an owned disposable sandbox (isolated-kubernetes-direct-probe). The bare KIND base had no add-ons, registry or delivery controllers. Installing CNPG used the existing development chart version 0.28.0/operator 1.29.0 with Kubernetes 1.35.8; kubectl is pinned to 1.35.8. Two independent namespaces each ran operator-managed PostgreSQL 18.1 with generated connection Secrets and a locally built SQL client application. The application created/queried its schema/data; a dirty-source update changed only its own image/environment. A real SQL assertion Job failed and waitResources rejected it. Removing beta preserved alpha and the shared CNPG operator.
+
+The chart repository redirects from cloudnative-pg.github.io to cloudnative-pg.io; both are permitted by the plugin network policy. Live update testing drove the rollout-readiness regression. Cold-restart and cleanup receipts are summarized below.
+
+Limits: this is a SQL-client fixture, not current Monorepo application acceptance. Gateway.Public was retired on current main, so the pilot PR still needs gateway adaptation. Optional gateway/Rollouts/Keycloak behavior was tested in the previous design; the new direct-apply path has not yet revalidated that entire combination. Full Cilium/Istio ambient, production HA/backups and GitOps delivery remain outside this acceptance. Existing old draft clusters are retained for explicit migration, never silently replaced.
+
+Final result: PASS. Cold VM stop/start through the installed interactive-shell hook retained the KIND node ID, namespace/CNPG Cluster/connection Secret UIDs and dirty application version. A sentinel row written separately from the application survived in PostgreSQL storage. The restart probe checks actual application connectivity after API/status caches recover, rather than relying only on pre-boot Ready conditions.
+
+Portable checks: 125 root tests in the preserved working checkout; 124 in the scoped PR snapshot; 21 native preview tests. All build/check suites passed. Only the recorded disposable sandbox was used and it was removed after validation; the three pre-existing sandbox identities were preserved. Current GUI/OMP recovery, full mesh and current-main application acceptance are not claimed.

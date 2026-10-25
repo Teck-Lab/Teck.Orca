@@ -24,7 +24,7 @@ provides:
   - "dotnet@10.0.401"
   - "typescript@5.9.3"
   - "kind@0.33.0"
-  - "kubectl@1.37.1"
+  - "kubectl@1.35.8"
   - "teck-language-servers@1"
   - "agent-browser@0.38.1"
   - "playwright@${{ kit.args.playwrightVersion }}"
@@ -67,7 +67,7 @@ capabilities:
             test -x /usr/local/bin/chromium
             test "$(dotnet --version)" = "10.0.401"
             test "$(kind version | cut -d ' ' -f 2)" = "v0.33.0"
-            test "$(kubectl version --client --output=json | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).clientVersion.gitVersion')" = "v1.37.1"
+            test "$(kubectl version --client --output=json | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).clientVersion.gitVersion')" = "v1.35.8"
             test -x /usr/local/bin/omnisharp
             test -x /usr/local/bin/typescript-language-server
             install -d -o agent -g agent -m 755 /home/agent/.dotnet /home/agent/.nuget

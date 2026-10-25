@@ -1,3 +1,5 @@
+> Historical validation of the superseded delivery design. Current workflow: validation-official-kind-2026-10-25.md.
+
 # Local Kubernetes workspace validation - 2026-10-25
 
 Layout correction: the initial GitOps paths in this historical report are superseded

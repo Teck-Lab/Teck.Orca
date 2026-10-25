@@ -1,3 +1,3 @@
 # Local bootstrap
 
-KIND/profile and artifact pins live here. Install Argo CD from argo-cd/, seed the local Git mirror, then apply root.yaml. The local root renders projects/local, which adapts the existing category ApplicationSets to apps/local and the local Git endpoint. Apps live in apps/local/{network,platform,security,system}; cluster prerequisites live in cluster-resources/local. Full remains disabled. No remote controller/credentials or Terraform is used.
+KIND topology/profile and verified component pins live here. Base startup is a single-node KIND cluster. Install only the optional controllers required by the application: CNPG, Rollouts, or Gateway API/kgateway/TLS. Use Docker build, kind load docker-image and kubectl apply against the local Kustomize overlay. There is no local Argo CD, Kargo, registry or Git server. Definitions remain under apps/local categories and cluster-resources/local. Full remains disabled.

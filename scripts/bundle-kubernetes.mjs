@@ -9,8 +9,8 @@ const repository=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const index=process.argv.indexOf('--gitops');
 if(index<0||!process.argv[index+1])throw Error('Pass --gitops <existing Teck.GitOps checkout>');
 const gitops=resolve(process.argv[index+1]),destination=join(repository,'runtime/kubernetes/gitops');
-const roots=['bootstrap/local','cluster-resources/local','apps/local','projects/local'];
-const shared=['AGENTS.md','apps/AGENTS.md','docs/local-development.md',...['network','platform','security','system'].map(g=>'projects/'+g+'.yaml'),
+const roots=['bootstrap/local','cluster-resources/local','apps/local'];
+const shared=['AGENTS.md','apps/AGENTS.md','docs/local-development.md',
   'apps/in-cluster/security/keycloak/development-realm.yaml','apps/in-cluster/security/keycloak/clients/development/teck-public-gateway-client.yaml'];
 const names=[...shared,...roots.flatMap(root=>bundleFiles(join(gitops,root)).map(name=>root+'/'+name))];
 const revision=execFileSync('git',['-C',gitops,'rev-parse','HEAD'],{encoding:'utf8'}).trim();

@@ -1,9 +1,18 @@
 # Local application development
 
-The local environment follows apps/{environment}/{category}/{application}. bootstrap/local owns KIND and artifact pins; cluster-resources/local owns namespaces and bootstrap RBAC. projects/local adapts the existing category templates for the isolated cluster. The remote category generators explicitly exclude apps/local so merging this tree does not register local tools on remote clusters.
+The workspace uses the official KIND build/load/apply workflow. Orca starts one persistent, single-node KIND cluster per project. Base startup installs no delivery controllers, registry or Git server. Worktrees deploy into separate namespaces. No Argo CD, Kargo, local OCI release pipeline or Terraform is required.
 
-Argo CD takes ownership after initial bootstrap. Helm charts are declared in each app kustomization.yaml, with artifact checksums locked in bootstrap/local/components.lock.json. The local Git mirror carries verified cached charts/CRDs to avoid public fetches from controller pods.
+Definitions follow apps/local/{category}/{application}, cluster-resources/local and bootstrap/local. Remote ApplicationSets exclude apps/local. There is no local ApplicationSet: agents apply local resources with kubectl. Local component versions/checksums are pinned in bootstrap/local/components.lock.json; the CNPG chart matches the existing development operator declaration (0.28.0 / operator 1.29.0). KIND uses Kubernetes 1.35.8, within that operator's documented version range.
 
-Keycloak lives in apps/local/security/keycloak. Its worktree overlay imports the existing in-cluster realm and client definitions; only the local realm name, redirect URI and generated secret differ. The same realm policies/client settings therefore drive local and deployed definitions. It is included in each isolated worktree Application instead of generating a global duplicate from the platform ApplicationSet.
+Optional shared add-ons:
+- cnpg: CloudNativePG operator only; each worktree owns its PostgreSQL Cluster.
+- rollouts: Argo Rollouts controller and required RBAC, when manifests contain Rollout/AnalysisTemplate.
+- gateway: Gateway API, kgateway and local TLS certificates, when testing HTTPRoute/HTTPS.
 
-Local delivery promotion configuration lives beside Kargo under apps/local/system/kargo/teck-cloud. Source repos own deployment/base plus environment overlays. The full WSL2 profile remains disabled until separately validated.
+The sandbox command teck-kube addon <name> installs a pinned add-on. The deployment/local/builds.json addons list can request the same add-ons. They remain shared and resume on cluster restart; worktree cleanup does not remove controllers. Existing releases with a different pin are rejected rather than upgraded automatically. Keycloak remains an optional worktree resource under apps/local/security/keycloak and reuses canonical realm/client definitions.
+
+Application repos own deployment/base and environment overlays. Build with Docker, load content-based image tags with kind load docker-image, render deployment/local, validate against the API and kubectl apply. teck-kube deploy is a convenience for these same operations, readiness and declared initial analyses. It creates no synthetic Git history or delivery destination. Inspect rendered manifests and results in the owned cluster worktree folder. Standard kubectl commands use the project's dedicated kubeconfig through teck-kube kubectl; the default kubeconfig is not changed.
+
+Use CNPG Cluster resources plus application connectivity/migration tests or Kubernetes Jobs. Apply success is not a test result. Test Job failure fails deployment. Cleanup uses the recorded namespace UID and preserves other worktrees/databases. A shared namespace is isolation of resources, not a security boundary for privileged agents or cluster-wide operators.
+
+Local storage and single-node testing validate application integration, not production HA, backups, Cilium or Istio ambient. GitOps promotion/synchronization belongs in the full environment. Old draft delivery clusters are retained and require explicit migration; startup never deletes their data.

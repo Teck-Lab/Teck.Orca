@@ -85,8 +85,7 @@ docs/                     — human-readable docs (apps.md, bootstrap.md, projec
 
 ## Local environment
 
-Local follows the existing category hierarchy under apps/local/, with prerequisites
-in cluster-resources/local/, initial setup/profile pins in bootstrap/local/, and
-category ApplicationSets adapted through projects/local/. Remote generators exclude
-apps/local. Keycloak is under security and reuses in-cluster realm/client definitions;
-its worktree-scoped overlay is included by the worktree Application. See docs/local-development.md.
+Local uses apps/local/ categories, cluster-resources/local/ and bootstrap/local/.
+Agents use direct kubectl against KIND; optional operators are installed explicitly.
+There is no local Argo CD/Kargo/Git service or local ApplicationSet. Remote category
+generators exclude apps/local. See docs/local-development.md.

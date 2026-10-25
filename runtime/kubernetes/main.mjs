@@ -6,12 +6,10 @@ import {paths} from './layout.mjs';
 import {loadBundle,bootstrapRevision} from './bundle.mjs';
 import {ensureProjectCluster,projectClusterName} from './cluster.mjs';
 import {command} from './command.mjs';
-import {bootstrapWorkspace,takeoverPlatform} from './platform.mjs';
+import {bootstrapWorkspace,installAddons} from './platform.mjs';
 import {readJson,processIdentity} from './state.mjs';
 import {launchBootstrap,startProject} from './startup.mjs';
-import {seedPlatformSource} from './local-git.mjs';
 import {deployWorktree} from './deploy.mjs';
-import {promoteWorktree} from './promotion.mjs';
 import {cleanupWorktree} from './cleanup.mjs';
 import {currentWorktree} from './render.mjs';
 
@@ -23,7 +21,7 @@ export async function ensureConfiguredProject(config,{run=command}={}){
   for(;;){try{await run('docker',['info','--format','{{.ServerVersion}}']);break;}catch(error){if(Date.now()>=deadline)throw error;await delay(2000);}}
   return ensureProjectCluster({projectId:config.projectId,profile:'workspace',root:config.root,
     config:bundle.yaml(paths.kind),nodeImage:bundle.json(paths.lock).kubernetes.nodeImage,revision:bootstrapRevision(bundle),runtimeRevision:config.assetDigest,run,
-    bootstrap:async options=>{await bootstrapWorkspace({...options,bundle});await seedPlatformSource({...options,bundle});await takeoverPlatform({...options,bundle});}});
+    bootstrap:async options=>bootstrapWorkspace({...options,bundle})});
 }
 export async function main(args=process.argv.slice(2)){
   if(process.platform!=='linux'||process.getuid?.()!==0)throw Error('Use the installed teck-kube command inside the project sandbox');
@@ -50,9 +48,13 @@ export async function main(args=process.argv.slice(2)){
       components:existsSync(join(folder,'components.json'))?readJson(join(folder,'components.json')):{},
       nodes:state?.nodes??[],log:join(config.root,'bootstrap.log')};
   }
-  if(action==='deploy'||action==='promote'){
+  if(action==='addon'){
+    const cluster=await ensureConfiguredProject(config),bundle=loadBundle(join(assetRoot,'gitops'));
+    return installAddons({names:[args[1]],cluster,bundle,run:command});
+  }
+  if(action==='deploy'){
     const context=await currentWorktree(config,process.env,command),cluster=await ensureConfiguredProject(config),bundle=loadBundle(join(assetRoot,'gitops'));
-    return (action==='deploy'?deployWorktree:promoteWorktree)({context,cluster,bundle,run:command});
+    return deployWorktree({context,cluster,bundle,run:command});
   }
   if(action==='cleanup'){
     const worktreeIndex=args.indexOf('--worktree');
@@ -65,7 +67,7 @@ export async function main(args=process.argv.slice(2)){
     const remaining=args.slice(1);if(index>=0)remaining.splice(index-1,2);
     return {output:await command('kubectl',['--kubeconfig',state.kubeconfig,...remaining])};
   }
-  throw Error('Use teck-kube start, ensure, status, deploy, promote, cleanup or kubectl');
+  throw Error('Use teck-kube start, ensure, status, deploy, addon <cnpg|rollouts|gateway>, cleanup or kubectl');
 }
 if(process.argv[1]&&resolve(process.argv[1])===entry){
   main().then(result=>process.stdout.write(JSON.stringify(result)+'\n')).catch(error=>{process.stderr.write('Teck local Kubernetes: '+error.message+'\n');process.exitCode=1;});

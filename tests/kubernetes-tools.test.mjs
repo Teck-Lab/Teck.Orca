@@ -12,20 +12,20 @@ function fixture(t) {
   const destination = mkdtempSync(join(tmpdir(), 'teck-kubernetes-test-'));
   t.after(() => rmSync(destination, { recursive: true, force: true }));
   const bytes = { kind: Buffer.from('kind fixture'), kubectl: Buffer.from('kubectl fixture') };
-  const config = { native: Object.fromEntries(Object.entries(bytes).map(([name, data]) => [name, { version: name === 'kind' ? '0.33.0' : '1.37.1', sha256: { x64: sha(data), arm64: sha(data) } }])) };
+  const config = { native: Object.fromEntries(Object.entries(bytes).map(([name, data]) => [name, { version: name === 'kind' ? '0.33.0' : '1.35.8', sha256: { x64: sha(data), arm64: sha(data) } }])) };
   const probes = [];
   return { destination, config, bytes, options: { lock: config, arch: 'x64', destination,
     download: (tool, file) => writeFileSync(file, bytes[tool.name]), verifyVersion: (tool, file) => probes.push({ tool: tool.name, bytes: readFileSync(file) }) }, probes };
 }
 test('kind and kubectl are pinned with checksums and official architecture-specific URLs', () => {
   assert.equal(lock.native.kind.version, '0.33.0');
-  assert.equal(lock.native.kubectl.version, '1.37.1');
+  assert.equal(lock.native.kubectl.version, '1.35.8');
   for (const arch of ['x64', 'arm64']) {
     const tools = kubernetesTools(lock, arch);
     assert.deepEqual(tools.map(t => t.name), ['kind', 'kubectl']);
     for (const tool of tools) assert.match(tool.sha256, /^[a-f0-9]{64}$/);
     assert.match(tools[0].url, new RegExp('github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-'+(arch === 'x64' ? 'amd64' : arch)));
-    assert.match(tools[1].url, new RegExp('dl.k8s.io/release/v1.37.1/bin/linux/'+(arch === 'x64' ? 'amd64' : arch)+'/kubectl'));
+    assert.match(tools[1].url, new RegExp('dl.k8s.io/release/v1.35.8/bin/linux/'+(arch === 'x64' ? 'amd64' : arch)+'/kubectl'));
   }
   assert.throws(() => kubernetesTools(lock, 'ia32'), /architecture/);
 });

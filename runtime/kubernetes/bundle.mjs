@@ -5,10 +5,8 @@ import {parseYaml} from './layout.mjs';
 
 export const checksum=value=>createHash('sha256').update(value).digest('hex');
 export function bootstrapRevision(bundle){
-  // Ordinary GitOps resource/template changes reconcile in Argo. Only the
-  // pinned runtime/topology/controller configuration requires explicit migration.
-  const files=Object.fromEntries(Object.entries(bundle.files).filter(([name])=>name==='bootstrap/local/components.lock.json'||name.startsWith('bootstrap/local/workspace/')||(name.startsWith('apps/local/')&&name.endsWith('/values.yaml'))));
-  return checksum(JSON.stringify(files));
+  const files=Object.fromEntries(Object.entries(bundle.files).filter(([name])=>name.startsWith('bootstrap/local/workspace/')));
+  return checksum(JSON.stringify({files,nodeImage:bundle.json('bootstrap/local/components.lock.json').kubernetes.nodeImage}));
 }
 const validPath=name=>typeof name==='string'&&/^[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*$/.test(name)&&!name.split('/').some(n=>['.','..'].includes(n))&&/\.(?:json|yaml|md|pl)$/.test(name)&&name!=='snapshot.json';
 export function bundleSnapshot({files,revision,dirty=false}){

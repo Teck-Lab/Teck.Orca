@@ -8,7 +8,7 @@ Four stages × six categories. Not every category exists in every stage — the 
 |-------|---------------|-----------------|
 | `development/` | `development` cluster context | full app stack including teck-cloud services |
 | `production/` | `production` cluster context | platform-only at the moment; teck-cloud overlay not yet onboarded |
-| `local/` | isolated KIND in each project sandbox | local platform/delivery, no mesh |
+| `local/` | isolated KIND in each project sandbox | optional local operators/dependencies, direct kubectl, no mesh |
 | `in-cluster/` | `https://kubernetes.default.svc` | hosts ArgoCD + Kargo themselves + shared DBs / brokers |
 
 ## Category × Stage Matrix
@@ -59,8 +59,7 @@ These apply to all services in the group and must be referenced by the parent `k
 
 ## Local environment
 
-Local follows the existing category hierarchy under apps/local/, with prerequisites
-in cluster-resources/local/, initial setup/profile pins in bootstrap/local/, and
-category ApplicationSets adapted through projects/local/. Remote generators exclude
-apps/local. Keycloak is under security and reuses in-cluster realm/client definitions;
-its worktree-scoped overlay is included by the worktree Application. See docs/local-development.md.
+Local follows apps/local/ categories with prerequisites in cluster-resources/local/
+and topology/artifact pins in bootstrap/local/. Agents use kubectl directly against
+KIND; operators are optional, shared add-ons. There is no local ApplicationSet or
+delivery service. Remote generators exclude apps/local. See docs/local-development.md.

@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.5.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.6.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 
@@ -63,7 +63,7 @@ technical research agent, TDD/review guidance, session recovery and development
 toolchain are snapshotted from the existing runtime. The network policy includes
 `quay.io:443` and `*.quay.io:443`.
 
-The workload includes checksum-pinned kind 0.33.0 and kubectl 1.37.1. Teck.Monorepo
+The workload includes checksum-pinned kind 0.33.0 and kubectl 1.35.8. Teck.Monorepo
 now opts into the managed workspace profile with "kubernetes": "workspace" in
 projects.json. On normal recipe create/reuse/resume, the plugin installs the
 immutable guest helper and starts bootstrap without holding up SSH/OMP. Interactive
@@ -73,43 +73,17 @@ retain their older immutable recipe snapshots: after refreshing, create an
 additional workspace with the same preview recipe to apply this update to the
 shared VM. Once installed, the terminal hook also covers older workspaces.
 
-The workspace cluster is persistent and shared by this project's worktrees. It
-uses kindnet, local Argo CD, Rollouts/Gateway API, Kargo controllers, kgateway and
-trusted HTTPS, with no Istio or Cilium. Kargo's user-facing API/UI is disabled;
-promotion runs through its Kubernetes API. The optional full WSL2/Linux profile
-is defined but disabled pending its own compatibility/routing tests. Workspace
-success does not validate production mTLS or network authorization.
+## Local Kubernetes
 
-From a real Orca worktree terminal, teck-kube deploy builds dirty source and
-syncs its isolated namespace; teck-kube promote deploys the matched immutable
-release into a separate promotion namespace. teck-kube status reports bootstrap
-and component state; teck-kube kubectl supplies the dedicated kubeconfig. Run
-teck-kube cleanup before removing a worktree, or cleanup --worktree with its exact
-saved Orca ID afterward. Cleanup retains the shared cluster and other worktrees.
-There is no automatic deletion hook or global Docker pruning. Local Git/image
-history is retained; future retention must be ownership-aware.
+Enable kubernetes: workspace in the existing project configuration. The separate native SSH preview keeps the GUI Run on workflow and starts one persistent, single-node KIND cluster. Base startup installs no Argo CD, Kargo, registry or Git server.
 
-Teck.Monorepo's deployment/ currently contains a Gateway.Public + local Keycloak
-pilot, not the whole commerce stack. These manifests are prepared in the local
-application checkout; normal remote-clone workspaces need them committed through
-the usual GitHub App flow. The plugin does not copy host uncommitted application
-files into a remote checkout.
+Use Docker build -> kind load docker-image -> kubectl apply -k deployment/local. teck-kube deploy is a convenience around these operations with source/image records, namespace ownership checks, apply phases, readiness and initial analysis checks. Optional shared add-ons are installed with teck-kube addon cnpg|rollouts|gateway, or the application build declaration's addons list. No local promotion destination is created.
 
-New Kubernetes-enabled VMs get 8 CPU/16g RAM plus 60g Docker and 30g root storage.
-Existing VM disks are preserved; bootstrap reports insufficient free space rather
-than resizing or deleting data. An installed configuration change may reconcile
-helper/dependency code, but controller/topology pin changes require an explicit
-migration. No automatic upgrade or cluster replacement runs on reconnect.
+Each worktree owns its namespace and databases. teck-kube kubectl supplies the dedicated kubeconfig; cleanup removes only the owned namespace and preserves shared operators/other worktrees. See docs/local-development.md in Teck.GitOps and ../docs/validation-official-kind-2026-10-25.md.
 
-GitOps uses apps/local/ categories, cluster-resources/local/, bootstrap/local/ pins and projects/local/ ApplicationSets. Refresh the packaged snapshot
-explicitly with npm run bundle:kubernetes -- --gitops ../Teck.GitOps, then build,
-check and install the preview. Runtime startup does not fetch remote GitOps HEAD.
-See ../docs/validation-local-kubernetes-2026-10-25.md for isolated live results.
-Other projects without this setting keep on-demand kind tooling.
+Keep platform definitions in GitOps apps/local categories, cluster-resources/local and bootstrap/local; app manifests remain in the source repo deployment/. Package definitions with npm run bundle:kubernetes -- --gitops ../Teck.GitOps, then build/check/setup the preview. Existing enabled VMs are not resized or silently migrated. Old draft delivery clusters require explicit migration; their data is retained.
 
-The preview bundles no Orca binary, custom daemon manager, fixed Orca profile,
-pairing server, loopback forwarder or login companion. It preserves Orca?s
-`ORCA_*` values and CLI PATH precedence in the guest.
+New enabled VMs retain the existing 8 CPU/16g memory, 60g Docker/30g root resource settings. The full WSL2/Cilium/Istio profile is still disabled.
 
 ## Development and installation
 
@@ -147,10 +121,3 @@ That pack documents the project-shared Run on recipe pattern; its current shell
 implementation is macOS/Linux-only and uses its own sshd. This preview uses
 Node on Windows and Docker-managed `.sbx` SSH with our existing workload.
 
-The GitOps layout now follows apps/local categories, cluster-resources/local,
-bootstrap/local and projects/local. Existing category templates are reused and
-remote generators exclude local. Argo CD owns platform reconciliation after
-bootstrap. Keycloak derives its local import from the existing canonical realm
-and client YAML; Kargo uses the ordinary ClusterPromotionTask pattern. A cluster
-created by the earlier draft layout is retained and requires an explicit migration;
-the plugin never deletes its data or silently adopts changed ownership.

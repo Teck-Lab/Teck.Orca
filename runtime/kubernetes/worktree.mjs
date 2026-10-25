@@ -1,30 +1,20 @@
 import {createHash} from 'node:crypto';
 import {worktreeIdentity} from './resources.mjs';
-import {appRepository,platformRepository} from './local-git.mjs';
 
 export const contentHash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export function ownerLabels(context){
   const id=worktreeIdentity(context.projectId,context.worktreeId);
   return {'teck.orca.io/project':createHash('sha256').update(context.projectId).digest('hex').slice(0,12),'teck.orca.io/worktree':id.hash};
 }
-export function targetIdentity(context,mode='iteration'){
-  if(!['iteration','promotion'].includes(mode))throw Error('Invalid local deployment mode');
-  const id=worktreeIdentity(context.projectId,context.worktreeId);
-  return mode==='iteration'?id:{...id,namespace:id.namespace+'-promotion',application:id.application+'-promotion',hostname:'promote-'+id.hash+'.teck.test'};
-}
-export function worktreeResources(context,{mode='iteration'}={}){
-  const id=targetIdentity(context,mode),labels=ownerLabels(context);
+export const targetIdentity=context=>worktreeIdentity(context.projectId,context.worktreeId);
+export function worktreeResources(context){
+  const id=targetIdentity(context),labels=ownerLabels(context);
   const meta=(name,namespace)=>({name,...(namespace?{namespace}:{}),labels});
   return [
     {apiVersion:'v1',kind:'Namespace',metadata:{...meta(id.namespace),labels:{...labels,'teck.orca.io/local-worktree':'true','teck.orca.io/profile':'workspace'}}},
     {apiVersion:'v1',kind:'ResourceQuota',metadata:meta('worktree',id.namespace),spec:{hard:{'requests.cpu':'2','requests.memory':'3Gi','limits.cpu':'6','limits.memory':'6Gi','requests.storage':'5Gi',pods:'40'}}},
     {apiVersion:'v1',kind:'LimitRange',metadata:meta('worktree',id.namespace),spec:{limits:[{type:'Container',defaultRequest:{cpu:'10m',memory:'32Mi'},default:{cpu:'1',memory:'512Mi'}}]}},
-    {apiVersion:'argoproj.io/v1alpha1',kind:'AppProject',metadata:meta(id.application,'argocd'),spec:{sourceRepos:[appRepository,platformRepository],destinations:[{server:'https://kubernetes.default.svc',namespace:id.namespace}],clusterResourceWhitelist:[]}},
   ];
-}
-export function syncOperation({revision,manifests}){
-  if(!/^[a-f0-9]{40}$/.test(revision)||!Array.isArray(manifests)||!manifests.length)throw Error('An exact local revision and manifests are required');
-  return {initiatedBy:{username:'teck-local-development'},sync:{revision,prune:false,syncOptions:['RespectIgnoreDifferences=true'],manifests:manifests.map(m=>JSON.stringify(m))}};
 }
 export function validateManifests(manifests,namespace,scopes){
   if(!Array.isArray(manifests)||!manifests.length)throw Error('No application resources were rendered');
@@ -49,13 +39,11 @@ export function manifestImages(value){
   visit(value);return [...images].sort();
 }
 export function releaseRecord({sourceRevision,sourceContentSha256,manifests,images}){
-  if(!/^[a-f0-9]{40}$/.test(sourceRevision)||!/^[a-f0-9]{64}$/.test(sourceContentSha256))throw Error('Exact source commit and content identities are required');
-  if(!Array.isArray(images)||!images.length||images.some(i=>!/^localhost:5001\/[a-z0-9/._-]+@sha256:[a-f0-9]{64}$/.test(i)))throw Error('Application images require local immutable digest references');
-  const record={schemaVersion:1,sourceRevision,sourceContentSha256,manifestSha256:contentHash(manifests),images:[...new Set(images)].sort()};
+  const record={schemaVersion:2,sourceRevision,sourceContentSha256,manifestSha256:contentHash(manifests),images:[...new Set(images)].sort()};
   validateRelease(record,manifests);return record;
 }
 export function validateRelease(record,manifests){
-  const images=manifestImages(manifests);
-  if(record.schemaVersion!==1||!/^[a-f0-9]{40}$/.test(record.sourceRevision)||!/^[a-f0-9]{64}$/.test(record.sourceContentSha256)||record.manifestSha256!==contentHash(manifests)||!Array.isArray(record.images)||record.images.some(i=>!/^localhost:5001\/[a-z0-9/._-]+@sha256:[a-f0-9]{64}$/.test(i)||!images.includes(i))||images.filter(i=>i.startsWith('localhost:5001/')).some(i=>!record.images.includes(i)))throw Error('Local release source, manifest and image references do not match');
+  const images=manifestImages(manifests),local=i=>/^teck-local\/[a-z0-9/._-]+:sha256-[a-f0-9]{64}$/.test(i);
+  if(record.schemaVersion!==2||!/^[a-f0-9]{40}$/.test(record.sourceRevision)||!/^[a-f0-9]{64}$/.test(record.sourceContentSha256)||record.manifestSha256!==contentHash(manifests)||!Array.isArray(record.images)||record.images.some(i=>!local(i)||!images.includes(i))||images.filter(i=>i.startsWith('teck-local/')).some(i=>!record.images.includes(i)))throw Error('Local release source, manifest and loaded image references do not match');
   return true;
 }

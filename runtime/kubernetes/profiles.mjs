@@ -2,7 +2,7 @@ import {checkAmbientRouting} from './preflight.mjs';
 
 const profiles=Object.freeze({
   workspace:Object.freeze({name:'workspace',runtime:'docker-sandbox',cni:'kindnet',mesh:'none',
-    proves:Object.freeze({application:true,delivery:true,meshSecurity:false,ciliumPolicy:false})}),
+    proves:Object.freeze({application:true,delivery:false,meshSecurity:false,ciliumPolicy:false})}),
   full:Object.freeze({name:'full',runtime:'linux',cni:'cilium',mesh:'ambient',
     proves:Object.freeze({application:true,delivery:true,meshSecurity:true,ciliumPolicy:true})}),
 });

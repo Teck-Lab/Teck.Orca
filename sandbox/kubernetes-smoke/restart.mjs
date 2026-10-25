@@ -1,22 +1,17 @@
-import assert from 'node:assert/strict';import {readFileSync,writeFileSync} from 'node:fs';import {join} from 'node:path';import {request} from 'node:https';
-const config=JSON.parse(readFileSync('/etc/teck-orca/kubernetes.json')),runtime='/usr/local/lib/teck-kubernetes/'+config.assetDigest;
-assert.ok(config.projectId.startsWith('isolated-kubernetes-'),'Refusing a real project');
-const {targetIdentity}=await import(runtime+'/worktree.mjs');
-const identity=targetIdentity({projectId:config.projectId,worktreeId:'synthetic-repo::'+(process.argv[3]??'/tmp/teck-monorepo-source')});
-const promotion=targetIdentity({projectId:config.projectId,worktreeId:'synthetic-repo::'+(process.argv[3]??'/tmp/teck-monorepo-source')},'promotion');
-const {command}=await import(runtime+'/command.mjs');const {waitFor}=await import(runtime+'/deploy.mjs');const {projectClusterName}=await import(runtime+'/cluster.mjs');
-const folder=join(config.root,projectClusterName(config.projectId)),path=folder+'/state.json',boot=readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim();
-if(process.argv[2]==='before')await waitFor('installed runtime ready before restart',()=>{const s=JSON.parse(readFileSync(path));return s.phase==='ready'&&s.readyBoot===boot&&s.runtimeRevision===config.assetDigest;},120_000);
-if(process.argv[2]==='after')await waitFor('automatic guest startup reconciliation',()=>{const s=JSON.parse(readFileSync(path));if(s.phase==='failed')throw Error('Guest bootstrap failed; inspect retained bootstrap.log');return s.phase==='ready'&&s.readyBoot===boot&&s.runtimeRevision===config.assetDigest;},300_000);
-const state=JSON.parse(readFileSync(path)),k=(args)=>command('kubectl',['--kubeconfig',folder+'/kubeconfig',...args]);
-const uids={};for(const ns of [identity.namespace,promotion.namespace]){
- uids[ns]=(JSON.parse(await k(['get','namespace',ns,'-o','json']))).metadata.uid;
- uids[ns+'/application']=(JSON.parse(await k(['-n','argocd','get','application',ns,'-o','json']))).metadata.uid;
- uids[ns+'/secret']=(JSON.parse(await k(['-n',ns,'get','secret','gateway-public-auth','-o','json']))).metadata.uid;
+import assert from 'node:assert/strict';import fs from 'node:fs';
+const cfg=JSON.parse(fs.readFileSync('/etc/teck-orca/kubernetes.json'));assert.ok(cfg.projectId.startsWith('isolated-kubernetes-'));const runtime='/usr/local/lib/teck-kubernetes/'+cfg.assetDigest,{command}=await import(runtime+'/command.mjs'),{waitFor}=await import(runtime+'/deploy.mjs'),{projectClusterName}=await import(runtime+'/cluster.mjs'),folder=cfg.root+'/'+projectClusterName(cfg.projectId),before=JSON.parse(fs.readFileSync('/tmp/teck-kind-direct-receipt.json')),boot=fs.readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim(),k=a=>command('kubectl',['--kubeconfig',folder+'/kubeconfig',...a]);
+if(process.argv[2]==='before'){
+ await k(['-n',before.namespace,'exec','deployment/db-client','--','psql','-v','ON_ERROR_STOP=1','-c',"INSERT INTO local_probe VALUES ('durable-only') ON CONFLICT DO NOTHING"]);
+ fs.writeFileSync('/tmp/teck-kind-restart-before.json',JSON.stringify({boot,...before}));
+}else{
+ const original=JSON.parse(fs.readFileSync('/tmp/teck-kind-restart-before.json'));assert.notEqual(boot,original.boot);
+ await waitFor('automatic startup',()=>{const s=JSON.parse(fs.readFileSync(folder+'/state.json'));if(s.phase==='failed')throw Error('Startup failed');return s.phase==='ready'&&s.readyBoot===boot&&s.runtimeRevision===cfg.assetDigest;},300000);
+ const state=JSON.parse(fs.readFileSync(folder+'/state.json'));assert.deepEqual(state.nodes,original.nodes);
+ await k(['-n',before.namespace,'wait','cluster.postgresql.cnpg.io/db','--for=condition=Ready','--timeout=180s']);
+ // Kubernetes can briefly retain pre-boot readiness status; probe the real app too.
+ await waitFor('actual SQL application readiness',async()=>{try{return (await k(['-n',before.namespace,'exec','deployment/db-client','--','cat','/tmp/ready'])).trim()==='alpha-dirty';}catch{return false;}},180000);
+ await k(['-n',before.namespace,'rollout','status','deployment/db-client','--timeout=180s']);
+ for(const [kind,name,uid] of [['namespace',before.namespace,before.namespaceUid],['cluster.postgresql.cnpg.io','db',before.dbUid],['secret','db-app',before.secretUid]]){const r=JSON.parse(await k([...(kind==='namespace'?[]:['-n',before.namespace]),'get',kind,name,'-o','json']));assert.equal(r.metadata.uid,uid);}
+ assert.equal((await k(['-n',before.namespace,'exec','deployment/db-client','--','psql','-Atc',"SELECT count(*) FROM local_probe WHERE version='durable-only'"])).trim(),'1');
+ const receipt={passed:true,automaticInteractiveStartup:true,nodeAndResourceIdentitiesRetained:true,persistentDatabaseSentinel:true,version:'alpha-dirty',nodes:state.nodes};fs.writeFileSync('/tmp/teck-kind-restart-receipt.json',JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
 }
-async function read(hostname){return new Promise((resolve,reject)=>{const q=request({hostname,path:'/__local_probe',ca:readFileSync('/etc/ssl/certs/ca-certificates.crt'),agent:false,timeout:5000},r=>{let body='';r.on('data',c=>body+=c);r.on('end',()=>{try{assert.equal(r.statusCode,200);resolve(JSON.parse(body).version);}catch(e){reject(e);}});});q.on('error',reject);q.on('timeout',()=>q.destroy(Error('HTTPS timeout')));q.end();});}
-await waitFor('worktree trusted HTTPS after restart',async()=>{try{return await read(identity.hostname)==='alpha-dirty'&&await read(promotion.hostname)==='alpha';}catch{return false;}},180_000);
-const result={boot,nodes:state.nodes,uids,worktreeImage:JSON.parse(readFileSync(folder+'/worktrees/'+identity.hash+'/state.json')).release.images,trustedHttps:true};
-if(process.argv[2]==='before')writeFileSync('/tmp/teck-restart-before.json',JSON.stringify(result));
-else{const before=JSON.parse(readFileSync('/tmp/teck-restart-before.json'));assert.notEqual(before.boot,boot);assert.deepEqual(result.nodes,before.nodes);assert.deepEqual(result.uids,before.uids);assert.deepEqual(result.worktreeImage,before.worktreeImage);writeFileSync('/tmp/teck-restart-receipt.json',JSON.stringify({passed:true,automaticInteractiveStartup:true,identitiesRetained:true,...result}));}
-console.log(JSON.stringify({phase:process.argv[2],boot,nodes:state.nodes.map(n=>n.id),identitiesVerified:Object.keys(uids).length,trustedHttps:true}));

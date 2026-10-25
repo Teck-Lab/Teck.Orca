@@ -1,3 +1,5 @@
+> Historical validation of the superseded delivery design. Current workflow: validation-official-kind-2026-10-25.md.
+
 # GitOps layout validation � 2026-10-25
 
 The local platform follows the existing repository hierarchy:

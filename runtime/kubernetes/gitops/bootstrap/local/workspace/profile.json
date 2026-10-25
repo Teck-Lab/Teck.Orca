@@ -4,9 +4,10 @@
   "cni": "kindnet",
   "mesh": "none",
   "domain": "teck.test",
-  "gitAgentPort": 19418,
   "securityValidation": false,
   "dependencies": {
     "keycloak": "apps/local/security/keycloak"
-  }
+  },
+  "workflow": "kubectl",
+  "defaultAddons": []
 }

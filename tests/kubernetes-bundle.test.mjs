@@ -4,13 +4,14 @@ import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname,join} from 'node:path';
 import {bundleSnapshot,loadBundle,bootstrapRevision} from '../runtime/kubernetes/bundle.mjs';
-const files={'bootstrap/local/components.lock.json':'{"schemaVersion":1}','bootstrap/local/workspace/profile.json':'{"name":"workspace","enabled":true}'};
+const files={'bootstrap/local/components.lock.json':'{"schemaVersion":1,"kubernetes":{"nodeImage":"pinned"}}','bootstrap/local/workspace/profile.json':'{"name":"workspace","enabled":true}'};
 test('app dependency additions do not silently upgrade shared controllers or require cluster replacement',()=>{
  const base=bundleSnapshot({files,revision:'a'.repeat(40)});
  const addition=bundleSnapshot({files:{...files,'apps/local/security/keycloak/deployment.yaml':'{}'},revision:'a'.repeat(40)});
- assert.equal(bootstrapRevision(base),bootstrapRevision(addition));
+ assert.equal(bootstrapRevision({...base,json:n=>JSON.parse(files[n])}),bootstrapRevision({...addition,json:n=>JSON.parse(files[n])}));
  const changed=bundleSnapshot({files:{...files,'apps/local/system/argo-cd/values.yaml':'changed'},revision:'a'.repeat(40)});
- assert.notEqual(bootstrapRevision(base),bootstrapRevision(changed));
+ assert.equal(bootstrapRevision({...base,json:n=>JSON.parse(files[n])}),bootstrapRevision({...changed,json:n=>JSON.parse(files[n])}));
+ assert.notEqual(bootstrapRevision({...base,json:n=>JSON.parse(files[n])}),bootstrapRevision({...base,json:()=>({kubernetes:{nodeImage:'different'}})}));
 });
 test('bundle content identity is deterministic and includes configuration changes',()=>{
  const a=bundleSnapshot({files,revision:'a'.repeat(40),dirty:true});

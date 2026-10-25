@@ -1,3 +1,5 @@
+> Local Kubernetes delivery was simplified in v0.1.6. See ../docs/validation-official-kind-2026-10-25.md for current acceptance; earlier Argo CD/Kargo results below are historical.
+
 # Native SSH preview 0.1.5 Kubernetes pilot - 2026-10-25
 
 The native provider suite passes 21 tests, including shared project reuse,

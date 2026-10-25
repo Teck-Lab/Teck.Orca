@@ -6,9 +6,9 @@ import {request} from 'node:https';
 import {setTimeout as delay} from 'node:timers/promises';
 import {directory,readJson,withProjectLock,writeJson} from './state.mjs';
 import {worktreeIdentity} from './resources.mjs';
-import {contentHash,manifestImages,ownerLabels,releaseRecord,syncOperation,targetIdentity,validateManifests,worktreeResources} from './worktree.mjs';
+import {contentHash,ownerLabels,releaseRecord,targetIdentity,validateManifests,worktreeResources} from './worktree.mjs';
 import {insideCheckout,parseResources,sourceIdentity} from './render.mjs';
-import {appRepository,localGit} from './local-git.mjs';
+import {installAddons} from './platform.mjs';
 
 export async function waitFor(label,predicate,timeout=240_000){
   const deadline=Date.now()+timeout;
@@ -24,23 +24,22 @@ export function assertOwner(resource,context,uid){
   const labels=ownerLabels(context);
   if((uid&&resource.metadata.uid!==uid)||Object.entries(labels).some(([key,value])=>resource.metadata.labels?.[key]!==value))throw Error('Resource ownership or identity changed: '+resource.kind+'/'+resource.metadata.name);
 }
-export async function ensureEnvironment({context,folder,k,mode='iteration'}){
-  const id=targetIdentity(context,mode),path=join(folder,'state.json');
+export async function ensureEnvironment({context,folder,k}){
+  const id=targetIdentity(context),path=join(folder,'state.json');
   let state=existsSync(path)?readJson(path):null;
   if(state&&(state.projectId!==context.projectId||state.worktreeId!==context.worktreeId||state.namespace!==id.namespace))throw Error('Invalid worktree environment ownership record');
   const existing=await object(k,'namespace',id.namespace);
   if(existing){if(!state?.namespaceUid)throw Error('An unowned worktree namespace already exists');assertOwner(existing,context,state.namespaceUid);}
   else{
     if(state&&state.phase!=='removed')throw Error('Owned worktree namespace is missing; inspect its data before recreating it');
-    const ns=worktreeResources(context,{mode}).find(r=>r.kind==='Namespace');
+    const ns=worktreeResources(context).find(r=>r.kind==='Namespace');
     const created=JSON.parse(await k(['create','-f','-','-o','json'],{input:JSON.stringify(ns)}));
     state={version:1,projectId:context.projectId,worktreeId:context.worktreeId,namespace:id.namespace,namespaceUid:created.metadata.uid,phase:'created'};writeJson(path,state);
   }
-  const resources=worktreeResources(context,{mode}).filter(r=>r.kind!=='Namespace');
+  const resources=worktreeResources(context).filter(r=>r.kind!=='Namespace');
   for(const r of resources){const existing=await object(k,r.kind,r.metadata.name,r.metadata.namespace);if(existing)assertOwner(existing,context);}
   await k(['apply','-f','-'],{input:JSON.stringify({apiVersion:'v1',kind:'List',items:resources})});
-  const project=await object(k,'appproject',id.application,'argocd');
-  state={...state,projectUid:project.metadata.uid};writeJson(path,state);return state;
+  return state;
 }
 export async function localCredentials({context,state,k,folder}){
   const name='gateway-public-auth',existing=await object(k,'secret',name,state.namespace);
@@ -50,24 +49,24 @@ export async function localCredentials({context,state,k,folder}){
   const created=JSON.parse(await k(['create','-f','-','-o','json'],{input:JSON.stringify(secret)}));
   state={...state,secretUid:created.metadata.uid};writeJson(join(folder,'state.json'),state);return state;
 }
-async function buildImages({context,config,source,run}){
-  if(config.schemaVersion!==1||!Array.isArray(config.images)||!config.images.length)throw Error('A local image build declaration is required');
+export async function buildImages({context,config,source,cluster,run,identify=sourceIdentity}){
+  if(config.schemaVersion!==1||!Array.isArray(config.images))throw Error('A local image build declaration is required');
   const id=worktreeIdentity(context.projectId,context.worktreeId),images=[];
   for(const build of config.images){
     if(!/^[a-z0-9][a-z0-9-]{0,62}$/.test(build.name)||!/^ghcr\.io\/[a-z0-9/._-]+$/.test(build.image))throw Error('Invalid application image declaration');
     const folder=insideCheckout(context.root,build.context),dockerfile=insideCheckout(context.root,build.dockerfile);
-    const tag=`localhost:5001/${ownerLabels(context)['teck.orca.io/project']}/${id.hash}/${build.name}:${source.sourceContentSha256.slice(0,20)}`;
+    const repository='teck-local/'+ownerLabels(context)['teck.orca.io/project']+'/'+id.hash+'/'+build.name;
+    const temporary=repository+':build-'+source.sourceContentSha256;
     const args=Object.entries({...build.args,VERSION:'0.0.0-local.'+source.sourceContentSha256.slice(0,12),SOURCE_SHA:source.sourceRevision});
-    if(args.some(([key,value])=>! /^[A-Z][A-Z0-9_]*$/.test(key)||typeof value!=='string'||/[\0\r\n]/.test(value)))throw Error('Invalid application build argument');
-    await run('docker',['build','--file',dockerfile,'--tag',tag,'--label','io.teck.local.source='+source.sourceContentSha256,'--label','org.opencontainers.image.revision='+source.sourceRevision,...args.flatMap(([key,value])=>['--build-arg',key+'='+value]),folder],{timeout:900_000});
-    if((await sourceIdentity(context.root,run)).sourceContentSha256!==source.sourceContentSha256)throw Error('Worktree changed during the image build; redeploy the current source');
-    const built=JSON.parse(await run('docker',['image','inspect',tag]))[0];
-    if(built.Config.Labels?.['io.teck.local.source']!==source.sourceContentSha256)throw Error('Built image does not match the source content');
-    await run('docker',['push',tag]);
-    const pushed=JSON.parse(await run('docker',['image','inspect',tag]))[0];
-    const image=pushed.RepoDigests.find(value=>value.startsWith(tag.slice(0,tag.lastIndexOf(':'))+'@sha256:'));
-    if(!image)throw Error('The local registry did not return an immutable image digest');
-    images.push({canonical:build.image,image});
+    if(args.some(([key,value])=>!/^[A-Z][A-Z0-9_]*$/.test(key)||typeof value!=='string'||/[\0\r\n]/.test(value)))throw Error('Invalid application build argument');
+    await run('docker',['build','--file',dockerfile,'--tag',temporary,'--label','io.teck.local.source='+source.sourceContentSha256,'--label','org.opencontainers.image.revision='+source.sourceRevision,...args.flatMap(([key,value])=>['--build-arg',key+'='+value]),folder],{timeout:900_000});
+    if((await identify(context.root,run)).sourceContentSha256!==source.sourceContentSha256)throw Error('Worktree changed during the image build; redeploy the current source');
+    const built=JSON.parse(await run('docker',['image','inspect',temporary]))[0];
+    if(!/^sha256:[a-f0-9]{64}$/.test(built.Id)||built.Config.Labels?.['io.teck.local.source']!==source.sourceContentSha256)throw Error('Built image does not match the source content');
+    const image=repository+':sha256-'+built.Id.slice(7);
+    await run('docker',['tag',temporary,image]);
+    await run('kind',['load','docker-image',image,'--name',cluster.name],{timeout:300_000});
+    images.push({canonical:build.image,image,id:built.Id});
   }
   return images;
 }
@@ -77,13 +76,15 @@ async function render({context,bundle,config,images,folder,k}){
   if(!Array.isArray(dependencies)||dependencies.some(name=>!/^[a-z0-9-]+$/.test(name)||!available[name]||!Object.hasOwn(bundle.files,`${available[name]}/kustomization.yaml`)))throw Error('Unknown local dependency');
   const spec={apiVersion:'kustomize.config.k8s.io/v1beta1',kind:'Kustomization',namespace:id.namespace,
     resources:[insideCheckout(context.root,'deployment/local'),...dependencies.map(name=>join(bundle.root,available[name]))].map(path=>relative(overlay,path)),
-    images:images.map(({canonical,image})=>({name:canonical,newName:image.split('@')[0],digest:image.split('@')[1]}))};
+    images:images.map(({canonical,image})=>({name:canonical,newName:image.slice(0,image.lastIndexOf(':')),newTag:image.slice(image.lastIndexOf(':')+1)}))};
   writeJson(join(overlay,'kustomization.yaml'),spec);
   const yaml=await k(['kustomize','--load-restrictor=LoadRestrictionsNone',overlay]);
   const json=await k(['create','--dry-run=client','--validate=false','-f','-','-o','json'],{input:yaml});
   const resources=parseResources(json).map(resource=>{
     delete resource.status;for(const key of ['creationTimestamp','resourceVersion','generation','uid','managedFields'])delete resource.metadata[key];
     resource.metadata.labels={...resource.metadata.labels,...ownerLabels(context)};
+    const pod=resource.kind==='CronJob'?resource.spec?.jobTemplate?.spec?.template?.spec:resource.kind==='Pod'?resource.spec:resource.spec?.template?.spec;
+    for(const container of [...(pod?.containers??[]),...(pod?.initContainers??[])])if(images.some(i=>i.image===container.image))container.imagePullPolicy='IfNotPresent';
     if(resource.spec?.template?.metadata)resource.spec.template.metadata.annotations={...resource.spec.template.metadata.annotations,'teck.orca.io/hostname':id.hostname};
     if(resource.kind==='HTTPRoute'){resource.spec.hostnames=[id.hostname];resource.spec.parentRefs=[{name:'edge',namespace:'teck-local-edge'}];}
     return resource;
@@ -96,7 +97,7 @@ async function render({context,bundle,config,images,folder,k}){
   validateManifests(resources,id.namespace,scopes);return resources;
 }
 export async function ensureHostname(hostname,folder){
-  if(!/^(?:wt-|promote-)[a-f0-9]{12}\.teck\.test$/.test(hostname))throw Error('Invalid worktree hostname');
+  if(!/^wt-[a-f0-9]{12}\.teck\.test$/.test(hostname))throw Error('Invalid worktree hostname');
   return withProjectLock(join(folder,'hosts'),async()=>{
     const path='/etc/hosts',text=readFileSync(path,'utf8'),marker='# teck-local '+hostname;
     const existing=text.split('\n').filter(line=>line.split('#')[0].trim().split(/\s+/).slice(1).includes(hostname));
@@ -104,54 +105,52 @@ export async function ensureHostname(hostname,folder){
     writeFileSync(path,text.replace(/\n?$/,'\n')+`127.0.0.1 ${hostname} ${marker}\n`);
   });
 }
-export async function publishRelease({context,folder,source,manifests,run,checks=[],healthPath='/health'}){
-  const id=worktreeIdentity(context.projectId,context.worktreeId),repo=directory(join(folder,'source'));
-  if(!existsSync(join(repo,'.git')))await localGit(run,repo,['init','--initial-branch=worktrees/'+id.hash]);
-  await localGit(run,repo,['config','remote.origin.url','http://127.0.0.1:19418/apps.git']);
-  const promotion=structuredClone(manifests).map(r=>{
-    r.metadata.namespace=id.namespace+'-promotion';
-    if(r.spec?.template?.metadata)r.spec.template.metadata.annotations={...r.spec.template.metadata.annotations,'teck.orca.io/hostname':'promote-'+id.hash+'.teck.test'};
-    const routing=r.spec?.strategy?.canary?.trafficRouting?.plugins?.['argoproj-labs/gatewayAPI'];if(routing?.namespace)routing.namespace=id.namespace+'-promotion';
-    if(r.kind==='HTTPRoute')r.spec.hostnames=['promote-'+id.hash+'.teck.test'];return r;
-  });
-  for(const [mode,resources] of [['iteration',manifests],['promotion',promotion]]){
-    const path=join(repo,mode);
-    if(existsSync(path)){if(dirname(resolve(path))!==resolve(repo)||lstatSync(path).isSymbolicLink())throw Error('Unsafe local snapshot path');rmSync(path,{recursive:true});}
-    directory(path);
-    for(let i=0;i<resources.length;i++)writeJson(join(path,i+'.json'),resources[i]);
-    writeJson(join(path,'kustomization.yaml'),{apiVersion:'kustomize.config.k8s.io/v1beta1',kind:'Kustomization',resources:resources.map((_r,i)=>i+'.json')});
+function resourceKey(r){return r.apiVersion+'/'+r.kind+'/'+r.metadata.namespace+'/'+r.metadata.name;}
+function resourceType(r){const group=r.apiVersion.includes('/')?r.apiVersion.split('/')[0]:'';return r.kind+(group?'.'+group:'');}
+export async function waitResources({manifests,k}){
+  for(const r of manifests){
+    if(!['Deployment','StatefulSet','DaemonSet','Rollout','Job','PersistentVolumeClaim','Cluster'].includes(r.kind))continue;
+    if(r.kind==='Cluster'&&r.apiVersion!=='postgresql.cnpg.io/v1')continue;
+    if(['Deployment','StatefulSet','DaemonSet'].includes(r.kind)){
+      await k(['-n',r.metadata.namespace,'rollout','status',r.kind.toLowerCase()+'/'+r.metadata.name,'--timeout=360s']);continue;
+    }
+    await waitFor(r.kind+'/'+r.metadata.name,async()=>{
+      const current=await object(k,resourceType(r),r.metadata.name,r.metadata.namespace);if(!current)return false;
+      const s=current.status??{},conditions=s.conditions??[];
+      const failure=conditions.find(c=>c.status==='True'&&['Failed','Degraded'].includes(c.type));
+      if(failure||s.phase==='Degraded')throw Error(r.kind+'/'+r.metadata.name+' failed: '+(failure?.message??s.message??'degraded'));
+      if(r.kind==='Job')return conditions.some(c=>c.type==='Complete'&&c.status==='True');
+      if(r.kind==='PersistentVolumeClaim')return s.phase==='Bound';
+      if(r.kind==='Cluster')return conditions.some(c=>c.type==='Ready'&&c.status==='True')&&(s.observedGeneration===undefined||s.observedGeneration>=current.metadata.generation);
+      if(r.kind==='Rollout')return s.phase==='Healthy'&&(s.observedGeneration===undefined||s.observedGeneration===current.metadata.generation);
+      if((s.observedGeneration??0)<(current.metadata.generation??0))return false;
+      if(r.kind==='DaemonSet')return s.numberReady===s.desiredNumberScheduled&&s.updatedNumberScheduled===s.desiredNumberScheduled;
+      return (s.readyReplicas??0)>=(r.spec.replicas??1)&&(s.updatedReplicas??0)>=(r.spec.replicas??1);
+    },360_000);
   }
-  const images=manifestImages(manifests).filter(i=>i.startsWith('localhost:5001/'));
-  const record={...releaseRecord({...source,manifests,images}),checks,healthPath,promotionManifestSha256:contentHash(promotion)};
-  writeJson(join(repo,'release.json'),record);
-  await localGit(run,repo,['add','.']);
-  if((await localGit(run,repo,['status','--porcelain'])).trim())await localGit(run,repo,['commit','-m','chore(local): snapshot '+source.sourceContentSha256]);
-  await localGit(run,repo,['push','origin','HEAD:refs/heads/worktrees/'+id.hash]);
-  const commit=(await localGit(run,repo,['rev-parse','HEAD'])).trim();
-  return {commit,...record};
 }
-export function application(context,revision,manifests,{mode='iteration'}={}){
-  const id=targetIdentity(context,mode);
-  const ignores=manifests.filter(r=>r.kind==='HTTPRoute').map(r=>({group:'gateway.networking.k8s.io',kind:'HTTPRoute',name:r.metadata.name,namespace:id.namespace,jqPathExpressions:['.spec.rules[].backendRefs[].weight']}));
-  for(const rollout of manifests.filter(r=>r.kind==='Rollout'))for(const name of [rollout.spec.strategy?.canary?.stableService,rollout.spec.strategy?.canary?.canaryService].filter(Boolean))ignores.push({group:'',kind:'Service',name,namespace:id.namespace,jsonPointers:['/spec/selector/rollouts-pod-template-hash']});
-  return {apiVersion:'argoproj.io/v1alpha1',kind:'Application',metadata:{name:id.application,namespace:'argocd',labels:ownerLabels(context)},spec:{project:id.application,destination:{server:'https://kubernetes.default.svc',namespace:id.namespace},source:{repoURL:appRepository,targetRevision:revision,path:'iteration'},syncPolicy:{syncOptions:['RespectIgnoreDifferences=true']},ignoreDifferences:ignores}};
-}
-export async function syncLocal({context,state,release,manifests,k,folder}){
-  const id=worktreeIdentity(context.projectId,context.worktreeId),existing=await object(k,'application',id.application,'argocd');
-  if(existing){if(!state.applicationUid)throw Error('An unowned local Argo Application already exists');assertOwner(existing,context,state.applicationUid);}
-  const app=application(context,state.baselineCommit??release.commit,manifests);
-  await k(['apply','-f','-'],{input:JSON.stringify(app)});
-  const created=await object(k,'application',id.application,'argocd');
-  state={...state,applicationUid:created.metadata.uid,baselineCommit:state.baselineCommit??release.commit};writeJson(join(folder,'state.json'),state);
-  const prior=created.status?.operationState?.startedAt;
-  if(created.operation)throw Error('A prior Argo operation is still running; inspect it before deploying again');
-  await k(['-n','argocd','patch','application',id.application,'--type=merge','-p',JSON.stringify({operation:syncOperation({revision:release.commit,manifests})})]);
-  await waitFor('local Argo sync',async()=>{
-    const app=await object(k,'application',id.application,'argocd'),op=app.status?.operationState;
-    if(app.operation||op?.startedAt===prior)return false;
-    if(['Failed','Error'].includes(op?.phase))throw Error('Local Argo sync failed: '+op.message);
-    return op?.phase==='Succeeded';
-  });
+export async function applyManifests({context,state,manifests,k,save}){
+  const records=new Map((state.resources??[]).map(r=>[r.key,r]));
+  // Validate every existing identity before writing any application resource.
+  for(const r of manifests){
+    const existing=await object(k,resourceType(r),r.metadata.name,r.metadata.namespace),record=records.get(resourceKey(r));
+    if(existing){if(!record?.uid)throw Error('An unowned application resource already exists: '+r.kind+'/'+r.metadata.name);assertOwner(existing,context,record.uid);}
+    else if(record)throw Error('Owned application resource is missing; inspect before recreating: '+r.kind+'/'+r.metadata.name);
+  }
+  const wave=r=>Number(r.metadata.annotations?.['teck.orca.io/apply-wave']??r.metadata.annotations?.['argocd.argoproj.io/sync-wave']??0);
+  if(manifests.some(r=>!Number.isInteger(wave(r))))throw Error('Invalid local apply wave');
+  for(const phase of [...new Set(manifests.map(wave))].sort((a,b)=>a-b)){
+    const group=manifests.filter(r=>wave(r)===phase),input=JSON.stringify({apiVersion:'v1',kind:'List',items:group});
+    await k(['apply','--dry-run=server','-f','-'],{input});
+    // Use kubectl's normal three-way apply, preserving undeclared controller-owned fields.
+    // Journal each successful write so an interrupted apply remains reviewable/retryable.
+    for(const r of group){
+      const actual=JSON.parse(await k(['apply','-f','-','-o','json'],{input:JSON.stringify(r)}));
+      records.set(resourceKey(r),{key:resourceKey(r),uid:actual.metadata.uid});
+      state={...state,resources:[...records.values()]};save(state);
+    }
+    await waitResources({manifests:group,k});
+  }
   return state;
 }
 export async function probeHttps(hostname,path='/health'){
@@ -183,28 +182,26 @@ export async function deployWorktree({context,cluster,bundle,run}){
   const id=worktreeIdentity(context.projectId,context.worktreeId),folder=directory(join(dirname(cluster.kubeconfig),'worktrees',id.hash)),k=kubernetes(run,cluster.kubeconfig);
   return withProjectLock(folder,async()=>{
     let state=await ensureEnvironment({context,folder,k});
+    const save=value=>{state=value;writeJson(join(folder,'state.json'),state);};
     try{
       const config=readJson(insideCheckout(context.root,'deployment/local/builds.json'));
+      await installAddons({names:config.addons??[],cluster,bundle,run});
       if(config.dependencies?.includes('keycloak'))state=await localCredentials({context,state,k,folder});
-      state={...state,phase:'building'};writeJson(join(folder,'state.json'),state);
-      const source=await sourceIdentity(context.root,run),images=await buildImages({context,config,source,run});
+      save({...state,phase:'building'});
+      const source=await sourceIdentity(context.root,run),images=await buildImages({context,config,source,cluster,run});
       const manifests=await render({context,bundle,config,images,folder,k});
-      const release=await publishRelease({context,folder,source,manifests,run,checks:config.initialAnalyses??[],healthPath:config.healthPath});
-      state={...state,phase:'syncing',release};writeJson(join(folder,'state.json'),state);
-      state=await syncLocal({context,state,release,manifests,k,folder});
-      await ensureHostname(id.hostname,dirname(cluster.kubeconfig));
-      await waitFor('application rollout',async()=>{
-        for(const resource of manifests.filter(r=>['Rollout','Deployment'].includes(r.kind))){
-          const current=await object(k,resource.kind,resource.metadata.name,id.namespace);
-          if(resource.kind==='Rollout'){if(current.status?.phase==='Degraded')throw Error('Application rollout failed; stable traffic may still be serving');if(current.status?.phase!=='Healthy')return false;}
-          else if((current.status?.availableReplicas??0)<(resource.spec.replicas??1))return false;
-        }
-        return true;
-      },360_000);
+      const release=releaseRecord({...source,manifests,images:images.map(i=>i.image)});
+      // Only local, non-secret artifacts: no synthetic Git commits or remote publication.
+      writeJson(join(folder,'manifests.json'),{apiVersion:'v1',kind:'List',items:manifests});
+      save({...state,phase:'applying',release});
+      state=await applyManifests({context,state,manifests,k,save});
       const analyses=await runInitialAnalyses({k,context,names:config.initialAnalyses??[],namespace:id.namespace});
-      await waitFor('trusted application HTTPS',async()=>{try{return await probeHttps(id.hostname,config.healthPath);}catch{return false;}});
-      state={...state,phase:'ready',analyses};writeJson(join(folder,'state.json'),state);
-      return {phase:'ready',namespace:id.namespace,hostname:id.hostname,url:'https://'+id.hostname,release,mode:'local-override',mesh:'none',securityValidation:false};
-    }catch(error){const latest=readJson(join(folder,'state.json'));writeJson(join(folder,'state.json'),{...latest,phase:'failed'});throw error;}
+      if(manifests.some(r=>r.kind==='HTTPRoute')){
+        await ensureHostname(id.hostname,dirname(cluster.kubeconfig));
+        await waitFor('trusted application HTTPS',async()=>{try{return await probeHttps(id.hostname,config.healthPath);}catch{return false;}});
+      }
+      save({...state,phase:'ready',analyses});
+      return {phase:'ready',namespace:id.namespace,...(manifests.some(r=>r.kind==='HTTPRoute')?{url:'https://'+id.hostname}:{}),release,mode:'kubectl',mesh:'none',securityValidation:false};
+    }catch(error){save({...state,phase:'failed'});throw error;}
   });
 }

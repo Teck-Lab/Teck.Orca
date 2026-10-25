@@ -11,15 +11,6 @@ nodes:
         hostPort: 443
         listenAddress: 127.0.0.1
         protocol: TCP
-      - containerPort: 30418
-        hostPort: 19418
-        listenAddress: 127.0.0.1
-        protocol: TCP
-  - role: worker
-    extraMounts:
-      - hostPath: /var/lib/teck-kubernetes/kmsg
-        containerPath: /dev/kmsg
-        readOnly: true
 networking:
   apiServerAddress: 127.0.0.1
   apiServerPort: 16443
