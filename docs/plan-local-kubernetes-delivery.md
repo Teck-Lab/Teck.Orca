@@ -10,4 +10,4 @@ The agent can use kubectl directly or the teck-kube deploy convenience wrapper. 
 
 Validation must use a separate recorded Docker Sandbox. Prove bare startup, optional CNPG, connectivity/migrations against operator-managed PostgreSQL, concurrent worktree isolation, image updates, test failure reporting, cleanup and cold restart persistence. Keep real project sandboxes untouched. Publish source and evidence through the existing GitHub App MCP PRs.
 
-Existing draft delivery clusters require explicit migration and are retained. Full Cilium/ambient, HA/backups and production GitOps promotion are outside workspace acceptance. The existing Gateway.Public pilot remains blocked on adaptation to current Monorepo gateways.
+Existing draft delivery clusters require explicit migration and are retained. Full Cilium/ambient, HA/backups and production GitOps promotion are outside workspace acceptance. The application pilot now targets the separate customer/admin web gateways; full downstream business workflows still need application-specific tests.

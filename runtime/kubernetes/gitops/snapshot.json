@@ -3,7 +3,7 @@
   "repository": "https://github.com/Teck-Lab/Teck.GitOps",
   "revision": "1b2b8cbca7485e9797d53f9a8b0cb803b9d256ed",
   "dirty": true,
-  "contentSha256": "d5bfbceefc1794b6e6719c810325cc44b01f1a2dd5391642228d0dd9e65362cd",
+  "contentSha256": "8f6efb62445e233088b7661892544b5f42d947624af033e52c5e4695d828079d",
   "files": {
     "AGENTS.md": "36c55aa1c8913719257cca1bce94c5bc284a373daadf8ed093295e6f15514fc9",
     "apps/AGENTS.md": "dbba04b8781a8e26e98e26160c968f650acaeef83bb2ae9858ac0b4b3e24ec8c",
@@ -35,10 +35,10 @@
     "apps/local/security/certificates/kustomization.yaml": "4d118b174027ce6312777960c8635b7e82d6a56d20d15624d684a67140cef5d6",
     "apps/local/security/keycloak/Chart.yaml": "6216c1bb1ab5b49a49b7983f1a967b2e7196d8ed77d6961b7ec76828568362a2",
     "apps/local/security/keycloak/config.yaml": "2471e74d1651509c7fb6a686a1af4e27f75ed919f4ed793697ab330a3c7c57c8",
-    "apps/local/security/keycloak/deployment.yaml": "0300363a4b9c5c10ba0a8ca2da51f908ecec3240cbaf767678ca2b2b86a9ed36",
+    "apps/local/security/keycloak/deployment.yaml": "c21944db4b7870081d063031d1d748b8079d42855db8193617a94ea00eee5f58",
     "apps/local/security/keycloak/kustomization.yaml": "963e3c5f6f0871fa7ad087ea5997e42f7e69bab1112abfb6c59757c77d806404",
     "apps/local/security/keycloak/pvc.yaml": "e3557087dcebd0dfa1e2c16f21bdcbbef474def84cb14e14c0f12d05f074102a",
-    "apps/local/security/keycloak/realm-template.yaml": "912027424eafaac58d421d58b51d9390c98bc1d880cae8e8161bc7b3bef6ea8e",
+    "apps/local/security/keycloak/realm-template.yaml": "c406cb3965a7aedc1ffde56b95b28e45265c0fae658c215b08bb48da9ff039bd",
     "apps/local/security/keycloak/service.yaml": "4c8d6e58f7d81d3ce1e8cd5d5b321c7aba673a65c0b710cb1f5fbdb34b8cb058",
     "apps/local/system/argo-rollouts/config.yaml": "5fdf18dd60ae34bafe68d29803ce2502f1c1e66a143e43f1b0d71a2996244472",
     "apps/local/system/argo-rollouts/kustomization.yaml": "909d2356979cbe36d047cd3d72f9818e5bff093d2edf458570f15160e4abc8bc",
@@ -54,6 +54,6 @@
     "cluster-resources/local/kustomization.yaml": "d78ca890b3cb13c379f4ef0aee25a77e1c3d6b82bf827d6d65759d773cc990ad",
     "cluster-resources/local/namespaces/kustomization.yaml": "6fdd1b291183e7c8cc07aa5437fd434ee5ace09d7a2ee50afb1841fadcd45d29",
     "cluster-resources/local/namespaces/namespace-teck-local-edge.yaml": "cf57adf0f7e236fa2eabdab7a6d958cad1020d6ba0591c18b962f10243136f7a",
-    "docs/local-development.md": "ef5dda9e40a731866c194a763138d2f8a3bde7981f7e978a94aa6de98d8d9903"
+    "docs/local-development.md": "0421bada3b4d80df607bfeb93163e1b441a89e9b6415c97affd2213629ddbae2"
   }
 }

@@ -42,10 +42,10 @@ export async function ensureEnvironment({context,folder,k}){
   return state;
 }
 export async function localCredentials({context,state,k,folder}){
-  const name='gateway-public-auth',existing=await object(k,'secret',name,state.namespace);
-  if(existing){if(!state.secretUid)throw Error('An unowned local application secret already exists');assertOwner(existing,context,state.secretUid);return state;}
+  const name='gateway-web-auth',existing=await object(k,'secret',name,state.namespace);
+  if(existing){if(!state.secretUid)throw Error('An unowned local application secret already exists');assertOwner(existing,context,state.secretUid);if(!existing.data?.['customer-client-secret']||!existing.data?.['admin-client-secret'])throw Error('Existing gateway credential format requires explicit migration');return state;}
   if(state.secretUid)throw Error('The owned application credential was removed; restore it before redeploying its persistent identity service');
-  const secret={apiVersion:'v1',kind:'Secret',metadata:{name,namespace:state.namespace,labels:ownerLabels(context)},type:'Opaque',stringData:{'client-secret':randomBytes(32).toString('base64url')}};
+  const secret={apiVersion:'v1',kind:'Secret',metadata:{name,namespace:state.namespace,labels:ownerLabels(context)},type:'Opaque',stringData:Object.fromEntries(['customer','admin'].map(role=>[role+'-client-secret',randomBytes(32).toString('base64url')]))};
   const created=JSON.parse(await k(['create','-f','-','-o','json'],{input:JSON.stringify(secret)}));
   state={...state,secretUid:created.metadata.uid};writeJson(join(folder,'state.json'),state);return state;
 }
@@ -122,7 +122,7 @@ export async function waitResources({manifests,k}){
       if(r.kind==='Job')return conditions.some(c=>c.type==='Complete'&&c.status==='True');
       if(r.kind==='PersistentVolumeClaim')return s.phase==='Bound';
       if(r.kind==='Cluster')return conditions.some(c=>c.type==='Ready'&&c.status==='True')&&(s.observedGeneration===undefined||s.observedGeneration>=current.metadata.generation);
-      if(r.kind==='Rollout')return s.phase==='Healthy'&&(s.observedGeneration===undefined||s.observedGeneration===current.metadata.generation);
+      if(r.kind==='Rollout')return s.phase==='Healthy'&&(s.observedGeneration===undefined||Number(s.observedGeneration)===Number(current.metadata.generation));
       if((s.observedGeneration??0)<(current.metadata.generation??0))return false;
       if(r.kind==='DaemonSet')return s.numberReady===s.desiredNumberScheduled&&s.updatedNumberScheduled===s.desiredNumberScheduled;
       return (s.readyReplicas??0)>=(r.spec.replicas??1)&&(s.updatedReplicas??0)>=(r.spec.replicas??1);

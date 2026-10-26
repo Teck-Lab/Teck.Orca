@@ -1,3 +1,5 @@
+> Gateway pilot adaptation is tracked in validation-web-gateways-2026-10-26.md. The gateway compatibility limitation below describes the earlier snapshot.
+
 # Official KIND workflow validation � 2026-10-25
 
 This supersedes the earlier local Argo CD/Kargo delivery design. The default is one persistent single-node KIND cluster per project with no delivery services, local Git server, registry or OCI promotion pipeline. Optional pinned add-ons are CNPG, Rollouts and Gateway API/kgateway/TLS. Definitions retain the existing apps/local categories, cluster-resources/local and bootstrap/local hierarchy; remote ApplicationSets exclude local. No local ApplicationSet is used.

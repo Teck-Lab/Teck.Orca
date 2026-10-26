@@ -25,7 +25,7 @@ spec:
             - sh
             - -ec
           args:
-            - helm template local-realm /template --set-file clientSecret=/client-secret/client-secret --set-string hostname="$LOCAL_HOSTNAME" > /import/realm.rendered && sed -e "/^#/d" -e "/^---$/d" /import/realm.rendered > /import/teck-cloud-local-realm.json
+            - helm template local-realm /template --set-file clientSecrets.customer=/client-secret/customer-client-secret --set-file clientSecrets.admin=/client-secret/admin-client-secret --set-string hostname="$LOCAL_HOSTNAME" > /import/realm.rendered && sed -e "/^#/d" -e "/^---$/d" /import/realm.rendered > /import/teck-cloud-local-realm.json
           env:
             - name: LOCAL_HOSTNAME
               valueFrom:
@@ -99,4 +99,4 @@ spec:
             sizeLimit: 1Mi
         - name: client-secret
           secret:
-            secretName: gateway-public-auth
+            secretName: gateway-web-auth
