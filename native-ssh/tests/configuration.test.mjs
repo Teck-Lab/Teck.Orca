@@ -4,8 +4,35 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { configureSandbox, ensureNamingHook, environmentScript, installationScript } from '../src/configuration.mjs';
+import { configureSandbox, ensureNamingHook, ensureWorkflowPolicy, environmentScript, installationScript } from '../src/configuration.mjs';
+import { runtimeFiles } from '../build.mjs';
 import { ensureKitBuilder } from '../src/provider.mjs';
+
+test('workflow upgrade preserves existing models, config and unrelated tools; installs a versioned policy once', async t => {
+  const root = mkdtempSync(join(tmpdir(), 'teck-workflow-upgrade-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  for (const [name, bytes] of Object.entries(runtimeFiles())) {
+    const target = join(root, name); mkdirSync(join(target, '..'), { recursive: true }); writeFileSync(target, bytes);
+  }
+  const calls = []; let installed = '';
+  const run = async (program, args, options) => {
+    calls.push({ program, args, options });
+    if (args.at(-1)?.includes('cat /home/agent/.omp/agent/teck-workflow')) return installed;
+    if (options?.input) installed = /printf '%s' '([a-f0-9]{64})'/.exec(options.input)?.[1] ?? '';
+    return '';
+  };
+  assert.equal(await ensureWorkflowPolicy({ name: 'owned-test-vm', assetRoot: root, run }), true);
+  const script = calls.find(c => c.options?.input).options.input;
+  assert.ok(!script.includes('models.yml'));
+  assert.ok(!script.includes('/agent/config.yml'));
+  assert.match(script, /mcpServers.*github-projects.*\?\?=/);
+  assert.match(script, /orca-orchestration.mjs/);
+  assert.match(script, /omp-launch-policy.mjs/);
+  const syntax = spawnSync(bash, ['-n'], { input: script, encoding: 'utf8' });
+  assert.equal(syntax.status, 0, syntax.stderr);
+  assert.equal(await ensureWorkflowPolicy({ name: 'owned-test-vm', assetRoot: root, run }), false);
+  assert.equal(calls.filter(c => c.options?.input).length, 1);
+});
 
 test('native configuration stages the bundled policy and launchers, never a daemon', async t => {
   const root = mkdtempSync(join(tmpdir(), 'teck-native-config-test-'));

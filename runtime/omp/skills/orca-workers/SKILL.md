@@ -22,14 +22,14 @@ and execution-host orchestration guide own exact lifecycle flags and heartbeats.
 A technical planning/research assignment follows the
 [research contract](../orca-feature-workflow/references/technical-planning.md).
 Return evidence and a proposed plan to the coordinator; preserve read-only scope.
-The native `technical-planner` helper uses the slow role for bounded internal
-consultations; it does not replace the sidebar-visible implementation owner.
+Use a visible Orca researcher Dispatch with the existing slow role; native
+technical-planner/task helpers are disabled in this workflow.
 
 ## Coordinator: dispatch
 
-Delegate when separate ownership, useful parallelism or specialist work helps.
-A contained change can be implemented by the lead directly; do not create an
-executor only to satisfy a role split. Every implementation owner follows the
+The coordinator never implements. Every implementation issue, including a
+contained fix, receives a task-role executor through orca_dispatch. Keep the
+existing issue unless separate deliverables warrant sub-issues. Every implementation owner follows the
 [test-first and coverage contract](../orca-feature-workflow/references/testing.md)
 and supplies its test/coverage evidence with delivery.
 
@@ -40,10 +40,11 @@ questions, coordinator-loop for DAG/reuse details, and recovery-and-cleanup when
 a receipt or uncertain lifecycle action requires it. Bundled official snapshots
 are fallback references; verify unsupported flags with the same CLI's help.
 
-From the feature's own Orca terminal, launch each ready execution task with
-worker-start --worktree new-child --agent omp and the configured modelRoles.task
-selector (bundled omniroute/teck-executor). Use the feature branch as base, with
-shared prerequisites committed before fan-out. Names/display names identify the
+From the feature's own Orca terminal, use orca_dispatch(role=executor,
+worktree=new-child) with the objective, issue and acceptance criteria. The tool
+uses public worker-start and the live configured modelRoles.task selector.
+Use the feature branch as base, with shared prerequisites committed by an
+executor/integration worker before fan-out. Names/display names identify the
 execution issue and short task title. OMP accepts --model, not worker-start
 --effort. Do not pass cross-host --on or select the feature recipe again.
 
@@ -66,8 +67,14 @@ both feature and executor may reference the same issue. Issue hierarchy and
 Orca child-worktree hierarchy are independent. Correct missing parentage using
 the exact feature selector before claiming successful dispatch.
 
-Keep one editing owner per checkout. OMP internal task helpers are optional for
-bounded scouting/research; they do not replace the visible implementation owner.
+Keep one editing owner per checkout. All scouting/research also uses Orca
+Dispatches; native OMP task/eval helpers are disabled. Each worker creates the
+exact native OMP assignment goal before work and completes it only with evidence,
+then reports through the live worker_done contract and idles.
+The structured report action stages a report submitted before native goal
+completion and delivers it after that exact goal completes. Finalize the goal
+next instead of polling for an undelivered staged report. Failed assignments
+record blockers and drop their assigned native goal; they never mark it complete.
 A quiet terminal or a timeout does not prove exit. Inspect failed start receipts
 before any retry so an uncertain launch cannot create a duplicate editor.
 Missing runtime authority is a reported blocker, not permission to switch hosts

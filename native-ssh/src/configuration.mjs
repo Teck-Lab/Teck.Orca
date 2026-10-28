@@ -1,4 +1,5 @@
-import { cpSync, mkdtempSync, rmSync } from 'node:fs';
+import { cpSync, mkdtempSync, rmSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { quote } from './system.mjs';
@@ -87,6 +88,52 @@ export async function ensureNamingHook({ name, project, assetRoot, run }) {
       `rm -rf -- ${quote(remote)}`,
     ].join('\n') + '\n';
     await run('sbx', ['exec', '-u', 'root', name, 'sh', '-s'], { input: install });
+    return true;
+  } finally { rmSync(staging, { recursive: true, force: true }); }
+}
+
+// Explicit plugin policy update on normal recipe reuse, not on agent startup.
+// Copy only Teck-maintained workflow assets; preserve models, user config,
+// credentials, sessions, unrelated extensions and project files.
+export async function ensureWorkflowPolicy({ name, assetRoot, run }) {
+  const roots = ['extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'orchestration.yml', 'RULES.md',
+    'skills/orca-feature-workflow', 'skills/orca-workers', 'skills/github-execution-planning', 'skills/github-publication'];
+  const files = [];
+  const walk = (path, relative) => {
+    const children = readdirSync(path, { withFileTypes: true });
+    for (const child of children) {
+      if (child.isSymbolicLink()) throw Error('Workflow asset symlink refused');
+      if (child.isDirectory()) walk(join(path, child.name), `${relative}/${child.name}`);
+      else files.push([`${relative}/${child.name}`, readFileSync(join(path, child.name))]);
+    }
+  };
+  for (const relative of roots) {
+    const path = join(assetRoot, 'assets/omp', relative);
+    if (relative.endsWith('.mjs') || relative.endsWith('.yml') || relative.endsWith('.md')) files.push([relative, readFileSync(path)]);
+    else walk(path, relative);
+  }
+  for (const file of ['omp-launch.mjs', 'omp-launch-policy.mjs']) files.push([`runtime/${file}`, readFileSync(join(assetRoot, 'assets', file))]);
+  const digest = createHash('sha256').update(Buffer.concat(files.flatMap(([path, bytes]) => [Buffer.from(path), bytes]))).digest('hex');
+  const present = await run('sbx', ['exec', '-u', 'agent', name, 'sh', '-c', 'cat /home/agent/.omp/agent/teck-workflow.sha256 2>/dev/null || true']);
+  if (present.trim() === digest) return false;
+  const staging = mkdtempSync(join(tmpdir(), 'teck-native-ssh-'));
+  try {
+    for (const [relative, bytes] of files) {
+      const destination = join(staging, relative); mkdirSync(join(destination, '..'), { recursive: true });
+      writeFileSync(destination, bytes);
+    }
+    await run('sbx', ['cp', staging, `${name}:/tmp/`]);
+    const remote = `/tmp/${basename(staging)}`;
+    const copy = files.map(([relative]) => relative.startsWith('runtime/') ?
+      `cp ${quote(`${remote}/${relative}`)} ${quote(`/usr/local/lib/teck-orca/${relative.slice(8)}`)}` :
+      `install -D -o agent -g agent -m 600 ${quote(`${remote}/${relative}`)} ${quote(`/home/agent/.omp/agent/${relative}`)}`);
+    // Merge the additional MCP binding without replacing existing servers/settings.
+    const merge = `const fs=require('node:fs');const p='/home/agent/.omp/agent/mcp.json';const c=JSON.parse(fs.readFileSync(p));c.mcpServers??={};c.mcpServers['github-projects']??={type:'http',url:'https://mcp.tecklab.dk/mcp/github-projects',headers:{Authorization:'Bearer '+String.fromCharCode(36)+'{MCPHUB_API_KEY}'},timeout:120000};fs.writeFileSync(p,JSON.stringify(c,null,2)+'\\n');`;
+    await run('sbx', ['exec', '-i', '-u', 'root', name, 'sh', '-s'], { input: [
+      'set -eu', ...copy, `node -e ${quote(merge)}`, 'chown agent:agent /home/agent/.omp/agent/mcp.json',
+      `printf '%s' ${quote(digest)} > /home/agent/.omp/agent/teck-workflow.sha256`,
+      'chown agent:agent /home/agent/.omp/agent/teck-workflow.sha256', `rm -rf -- ${quote(remote)}`,
+    ].join('\n') + '\n' });
     return true;
   } finally { rmSync(staging, { recursive: true, force: true }); }
 }

@@ -151,7 +151,7 @@
     },
     {
       "name": "github-execution-planning/references/issue-structure.md",
-      "sha256": "6de33f75389a07c92d1180ffbbcf1dcf1dd90e04b48eed1c21409a2fbc59a8df"
+      "sha256": "ed8f4cdad88fe8109cfb35c7111ab02177a9814cd0cd406c5c4fa12508733f6f"
     },
     {
       "name": "github-execution-planning/references/pr-stacks.md",
@@ -163,11 +163,11 @@
     },
     {
       "name": "github-execution-planning/SKILL.md",
-      "sha256": "dd635a6d50081711653579d4393705f2c7637eb15c3be2270a962f562877dab0"
+      "sha256": "8942e13abe7579d6b086d1228d80606209ae91281330cedc0346dee46f76f4b6"
     },
     {
       "name": "github-publication/SKILL.md",
-      "sha256": "1ad8a96093aeb88d844297117cf773b79e309d6bf4cdcd0c53065cbc3ea740d6"
+      "sha256": "e13eb78a8a7ce184485a8c82ea174ee22bacc2222d61348015af13b861e60b9a"
     },
     {
       "name": "keycloak-administration/LICENSE.md",
@@ -298,12 +298,16 @@
       "sha256": "59b17f69676de725ea4cf7a8af2032101ffc5f393fffd9100c6b260e6b893c31"
     },
     {
+      "name": "orca-feature-workflow/references/goals-and-milestones.md",
+      "sha256": "1d4d9c0dd26155a46f145704821015e15a0dfcbddb1ef5ed4b858eda79bf027e"
+    },
+    {
       "name": "orca-feature-workflow/references/review-gates.md",
-      "sha256": "ddcadd2a829ac7947c325ea0ff15d3f430dc478c29420b2e663a609aa64f55fd"
+      "sha256": "fc58dbdb603c8ab73e4bac03293ad3ffa183b8f32cafd946a696a5a2b8ac360a"
     },
     {
       "name": "orca-feature-workflow/references/technical-planning.md",
-      "sha256": "508355b001bc2495bb4578fc4803b2f4f14847de218cce98600d97a4d8dfcfdf"
+      "sha256": "e6a4531f307302655a5673fbde1096a19c19285e17392a7d3a8883bed34176e7"
     },
     {
       "name": "orca-feature-workflow/references/testing.md",
@@ -311,11 +315,11 @@
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "231b45190290f7efffb9fd2f67a8ea1383ae373d28eda81574284f8f1ec7a849"
+      "sha256": "dfea16447e3ab273e159022652b3fb256bc1ea10aed234f0e5f1cd28e7928d89"
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "c2c6d05283924bf289e41dfc32e7000f1ac4f67be164f203864beff5a1c0d2d6"
+      "sha256": "262e1f17159e8bf82507e57fe080c867be02fa0311b770b26f87057d44e35e79"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",

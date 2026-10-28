@@ -172,6 +172,19 @@ Derived from [mattjohnson/orca-sbx-recipes](https://github.com/mattjohnson/orca-
 
 The separate [native SSH preview](native-ssh/README.md) preserves the Run on GUI
 workflow and lets Orca manage its guest daemon. It supports a shared project KIND
-cluster with isolated worktree deployments and local delivery controllers. See
+cluster with isolated worktree deployments and optional application operators. See
 [the profile plan](docs/plan-local-kubernetes-delivery.md) and
 [isolated validation](docs/validation-local-kubernetes-2026-10-25.md).
+
+## Coordinated OMP goals
+
+The existing configured model roles are retained. Default/plan sessions only
+coordinate GitHub metadata and Orca Tasks/Dispatches/messages. All implementation,
+research, review, integration and publication uses visible Orca workers with
+acceptance-bounded native OMP goals. The coordinator goal matches the authorized
+GitHub milestone/delivery scope; phased todos track its next coordination action.
+The tool guard prevents coordinator source inspection, editing, test execution
+and code publication, and blocks native task/eval helpers. Explicit independent
+reviews replace periodic WATCHDOG loops. See
+[runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md)
+and [isolated validation](docs/validation-omp-coordination-2026-10-28.md).

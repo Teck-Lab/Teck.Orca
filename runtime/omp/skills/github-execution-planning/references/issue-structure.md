@@ -17,9 +17,10 @@ determines investigation, test depth and review expertise, not issue count.
 Research, test runs, reviews and revision rounds are Orca tasks/checklist items
 under the same issue unless they are independently scoped deliverables.
 
-Flow: issue -> implementation with tests -> relevant combined checks -> one final
-independent review -> canonical PR. The lead can implement contained work; use an
-executor when delegation helps. The review reference defines the exact gate.
+Flow: issue -> Orca executor goal with tests -> relevant combined checks -> one
+final independent review -> publication worker -> canonical PR. The coordinator
+never implements, including contained work. Delegation does not require a new
+GitHub sub-issue. The review reference defines the exact gate.
 
 ## Use a parent with execution sub-issues when useful
 

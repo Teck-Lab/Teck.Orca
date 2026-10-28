@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.7.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.8.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 
@@ -34,7 +34,8 @@ makes a fresh remote clone and does not copy uncommitted work or merge profiles.
 One persistent VM is named `teck-orca-ssh-<project-hash>`. Ownership lives under
 `~/.teck-orca-native-ssh/`, separately from the original plugin?s records.
 Concurrent creation is serialized. Later creates reuse the VM and leave OMP
-configuration untouched. A manually deleted VM can be replaced by a new create;
+user model configuration and sessions untouched. Versioned Teck workflow assets
+are updated on normal recipe reuse/resume. A manually deleted VM can be replaced by a new create;
 resume requires the original provider identity and never silently replaces it.
 Unowned, renamed or replaced VMs are refused.
 
@@ -62,6 +63,17 @@ or local origin. Each project gets its own sandbox. OMP 18.12.5, its model roles
 technical research agent, TDD/review guidance, session recovery and development
 toolchain are snapshotted from the existing runtime. The network policy includes
 `quay.io:443` and `*.quay.io:443`.
+
+The default/plan OMP session only coordinates through Orca and GitHub metadata.
+Task-role workers implement/test/integrate, slow-role workers research,
+advisor-role workers review and a task-role publication worker verifies/publishes
+the approved snapshot. Existing modelRoles are preserved. Native OMP goals and
+todo phases track the milestone/delivery scope and each bounded assignment;
+Orca remains authoritative for parallel worker state. The policy denies
+coordinator editing/shell/source inspection and native task/eval delegation.
+Explicit reviews replace duplicate WATCHDOG loops. Refresh the preview plugin,
+then use its normal GUI recipe create/reuse/resume to install the updated policy;
+existing running OMP processes retain their loaded policy until restarted.
 
 The workload includes checksum-pinned kind 0.33.0 and kubectl 1.35.8. Teck.Monorepo
 now opts into the managed workspace profile with "kubernetes": "workspace" in

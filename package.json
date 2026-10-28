@@ -28,6 +28,7 @@
     "smoke:devtools": "node scripts/smoke-devtools.mjs",
     "smoke:dotnet-tests": "node scripts/smoke-dotnet-tests.mjs",
     "smoke:workflow-policy": "node scripts/smoke-workflow-policy.mjs",
-    "bundle:kubernetes": "node scripts/bundle-kubernetes.mjs"
+    "bundle:kubernetes": "node scripts/bundle-kubernetes.mjs",
+    "smoke:orchestration": "node scripts/smoke-orchestration.mjs"
   }
 }

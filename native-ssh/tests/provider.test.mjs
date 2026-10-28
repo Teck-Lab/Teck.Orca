@@ -21,7 +21,7 @@ function fixture(t) {
     }
     return '';
   };
-  const options = { project, stateRoot, assetRoot: stateRoot, run, configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {} };
+  const options = { project, stateRoot, assetRoot: stateRoot, run, configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {}, syncPolicy: async () => {} };
   return { project, name, rows, calls, options, stateRoot, run };
 }
 

@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
-import { reviewLaunchArgs } from './omp-launch-policy.mjs';
+import { reviewLaunchArgs, orchestrationLaunchArgs } from './omp-launch-policy.mjs';
 import { preserveProjectName } from './project-name.mjs';
 import { bootId, identity, recordPath, readRecord, writeRecord, recoveryMode,
   interactiveLaunch, explicitSession, reusableArgs, resumeArgs, claimPane } from './omp-session.mjs';
@@ -37,7 +37,8 @@ if (tracked) {
   // Explicit loading still works when ambient extension discovery is disabled.
   args.push('--extension', '/usr/local/lib/teck-orca/omp-session-extension.ts');
 }
-const child = spawn('/opt/paseo-omp/bin/omp', reviewLaunchArgs(args), { stdio: 'inherit', env: {
+const policyArgs = interactiveLaunch(args) ? orchestrationLaunchArgs(reviewLaunchArgs(args)) : reviewLaunchArgs(args);
+const child = spawn('/opt/paseo-omp/bin/omp', policyArgs, { stdio: 'inherit', env: {
   ...process.env, ...(tracked ? { TECK_ORCA_OMP_RECORD: path, TECK_ORCA_OMP_TOKEN: token } : {}),
 } });
 // Ctrl-C from the terminal already reaches the child process group. Do not

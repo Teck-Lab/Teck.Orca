@@ -1,9 +1,18 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { reviewLaunchArgs } from '../runtime/omp-launch-policy.mjs';
+import { reviewLaunchArgs, orchestrationLaunchArgs } from '../runtime/omp-launch-policy.mjs';
 import { resumeArgs } from '../runtime/omp-session.mjs';
 
 const overlay = '/home/agent/.omp/agent/reviewer.yml';
+test('coordination policy is explicit, session-local and survives disabled extension discovery and resume', () => {
+  const args = ['--resume', '/sessions/worker.jsonl', '--model', 'omniroute/teck-executor', '--no-extensions', '--', 'Follow up'];
+  const applied = orchestrationLaunchArgs(args);
+  assert.ok(applied.includes('/home/agent/.omp/agent/orchestration.yml'));
+  assert.ok(applied.includes('/home/agent/.omp/agent/extensions/orca-orchestration.mjs'));
+  assert.deepEqual(applied.slice(-2), ['--', 'Follow up']);
+  assert.deepEqual(orchestrationLaunchArgs(applied), applied);
+  assert.deepEqual(orchestrationLaunchArgs(['--version']), ['--version']);
+});
 test('dedicated advisor sessions disable their background advisors without changing model or user overlays', () => {
   for (const selector of ['omniroute/teck-advisor', 'omniroute/teck-advisor:medium', 'omniroute/teck-advisor:high']) {
     const args = ['--config', '/user/custom.yml', '--model', selector, '--thinking', 'high'];

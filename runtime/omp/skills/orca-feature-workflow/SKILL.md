@@ -18,7 +18,7 @@ linked skill and reference. Reuse already-loaded guidance during this session.
 
 | Role or next action | Read |
 | --- | --- |
-| Lead: diagnose and plan | [GitHub execution planning](../github-execution-planning/SKILL.md) |
+| Lead: plan from issue/worker evidence | [GitHub execution planning](../github-execution-planning/SKILL.md) and [goals and milestones](references/goals-and-milestones.md) |
 | Technical uncertainty or substantial design work | [Technical planning and research](references/technical-planning.md) |
 | Lead: launch or reconcile workers | [Orca workers](../orca-workers/SKILL.md) and the execution-host CLI's compact orchestration guide |
 | Implementation: code, tests and coverage | [Test-first implementation](references/testing.md), then the relevant repository/testing guidance |
@@ -36,29 +36,31 @@ implementation. Select issue structure using the planning skill's
 A single issue remains sufficient for a contained change, including its tests.
 Risk changes verification depth; it does not itself require sub-issues.
 
-Research/planning stay in the feature worktree. Use `technical-planner` on the
-configured slow role when technical uncertainty could change the implementation;
-follow the [research contract](references/technical-planning.md). Fast codebase
-scouting uses `scout`; the main agent handles clear tasks directly. Keep project
-code read-only during investigation and keep the lead as canonical plan writer.
+The coordinator plans from GitHub metadata and worker evidence. Dispatch source
+investigation and uncertain design questions through Orca on the configured slow
+role; follow the [research contract](references/technical-planning.md). Do not use
+native task/scout helpers. Keep the coordinator as canonical plan writer and
+project code read-only during investigation.
 
-For contained work the lead can implement and test directly in its worktree.
-Delegate to the configured OMP executor when ownership, useful parallelism or
-specialist work warrants it. Each editing worker uses its own visible checkout.
+Every implementation is delegated to the configured task-role OMP executor,
+including contained fixes. Each editing worker uses its own visible checkout.
 When supervising workers, record issue -> Orca Task -> Dispatch -> worktree;
 create/reuse one Run and dispatch ready work against actual dependencies. Direct
-implementation does not need a synthetic executor or a second orchestration layer.
+implementation still uses an Orca Task/Dispatch, but needs no synthetic GitHub
+sub-issue or second orchestration layer. Use orca_dispatch with an explicit
+objective, acceptance criteria and constraints; it resolves existing model roles.
 Code changes follow the [test-first and coverage contract](references/testing.md).
 
 Use one final independent review by default, including multi-deliverable features.
 Add an early targeted review only for a concrete high-risk boundary or a required
 contract acceptance gate. Reviewed child code does not need another full audit;
 the final review covers the final delta, tests and integration interactions.
-Resolve findings through an executor follow-up, verify the reviewed snapshot,
-then publish one canonical PR through GitHub MCP. Honor narrower user scope and
+Resolve findings through an executor follow-up. Dispatch snapshot verification
+and publication to a task-role publication worker, then reconcile its evidence
+and the canonical PR returned through GitHub MCP. Honor narrower user scope and
 repository-required checks; creating a PR never authorizes merging.
 
-Read back the PR URL, head/base, remote contents/signature and outstanding gates.
+Require the publication report's PR URL, head/base, remote contents/signature and outstanding gates.
 Report precise planning, validation, review or publication blockers; do not
 claim success from worker completion alone. The planning skill owns issue
 status/closure rules; the workers skill owns terminal disposition.

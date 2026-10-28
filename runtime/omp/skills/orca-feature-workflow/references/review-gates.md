@@ -7,6 +7,9 @@ These are dedicated, independent, read-only reviews of completed changes.
 
 ## Select the review path
 
+The coordinator only dispatches and reconciles evidence; it never reads the code
+or runs checks itself. Use orca_dispatch(role=reviewer) on the existing checkout;
+the independent reviewer inspects code, acceptance criteria and test evidence.
 Use one independent final review before publication for both single issues and
 features with execution sub-issues. Review the implementation owner's stable
 checkout, or the integrated feature checkout when work was delegated. Issue or
@@ -26,7 +29,8 @@ delivery for integration is provisional and never substitutes for final approval
 
 ## Reviewer placement and model
 
-The coordinator creates a bounded Orca review Task and Dispatch on the existing
+The coordinator creates a bounded Orca review Task and Dispatch with its own
+native OMP goal (deliver the verdict/report, including request_changes) on the existing
 feature Run. Launch the independent OMP reviewer in the exact existing checkout
 for the chosen review. The implementation owner must be settled/idle and that checkout
 must remain unchanged while review is in progress. Do not create another child,
@@ -114,8 +118,9 @@ on the Orca review Task and the relevant GitHub execution issue or parent plan.
 
 ## Final parent publication gate
 
-After the single delivered change or all required sub-issues are integrated, run combined acceptance checks and
-dispatch the independent reviewer in the parent checkout. Review the complete
+After an executor/integration worker integrates the delivered change or required
+sub-issues and runs combined acceptance checks, dispatch the independent reviewer
+in the parent checkout. The reviewer checks the complete
 parent delta against the verified PR base, all issue/plan criteria, applicable
 targeted review outcomes and combined validation. This is the sole default code
 review gate for both single issues and multi-deliverable features. Use prior
@@ -132,7 +137,8 @@ inspect the existing worker and report evidence instead of launching duplicates
 or treating elapsed time as approval. Do not change an approved snapshot
 before publication: recheck revisions/status/fingerprint, and invalidate/repeat
 the affected review if code, tests or relevant base changes. Publish the reviewed
-content through the existing GitHub MCP/signature workflow and verify that the
-remote tree matches it. Record the final verdict and return the canonical PR URL
+content through a task-role publication worker using the existing GitHub
+MCP/signature workflow. Require its evidence that the remote tree matches the
+reviewed snapshot. Record the final verdict and return the canonical PR URL
 and outstanding remote CI/review gates. An AI review does not satisfy a required
 human GitHub review or authorize merging.

@@ -15,3 +15,16 @@ export function reviewLaunchArgs(args) {
       options.includes('--advisor') || configured) return [...args];
   return [...options, '--config', overlay, ...args.slice(end)];
 }
+
+// Explicit extension loading survives --no-extensions. OMP deduplicates its
+// ambient discovery by resolved path. Utility commands remain passthrough.
+export function orchestrationLaunchArgs(args) {
+  if (args.some(arg => ['--version', '-v', '--help', '-h'].includes(arg))) return [...args];
+  const end = args.indexOf('--') < 0 ? args.length : args.indexOf('--');
+  const options = args.slice(0, end), rest = args.slice(end);
+  const config = '/home/agent/.omp/agent/orchestration.yml';
+  const extension = '/home/agent/.omp/agent/extensions/orca-orchestration.mjs';
+  const has = (flag, value) => options.some((arg, i) => arg === `${flag}=${value}` || arg === flag && options[i + 1] === value);
+  return [...options, ...(!has('--config', config) ? ['--config', config] : []),
+    ...(!has('--extension', extension) ? ['--extension', extension] : []), ...rest];
+}

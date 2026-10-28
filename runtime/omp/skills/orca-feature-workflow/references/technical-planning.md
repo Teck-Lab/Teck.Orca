@@ -1,16 +1,16 @@
 # Technical planning and research
 
-Use `technical-planner` for a decision that could materially change the
+Dispatch a researcher for a decision that could materially change the
 implementation: an unfamiliar library/API, uncertain failure mechanism,
-cross-cutting design, or meaningful architectural tradeoff. The main agent handles
-clear bugs and straightforward features; the fast `scout` collects codebase facts.
+cross-cutting design, or meaningful architectural tradeoff. Source investigation
+is assigned to a worker; the coordinator handles planning and messages only.
 Research is conditional, not a mandatory phase or a new review/approval gate.
 
 ## Assign a bounded question
 
-The bundled OMP task agent `technical-planner` resolves `@slow` through the live
-`modelRoles.slow` setting (default `omniroute/teck-researcher`). Invoke it by agent
-name with OMP's native task tool, following the live tool schema. Do not replace
+Use orca_dispatch(role=researcher) in the existing checkout. It resolves `@slow`
+through the live `modelRoles.slow` setting. Native OMP task agents, including
+the retained technical-planner preset, are not the execution path. Do not replace
 the main session model or remap all planning to the specialist. `plan`, `default`,
 `task`, `advisor` and `smol` retain their existing assignments. The concrete model
 behind the researcher alias is configured in OmniRoute; do not infer it from its name.
@@ -22,12 +22,10 @@ ask for the smallest useful investigation rather than "research everything".
 Reuse prior research while its assumptions and inputs remain valid. Investigate
 new uncertainty during implementation when it could change the next step.
 
-Default to one bounded internal task on the current execution host. Follow the
-user's concurrency limit; no recursive research delegation. If separately visible
-supervision is needed, use an Orca research Task/Dispatch in the existing checkout
-and the resolved slow-role model, carrying this same read-only contract. Such a
-terminal follows the worker reporting/release lifecycle, without a new issue,
-editing checkout, sandbox or parallel orchestration layer.
+Use one bounded Orca research Task/Dispatch on the current execution host with
+its own exact native OMP goal and acceptance criteria. Follow the user's
+concurrency limit; no recursive delegation. The worker follows reporting/release
+lifecycle without a new issue, editing checkout, sandbox or orchestration layer.
 
 ## Investigate and return a proposed plan
 
