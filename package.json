@@ -1,6 +1,6 @@
 {
   "name": "teck-orca",
-  "version": "0.5.4",
+  "version": "0.5.13",
   "private": true,
   "type": "module",
   "engines": {
@@ -29,6 +29,7 @@
     "smoke:dotnet-tests": "node scripts/smoke-dotnet-tests.mjs",
     "smoke:workflow-policy": "node scripts/smoke-workflow-policy.mjs",
     "bundle:kubernetes": "node scripts/bundle-kubernetes.mjs",
-    "smoke:orchestration": "node scripts/smoke-orchestration.mjs"
+    "smoke:orchestration": "node scripts/smoke-orchestration.mjs",
+    "smoke:daemon": "node scripts/smoke-daemon.mjs"
   }
 }

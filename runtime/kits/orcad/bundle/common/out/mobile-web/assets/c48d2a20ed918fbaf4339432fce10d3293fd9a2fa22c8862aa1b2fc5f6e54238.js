@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+var i=()=>!1;function t(e){i=e}function o(){i("mediumImpact")}function r(){i("selection")}function p(){i("success")}function c(){i("error")}function n(){i("edgeBump")}export{t as a,o as b,r as c,p as d,c as e,n as f};

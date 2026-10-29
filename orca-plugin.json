@@ -3,10 +3,10 @@
   "id": "teck-sbx-recipes",
   "publisher": "teck-lab",
   "name": "Teck OMP Docker Sandbox",
-  "version": "0.5.4",
+  "version": "0.5.13",
   "description": "One persistent Docker Sandbox per Orca project, with OMP, local Orca daemon and native Docker SSH recovery. Retains recovery for older feature sandboxes.",
   "engines": {
-    "orca": ">=1.4.229"
+    "orca": ">=1.4.244"
   },
   "pluginApi": 1,
   "main": "reconnect.mjs",
@@ -18,7 +18,11 @@
         "context": "global"
       }
     ],
-    "vmRecipes": [{ "path": "recipes/sbx-project-sandbox.json" }]
+    "vmRecipes": [
+      {
+        "path": "recipes/sbx-project-sandbox.json"
+      }
+    ]
   },
   "capabilities": [
     {

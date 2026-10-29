@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+function e(t){return`'${t.replace(/'/g,"'\\''")}'`}function n(t){return/^[a-zA-Z0-9_./@:-]+$/.test(t)?t:e(t)}function r(t){return`"${t.replace(/"/g,'""')}"`}export{n as a,r as b};
