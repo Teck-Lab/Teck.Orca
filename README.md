@@ -188,3 +188,5 @@ and code publication, and blocks native task/eval helpers. Explicit independent
 reviews replace periodic WATCHDOG loops. See
 [runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md)
 and [isolated validation](docs/validation-omp-coordination-2026-10-28.md).
+
+The separately bundled daemon plugin 0.5.13 includes Orca 1.4.244 and its matching Node 24.22.1 runtime. See [runtime validation](docs/validation-orca-1.4.244-2026-10-29.md). The native SSH preview uses the desktop-managed server after the desktop update.

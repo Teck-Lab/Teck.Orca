@@ -53,6 +53,9 @@ containers; Docker Sandboxes manages the VM and native `.sbx` SSH transport.
 ## Runtime and requirements
 
 Orca 1.4.237+, host Node 22+, OpenSSH, Docker Sandboxes 0.48+ and a Docker login.
+For desktop 1.4.244, the native SSH connection uses Orca's matching managed guest
+server. The separate bundled-daemon plugin is updated independently; this preview
+does not install or pin that custom daemon over the managed SSH server.
 OmniRoute, MCPHub and GitHub service credentials must already be configured
 in Docker. Proxy-managed placeholders are used; host Git identity and personal
 credential helpers are not copied.
