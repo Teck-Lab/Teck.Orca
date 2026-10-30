@@ -20,6 +20,8 @@ Keep priority, dependencies and acceptance criteria on GitHub. Use the existing
 official GitHub MCP for issues/fields/dependencies and github-projects for
 Projects/milestone CRUD. No PAT, raw remote Git transport or new MCP is needed.
 
+Canonical execution issues/sub-issues retain tracked Orca executors and bounded
+native goals; native helpers support their owner without replacing that record.
 Use orca_dispatch with role, objective, issue URL where applicable, observable
 acceptance criteria, constraints and explicit worktree placement. It resolves
 task/slow/advisor from OMP's live configuration; publisher uses task. The wrapper

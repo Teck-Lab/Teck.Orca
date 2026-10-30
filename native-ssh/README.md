@@ -72,7 +72,7 @@ Task-role workers implement/test/integrate, slow-role workers research,
 advisor-role workers review and a task-role publication worker verifies/publishes
 the approved snapshot. Existing modelRoles are preserved. Native OMP goals and
 todo phases track the milestone/delivery scope and each bounded assignment;
-Orca owns its visible workers and OMP owns native helper state. Every role,
+Orca owns its visible workers and OMP owns native helper state. Canonical execution issues/sub-issues retain tracked Orca executors and bounded goals. Every role,
 including researchers and reviewers, may use native task/eval subagents as needed.
 The parent retains scope and acceptance; native helpers do not claim its Orca
 Dispatch or goal. Direct coordinator implementation tools remain scoped.

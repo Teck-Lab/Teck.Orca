@@ -42,9 +42,10 @@ investigation and design questions; follow the [research contract](references/te
 Every role may delegate natively as needed. Keep the coordinator as canonical plan
 writer and project code read-only during investigation.
 
-Delegate implementation to the configured task role, using native OMP helpers or
-an independently owned Orca executor/worktree as appropriate.
-When supervising workers, record issue -> Orca Task -> Dispatch -> worktree;
+Assign canonical execution issues/sub-issues to Orca executors on the configured
+task role, with bounded native goals. Executors may use native helpers for any
+scoped implementation work and retain acceptance ownership.
+Record issue -> Orca Task -> Dispatch -> worktree;
 create/reuse one Run and dispatch ready work against actual dependencies. Direct
 implementation needs no synthetic GitHub sub-issue or second orchestration layer.
 Native helpers keep their OMP lifecycle and return results to their parent; they

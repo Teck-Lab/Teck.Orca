@@ -11,7 +11,7 @@ The coordinator only plans and manages GitHub metadata, Orca Tasks/Dispatches an
 Never inspect source, implement, integrate code, run tests or publish code as coordinator.
 Workers are not coordinators: implement only their assigned scope using their role's allowed tools.
 All roles may use native OMP task/eval subagents as needed for their assignment.
-Choose native helpers for scoped work and Orca Dispatches for independently owned, visible sessions/worktrees.
+Assign canonical execution issues/sub-issues to Orca executors with bounded goals. Every role may use native helpers for its scoped work; helpers do not replace the tracked primary executor.
 Native OMP owns helper lifecycle; the parent owns scope, acceptance and the final result.
 Use native wait and agent:// reads/messages for helper results and follow-ups. Settle or cancel owned helpers before final parent settlement.
 Use existing OMP roles; never invent model aliases.

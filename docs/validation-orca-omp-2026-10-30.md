@@ -61,6 +61,8 @@ including native agents whose depth is zero. The parent owns scope, permissions,
 actual evidence and final acceptance. This is a behavioral/tool policy, not OS
 isolation of delegated code.
 
+Canonical execution issues/sub-issues retain tracked Orca executors and bounded
+native goals; native helpers support their owner without replacing that record.
 The same planning, execution and verification flow applies recursively within
 issues and sub-issues. Independently trackable deliverables may become durable
 GitHub sub-sub-issues; transient helpers do not each need an issue or Orca Task.
@@ -86,3 +88,45 @@ Live disposable acceptance results are recorded below after completion. No
 production project sandbox, model mapping, remote Git repository or desktop UI
 is changed by the fixture. Native child rows in the desktop GUI are not visually
 validated by these command-line tests.
+
+### Completed disposable acceptance
+
+- `npm run smoke:daemon` passed on `teck-orca-f-987c2e993447`:
+  Orca 1.4.245 / Node 24.22.1, managed terminal output, parent/child worktrees,
+  cold stop/resume and persistent identity equality. The sandbox was removed.
+- `node scripts/smoke-orchestration.mjs --launch-policy-only` passed on
+  `teck-orca-f-35341ad8b6d9`: conflicting config and `--no-extensions` still
+  retain the policy, native goal and task/eval/wait/messaging. Direct bash/edit
+  tools remain absent from the coordinator. The sandbox was removed.
+- The fresh full `npm run smoke:orchestration` passed on
+  `teck-orca-f-5475589763f4`, Run `run_8b9c44c02e62`. Nested read-only native
+  planning returned to the coordinator; a real Orca executor demonstrated RED,
+  used a native implementation helper, verified GREEN/comparable coverage and
+  handed over `validation-evidence.md`. An independent Orca reviewer used one
+  native read-only helper, reviewed actual files/evidence and returned
+  `REVIEW_VERDICT=approve`. Both Orca workers were released, all three owning
+  native goals completed, and host test/coverage execution passed with 100%
+  line, branch and function coverage. The coordinator made no direct source
+  inspection, implementation or test calls. The sandbox was removed.
+- Native helper session evidence and unit tests confirm helpers did not claim
+  parent Orca contracts/goals. Live planning/execution/review delegation was
+  exercised; every-role tool permission coverage is also checked in unit tests.
+
+The first full run reached native planning, implementation and reviewer helper
+execution but hit its 18-minute deadline before final settlement. The fixture
+now passes the exact requirement to planning helpers, bounds unavailable-provider
+retries, and hands the reviewer a concise evidence artifact instead of requiring
+session-transcript reconstruction. The fresh full run above passed, including
+its updated launch-policy assertions; it replaces the incomplete initial run.
+The reusable workflow guidance now requires that direct evidence handoff too.
+
+The configured `omniroute/teck-researcher` alias returned HTTP 404, "Combo has no
+executable targets", in both attempts. The live fixture used an explicitly
+read-only default native planning fallback without changing any model mapping.
+This validates fallback/nested delegation, not availability of the specialist
+provider; its routing still needs to be corrected at the provider. The managed
+technical-planner preset upgrade itself is covered by the native profile tests.
+
+This local fixture covers the delegation/review lifecycle and a finite-range
+behavioral regression. It does not create a remote GitHub milestone/sub-issue
+DAG, measure application coverage, or visually validate desktop child rows.

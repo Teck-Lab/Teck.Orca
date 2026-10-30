@@ -17,7 +17,7 @@ determines investigation, test depth and review expertise, not issue count.
 Research, test runs, reviews and revision rounds are native helper assignments or Orca tasks/checklist items
 under the same issue unless they are independently scoped deliverables.
 
-Flow: issue -> native executor or Orca executor goal with tests -> relevant combined checks -> one
+Flow: issue -> Orca executor goal with tests and optional native helpers -> relevant combined checks -> one
 final independent review -> publication worker -> canonical PR. The coordinator
 never implements, including contained work. Delegation does not require a new
 GitHub sub-issue. The review reference defines the exact gate.
@@ -53,6 +53,8 @@ An executor owns its assigned issue and may plan its local work, use a native
 planner, and fan out native helpers for frontend, backend, database, testing or
 other useful purposes. Researchers and reviewers can also use native helpers.
 The parent accepts their evidence and remains responsible for the complete result.
+Canonical execution sub-issues/sub-sub-issues retain an Orca executor and bounded
+goal; native helpers support that owner without replacing its tracked assignment.
 
 Apply the splitting decision at any level. A sub-sub-issue is useful when it has
 its own acceptance criteria, owner, durable blocker or independently trackable

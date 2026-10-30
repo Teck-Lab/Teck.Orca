@@ -181,7 +181,8 @@ cluster with isolated worktree deployments and optional application operators. S
 Existing OMP model roles are retained. The coordinator owns the authorized
 GitHub milestone/delivery goal, canonical issue plan and final acceptance. Orca
 Tasks/Dispatches provide visible workers with independent sessions/checkouts.
-Every role may also use native OMP task/eval helpers: planner, researcher,
+Canonical execution issues/sub-issues retain tracked Orca executors with bounded
+goals. Every role may also use native OMP task/eval helpers: planner, researcher,
 executor, reviewer and coordinator. OMP owns those helpers' lifecycle; their
 parent owns scope, evidence and acceptance. Native helpers do not each need an
 Orca Dispatch or GitHub issue.
