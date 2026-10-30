@@ -1,61 +1,93 @@
-# Technical planning and research
+﻿# Technical planning and research
 
-Dispatch a researcher for a decision that could materially change the
-implementation: an unfamiliar library/API, uncertain failure mechanism,
-cross-cutting design, or meaningful architectural tradeoff. Source investigation
-is assigned to a worker; the coordinator handles planning and messages only.
-Research is conditional, not a mandatory phase or a new review/approval gate.
+Use investigation for uncertainty that could materially change the approach:
+unfamiliar APIs, a failure mechanism, a shared contract or an architectural
+tradeoff. Research is conditional, not a mandatory phase or another approval gate.
 
-## Assign a bounded question
+## Choose the assignment
 
-Use the native technical-planner/research helper, or orca_dispatch(role=researcher)
-when independent visible ownership is useful. Both use the existing slow role.
-Researchers may use their own native helpers as needed. Do not replace
-the main session model or remap all planning to the specialist. `plan`, `default`,
-`task`, `advisor` and `smol` retain their existing assignments. The concrete model
-behind the researcher alias is configured in OmniRoute; do not infer it from its name.
+- For read-only investigation, use the native `technical-planner` helper or
+  `orca_dispatch(role=researcher)`. Return findings to the owning session.
+- To maintain an authorized execution plan on GitHub, use
+  `orca_dispatch(role=planner, issue=<canonical parent issue URL>)`. The verified
+  Orca planner owns a bounded native goal and uses the existing `slow` role.
+  This is an assignment role, not a new model alias or a model remapping.
+- Every role may use native helpers. A native planning/research helper stays
+  read-only and returns its findings; the assigned Orca planner owns GitHub writes.
+  A model name, helper name or copied prompt does not confer writer authority.
 
-Supply the decision/question, user requirements and exclusions, existing issue
-and relevant worktree, known evidence, applicable versions, constraints and the
-needed output. Set a reasonable investigation budget or stopping condition;
-ask for the smallest useful investigation rather than "research everything".
-Reuse prior research while its assumptions and inputs remain valid. Investigate
-new uncertainty during implementation when it could change the next step.
+Supply the parent issue, repository, authorized milestone/delivery scope,
+requirements/non-goals, relevant worktree, existing child/dependency IDs, known
+facts, needed output and a stopping condition. Read the current plan first.
+Do not replace the main model, infer a model from an alias name, or remap the
+existing default/plan/task/slow/advisor/smol roles.
 
-Keep research bounded by the question and acceptance criteria. Native helpers
-return findings through OMP; an Orca researcher owns a Task/Dispatch and native
-goal and follows its reporting/release lifecycle. Follow the user's concurrency
-limit without creating a new issue, editing checkout or sandbox merely to research.
+## Investigate the decision
 
-## Investigate and return a proposed plan
+Inspect actual source/tests and version-specific primary documentation. Use the
+configured GitHub MCP reads for GitHub evidence. Cite material findings and
+separate verified behavior from inference and assumptions. Compare alternatives
+only when they affect the decision. Reuse prior evidence while its inputs remain
+valid; do not repeat a full investigation for every implementation turn.
 
-Ground the recommendation in repository source/tests and version-specific primary
-documentation. Use the existing search/page reader and GitHub MCP reads. Cite
-links or file locations for material findings. State evidence gaps honestly and
-separate verified behavior, inference and assumptions. Compare alternatives only
-where they affect the decision; identify compatibility and operational costs.
+Return the recommendation/rationale, affected boundaries and sequence, real
+prerequisites, observable acceptance criteria, test-first cases, validation and
+coverage approach, relevant risks and exact unresolved questions. A narrow lookup
+needs only the supported behavior, its source and its consequence. Never invent
+executed tests, coverage or implementation results from research.
 
-For technical planning, return:
+## Planner creates the canonical execution plan
 
-- The decision/recommendation and the evidence supporting it.
-- Material alternatives and why the recommendation fits the stated constraints.
-- A scoped implementation sequence, affected boundaries and real dependencies.
-- Observable acceptance criteria, test-first cases and the validation/coverage
-  approach using the repository's existing tooling.
-- Concrete risks, rollout/migration considerations where relevant, and unresolved
-  questions that require more evidence or a user decision.
+The coordinator explicitly delegates plan writing and pauses its own edits to
+that plan until the planner reports or the assignment is reconciled. There is
+one writer per canonical plan; independently owned work continues. No extra
+human approval round is required for children within the already authorized scope.
+Planning-only, brainstorming and explicit no-write assignments remain read-only.
 
-Scale the report to the assignment. A narrow API lookup needs the supported
-behavior, source and consequence, not a full architecture document. Do not
-invent executed tests, coverage reports or implementation results from research.
-Keep project files and GitHub state read-only; return findings to the parent.
+Follow `github-execution-planning` and its issue-structure/classification rules.
+Default to one issue; create children only for useful independent deliverables,
+not per helper, test run, failure or review. Read existing children and reuse
+verified records before creating anything. Preserve human text, accepted work,
+ownership, existing IDs and the canonical PR.
 
-## Execution owner adopts and updates
+Use the configured App MCP's real tools. The current server exposes
+`create_issue` with `parent_issue_number`, `update_issue_body`,
+`update_issue_title`, `add_sub_issue`, `reprioritize_sub_issue`,
+`issue_read` and `issue_dependency_read/write`. Parent links use database IDs
+where the schema asks for them; issue numbers are not interchangeable with IDs.
+Create under a verified parent, then read back the returned issue. Read existing
+child lists recursively before editing those descendants. Reused candidates must
+be read by exact identity before linking; never force-reparent an existing issue.
 
-The main orchestrator checks applicability, resolves material open decisions and
-records the adopted plan in the existing canonical issue when implementation is
-authorized. Planning-only/brainstorming work needs no new issue or publication.
-The specialist does not create issue trees, dispatch implementation, or approve
-delivery. Independent ready work can continue while a question is investigated.
-Revisit only the affected part of the plan as implementation produces new facts;
-reuse the findings in review rather than ordering the same research again.
+Each child records its bounded scope, acceptance criteria, test expectations,
+validation approach, parent context and real prerequisites. Record only actual
+blocking dependencies; several blockers mean all must be accepted. Read back
+both parent links and required edges before declaring the plan executable.
+Return the root/child URLs and IDs, proposed execution waves, changed edges,
+read-back evidence and unresolved blockers. Root milestone/Project changes,
+issue closure, implementation dispatch and publication stay with their owners.
+The planner cannot edit project files, run tests/shell commands, publish or merge.
+
+After a lost/partial mutation receipt, inspect the existing parent/children and
+related edges; reconcile by known IDs before retrying. Never create another child
+merely because a response timed out. The extension retains admitted issue scope
+across resume; a new Dispatch receives a fresh scope. Unknown records are not
+assumed writable.
+
+## Coordinator checks the plan and dispatches
+
+The orchestrator checks returned issue records, scope, acceptance and dependency
+read-back evidence. It reconciles the shared issue -> Task -> Dispatch -> worktree
+map, applies the selected milestone/Project metadata and dispatches ready
+executors. It does not redo the specialist's source investigation. The planner
+neither dispatches implementation nor approves delivery.
+
+## Reassess a missed blocker
+
+Follow the missed-blocker loop in
+`github-execution-planning/references/issue-structure.md`. Reopen only the affected
+question or dependency. Give the planner/researcher the executor's actual failure
+evidence and current issue graph. Diagnose before creating an issue, preserve
+accepted work, and allow unrelated verified ready work to continue. Reuse the
+result in implementation and review instead of commissioning the same research
+again.

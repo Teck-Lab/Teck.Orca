@@ -23,8 +23,9 @@ PR. Research/review helpers also use existing issues.
 
 When technical uncertainty could materially change the approach, use the
 [technical planning and research contract](../orca-feature-workflow/references/technical-planning.md)
-and the `technical-planner` agent. The lead adopts its evidence-backed proposal
-into the canonical plan; straightforward work needs no specialist pass.
+and the `technical-planner` research helper. An assigned Orca planner can
+create/reuse execution sub-issues and record dependencies; the orchestrator
+checks the returned graph before dispatch. Straightforward work needs no specialist pass.
 
 Create/reuse one GitHub issue for executable implementation/repair work; read-only
 diagnosis and brainstorming need no new issue. Read
@@ -53,8 +54,9 @@ partial writes using known IDs instead of rebuilding an issue graph on retry.
 
 Use [orca-feature-workflow](../orca-feature-workflow/SKILL.md) for delivery routing
 and [orca-workers](../orca-workers/SKILL.md) when dispatching. The lead maintains
-the issue -> Task -> Dispatch -> worktree map and updates the canonical plan
-when scope or blockers change.
+the issue -> Task -> Dispatch -> worktree map. A delegated planner owns canonical
+plan edits while the coordinator pauses its own edits to that plan. Follow the
+missed-blocker loop in the issue-structure reference when new facts change a prerequisite.
 
 ## Conditional relationship fallback
 

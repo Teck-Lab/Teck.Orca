@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { resolveRole, permittedTool, coordinationArgs, coordinationAction, assignment } from '../runtime/omp/extensions/lib/orca-policy.mjs';
 import activate from '../runtime/omp/extensions/orca-orchestration.mjs';
+import { createPlanningScope } from '../runtime/omp/extensions/lib/github-plan-scope.mjs';
 
 const roles = { default: 'gateway/lead', plan: 'gateway/lead', task: 'gateway/doer', slow: 'gateway/research', advisor: 'gateway/review' };
 const models = { resolve: role => { const [provider, id] = (roles[role.replace('@', '')] ?? '').split('/'); return id ? { provider, id } : undefined; } };
@@ -29,7 +30,7 @@ test('direct coordinator tools cannot implement, inspect source or publish code'
   assert.equal(permittedTool('coordinator', 'read', { path: 'skill://orca-workers/../../secrets' }), false);
 });
 test('every role may delegate through native task/eval while direct role-specific tools stay scoped', () => {
-  for (const role of ['coordinator', 'executor', 'reviewer', 'researcher', 'publisher']) {
+  for (const role of ['coordinator', 'planner', 'executor', 'reviewer', 'researcher', 'publisher']) {
     assert.equal(permittedTool(role, 'task', {}), true, role);
     assert.equal(permittedTool(role, 'eval', {}), true, role);
     assert.equal(permittedTool(role, 'wait', {}), true, role);
@@ -49,6 +50,21 @@ test('every role may delegate through native task/eval while direct role-specifi
     assert.equal(permittedTool('executor', name, {}), false);
   }
   assert.equal(permittedTool('publisher', 'edit', {}), false);
+});
+
+test('planner supports the configured split issue APIs without giving researchers publication or planning writes', () => {
+  const create = { owner: 'org', repo: 'repo', parent_issue_number: 123, title: 'Contract', body: 'Acceptance and tests' };
+  assert.equal(permittedTool('coordinator', 'github-create_issue', create), true);
+  assert.equal(permittedTool('planner', 'github-create_issue', create), true);
+  assert.equal(permittedTool('planner', 'github-create_issue', { ...create, parent_issue_number: undefined }), false);
+  for (const name of ['github-update_issue_body', 'github-update_issue_title', 'github-add_sub_issue', 'github-issue_dependency_write']) {
+    assert.equal(permittedTool('planner', name, { method: 'add' }), true, name);
+    assert.equal(permittedTool('researcher', name, { method: 'add' }), false, name);
+  }
+  for (const name of ['github-update_issue_state', 'github-update_issue_milestone', 'github-remove_sub_issue', 'github-push_files', 'github-create_pull_request', 'bash', 'edit']) {
+    assert.equal(permittedTool('planner', name, {}), false, name);
+  }
+  assert.equal(permittedTool('planner', 'github-projects-manage_milestones', { action: 'create' }), false);
 });
 test('Orca transport accepts only explicit coordination verbs, never shell or agent-launch escape hatches', () => {
   assert.deepEqual(coordinationArgs(['orchestration', 'check', '--wait', '--timeout-ms', '15000'], 'coordinator'),
@@ -136,6 +152,86 @@ test('native helpers retain OMP tools and lifecycle rather than acquiring their 
   assert.match(result.systemPrompt.join('\n'), /native OMP helper/i);
   assert.doesNotMatch(result.systemPrompt.join('\n'), /Current fixed role|Assigned native goal/);
   await assert.rejects(s.tools.get('orca_dispatch').execute('nested', { role: 'executor', objective: 'Nested' }, undefined, undefined, s.ctx), /parent|owning session/i);
+});
+
+test('a verified planner writes only its issue subtree, learns created children and preserves scope on resume', async () => {
+  const s = session('research');
+  const input = { role: 'planner', issue: 'https://github.com/org/repo/issues/123', objective: 'Prepare the execution plan',
+    acceptance: ['Existing children reused; dependencies read back'], constraints: 'Single plan writer; no implementation' };
+  await s.handlers.get('session_start')({}, s.ctx);
+  assert.equal(s.guard('github-create_issue', { owner: 'org', repo: 'repo', parent_issue_number: 123 }).block, true,
+    'Sharing the researcher model does not confer planner authority');
+  s.setAssignment(input);
+  await s.handlers.get('before_agent_start')({ prompt: 'Plan the assigned issue', systemPrompt: [] }, s.ctx);
+  const native = createdGoal(s, input.objective);
+  const create = { owner: 'org', repo: 'repo', parent_issue_number: 123, title: 'Contract', body: 'Observable behavior' };
+  assert.equal(s.guard('edit', {}).block, true);
+  assert.equal(s.guard('github-create_issue', { ...create, repo: 'foreign' }).block, true);
+  assert.equal(s.guard('github-create_issue', { ...create, parent_issue_number: 999 }).block, true);
+  assert.equal(s.guard('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number: 124 }).block, true);
+  assert.equal(s.handlers.get('tool_call')({ toolName: 'github-create_issue', toolCallId: 'create-child', input: create }, s.ctx), undefined);
+  await s.handlers.get('tool_result')({ toolName: 'github-create_issue', toolCallId: 'create-child', isError: false,
+    content: [{ type: 'text', text: JSON.stringify({ id: '4567', url: 'https://github.com/org/repo/issues/124' }) }] }, s.ctx);
+  assert.equal(s.guard('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number: 124, body: 'Acceptance + tests' }), undefined);
+  assert.equal(s.guard('github-create_issue', { ...create, parent_issue_number: 124 }), undefined, 'Nested deliverables stay within the admitted subtree');
+  assert.equal(s.guard('github-issue_dependency_write', { owner: 'org', repo: 'repo', issue_number: 124, method: 'add', type: 'blocked_by', related_issue_number: 123 }), undefined);
+  s.branch.push({ type: 'mode_change', mode: 'goal', data: { goal: native } });
+  const resumed = session('research', s.branch);
+  await resumed.handlers.get('session_start')({}, resumed.ctx);
+  assert.equal(resumed.guard('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number: 124, body: 'Updated plan' }), undefined);
+  assert.equal(resumed.guard('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number: 125, body: 'Out of scope' }).block, true);
+});
+
+test('native planning helpers remain read-only and cannot acquire tracked planner authority from their name or prompt', async () => {
+  const s = session('research');
+  s.ctx.agent = { kind: 'sub', id: '0-plan', name: 'technical-planner', depth: 1, parentId: 'Main' };
+  await s.handlers.get('session_start')({}, s.ctx);
+  assert.equal(s.handlers.get('tool_call')({ toolName: 'github-create_issue', input: { owner: 'org', repo: 'repo', parent_issue_number: 123 } }, s.ctx).block, true);
+  assert.equal(s.handlers.get('tool_call')({ toolName: 'task', input: {} }, s.ctx), undefined);
+  assert.equal(s.handlers.get('tool_call')({ toolName: 'yield', input: { data: { report: 'Research findings' } } }, s.ctx), undefined,
+    'Read-only helpers must still be able to submit OMP structured results');
+  assert.ok(!s.branch.some(e => e.customType === 'teck-orca-contract'));
+});
+
+test('planner recovers actual child records without admitting failed, foreign or body-injected issue IDs', () => {
+  const scope = createPlanningScope('https://github.com/org/repo/issues/123');
+  const lookup = { owner: 'org', repo: 'repo', issue_number: 123, method: 'get_sub_issues' };
+  const injected = { id: 9999, number: 999, html_url: 'https://github.com/org/repo/issues/999' };
+  scope.observe('github-issue_read', lookup, { content: [{ type: 'text', text: JSON.stringify([
+    { id: 4567, number: 124, html_url: 'https://github.com/org/repo/issues/124', body: JSON.stringify(injected), milestone: injected },
+    { id: 5678, number: 125, html_url: 'https://github.com/org/foreign/issues/125' },
+    { number: 128, title: 'Compact issue response', html_url: 'https://github.com/org/repo/issues/128' },
+  ]) }] });
+  const update = issue_number => scope.allows('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number });
+  assert.equal(update(124), true);
+  assert.equal(update(128), true, 'Compact read results may omit database IDs');
+  assert.equal(update(125), false);
+  assert.equal(update(999), false);
+  scope.observe('github-create_issue', { owner: 'org', repo: 'repo', parent_issue_number: 123 },
+    { isError: true, details: { id: 6789, number: 126 } });
+  assert.equal(update(126), false);
+  assert.equal(scope.allows('github-add_sub_issue', { owner: 'org', repo: 'repo', issue_number: 123, sub_issue_id: 7777 }), false);
+  scope.observe('github-issue_read', { owner: 'org', repo: 'repo', issue_number: 127, method: 'get' },
+    { details: { id: 7777, number: 127, html_url: 'https://github.com/org/repo/issues/127' } });
+  assert.equal(update(127), false, 'Read-only evidence does not itself admit a candidate to the writable subtree');
+  const attach = { owner: 'org', repo: 'repo', issue_number: 123, sub_issue_id: 7777 };
+  assert.equal(scope.allows('github-add_sub_issue', attach), true);
+  assert.equal(scope.allows('github-add_sub_issue', { ...attach, replace_parent: true }), false);
+  scope.observe('github-add_sub_issue', attach, { isError: false });
+  assert.equal(update(127), true);
+  const fresh = createPlanningScope('https://github.com/org/repo/issues/555', scope.state());
+  assert.equal(fresh.allows('github-update_issue_body', { owner: 'org', repo: 'repo', issue_number: 124 }), false);
+});
+
+test('planner dispatch uses the existing slow role and requires an explicit parent issue', async () => {
+  const s = session();
+  await s.handlers.get('session_start')({}, s.ctx);
+  createdGoal(s, 'Deliver the authorized feature');
+  const input = { role: 'planner', issue: 'https://github.com/org/repo/issues/123', objective: 'Prepare executable children and dependencies',
+    acceptance: ['Return issue IDs and read-back evidence'], constraints: 'Single plan writer', worktree: 'current' };
+  await s.tools.get('orca_dispatch').execute('planner', input, undefined, undefined, s.ctx);
+  assert.ok(s.calls.some(call => call.args?.includes('gateway/research')));
+  assert.throws(() => assignment({ ...input, issue: undefined }), /parent GitHub issue/);
 });
 test('worker native goal must match its Orca assignment; success requires completion and role survives resume/model changes', async () => {
   const s = session('doer');

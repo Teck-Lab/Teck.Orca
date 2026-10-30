@@ -96,7 +96,7 @@ export async function ensureNamingHook({ name, project, assetRoot, run }) {
 // Copy only Teck-maintained workflow assets; preserve models, user config,
 // credentials, sessions, unrelated extensions and project files.
 export async function ensureWorkflowPolicy({ name, assetRoot, run }) {
-  const roots = ['extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'orchestration.yml', 'RULES.md',
+  const roots = ['extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'extensions/lib/github-plan-scope.mjs', 'orchestration.yml', 'RULES.md',
     'agents/technical-planner.md',
     'skills/orca-feature-workflow', 'skills/orca-workers', 'skills/github-execution-planning', 'skills/github-publication'];
   const files = [];

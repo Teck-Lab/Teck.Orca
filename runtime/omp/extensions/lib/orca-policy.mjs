@@ -3,7 +3,7 @@
 import { realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, relative, isAbsolute } from 'node:path';
-export const workerRoles = { executor: 'task', researcher: 'slow', reviewer: 'advisor', publisher: 'task' };
+export const workerRoles = { executor: 'task', planner: 'slow', researcher: 'slow', reviewer: 'advisor', publisher: 'task' };
 const same = (a, b) => a && b && a.provider === b.provider && a.id === b.id;
 export function resolveRole(model, models, assignedRole) {
   // --model overrides OMP's session default. A worker's default can therefore
@@ -16,7 +16,15 @@ export function resolveRole(model, models, assignedRole) {
 }
 const planning = new Set(['issue_read', 'issue_write', 'search_issues', 'list_issues', 'list_issue_types',
   'list_issue_fields', 'set_issue_fields', 'add_issue_comment', 'sub_issue_read', 'sub_issue_write',
-  'issue_dependency_read', 'issue_dependency_write', 'get_label', 'list_label', 'list_pull_requests', 'search_pull_requests']);
+  'issue_dependency_read', 'issue_dependency_write', 'get_label', 'list_label', 'list_pull_requests', 'search_pull_requests',
+  'create_issue', 'update_issue_body', 'update_issue_title', 'update_issue_labels', 'update_issue_type',
+  'update_issue_assignees', 'update_issue_milestone', 'update_issue_state', 'update_issue_comment',
+  'add_sub_issue', 'remove_sub_issue', 'reprioritize_sub_issue']);
+const planningWrites = new Set(['issue_write', 'set_issue_fields', 'add_issue_comment', 'sub_issue_write', 'issue_dependency_write',
+  'create_issue', 'update_issue_body', 'update_issue_title', 'update_issue_labels', 'update_issue_type',
+  'update_issue_assignees', 'update_issue_milestone', 'update_issue_state', 'update_issue_comment',
+  'add_sub_issue', 'remove_sub_issue', 'reprioritize_sub_issue']);
+const plannerWrites = new Set(['update_issue_body', 'update_issue_title', 'add_issue_comment', 'add_sub_issue', 'reprioritize_sub_issue']);
 const reading = new Set(['get_file_contents', 'get_commit', 'list_commits', 'search_code', 'list_branches',
   'get_code_scanning_alert', 'list_code_scanning_alerts', 'get_dependabot_alert', 'list_dependabot_alerts']);
 const publishing = new Set(['push_files', 'create_or_update_file', 'delete_file', 'create_branch', 'create_pull_request', 'update_pull_request',
@@ -32,10 +40,12 @@ const compounds = {
 };
 const readActions = new Set(['list', 'get', 'list_comments', 'list_sub_issues', 'get_parent_issue', 'search_advanced',
   'list_fields', 'list_items', 'get_field_value', 'filter_items', 'get_metrics', 'get_overdue', 'get_upcoming', 'get_readme']);
-function mcpName(name) {
+export function mcpName(name) {
   if (!/(?:^|[\/_-])github(?:-projects)?(?:[\/_-]|$)/.test(name)) return null;
   return name.replace(/^.*github(?:-projects)?[\/_-]+/, '');
 }
+export const isPlanningWrite = name => planningWrites.has(mcpName(name));
+export const isPlanningTool = name => planning.has(mcpName(name));
 export function permittedTool(role, name, input = {}) {
   // Native OMP delegation is available to every role. The parent remains
   // accountable for the helper's scope, permissions and returned evidence.
@@ -44,7 +54,7 @@ export function permittedTool(role, name, input = {}) {
   if (name === 'ask') return role === 'coordinator';
   if (['goal', 'todo', 'orca', 'orca_dispatch'].includes(name)) return name !== 'orca_dispatch' || role === 'coordinator';
   if (name === 'read') {
-    if (['executor', 'reviewer', 'researcher', 'publisher'].includes(role)) return true;
+    if (['executor', 'planner', 'reviewer', 'researcher', 'publisher'].includes(role)) return true;
     const path = input.path ?? '';
     if (path.includes('..')) return false;
     if (/^skill:\/\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_./-]+)?$/.test(path)) return true;
@@ -61,12 +71,18 @@ export function permittedTool(role, name, input = {}) {
     if (tool === 'pull_request_read') return role !== 'coordinator' || ['get', 'get_status', 'get_reviews', 'get_comments', 'get_review_comments', 'get_check_runs'].includes(input.method);
     if (compounds[tool]) return compounds[tool].includes(input.action) &&
       (role === 'coordinator' || readActions.has(input.action));
-    if (planning.has(tool)) return role === 'coordinator' || !['issue_write', 'set_issue_fields', 'add_issue_comment', 'sub_issue_write', 'issue_dependency_write'].includes(tool);
+    if (planning.has(tool)) {
+      if (role === 'coordinator' || !planningWrites.has(tool)) return true;
+      if (role !== 'planner') return false;
+      if (tool === 'create_issue') return Number.isSafeInteger(input.parent_issue_number) && input.parent_issue_number > 0;
+      if (tool === 'issue_dependency_write') return ['add', 'remove'].includes(input.method);
+      return plannerWrites.has(tool);
+    }
     if (reading.has(tool)) return role !== 'coordinator';
     return role === 'publisher' && publishing.has(tool);
   }
   if (role === 'executor') return ['edit', 'write', 'bash', 'grep', 'glob', 'find', 'lsp', 'ast_edit', 'ast_grep', 'debug', 'web_search'].includes(name);
-  if (['researcher', 'reviewer', 'publisher'].includes(role)) return ['grep', 'glob', 'find', 'ast_grep', 'web_search'].includes(name);
+  if (['planner', 'researcher', 'reviewer', 'publisher'].includes(role)) return ['grep', 'glob', 'find', 'ast_grep', 'web_search'].includes(name);
   return false; // Includes xd://, native github and arbitrary MCP bridges.
 }
 
@@ -156,6 +172,8 @@ export function coordinationAction(input, role) {
 }
 export function assignment(input) {
   if (!workerRoles[input.role] || !input.objective?.trim() || !input.acceptance?.length || input.acceptance.some(a => !a.trim())) throw Error('Worker role, objective and acceptance criteria are required');
+  if (input.role === 'planner' && !/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/issues\/[1-9][0-9]*$/.test(input.issue ?? ''))
+    throw Error('A planner requires its authorized parent GitHub issue URL');
   return `TECK_ORCA_ASSIGNMENT ${JSON.stringify(input)}\n\n` +
     'Use the native OMP goal tool to create this assignment objective before work. Keep its acceptance criteria in native todos. ' +
     'Follow the live Orca Task/Dispatch preamble. Own this assignment; native OMP helpers are allowed as needed, without separate Orca Dispatches. Do not create a competing PR. ' +

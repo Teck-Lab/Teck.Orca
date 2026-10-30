@@ -3,13 +3,16 @@ import { promisify } from 'node:util';
 import { createHash, randomUUID } from 'node:crypto';
 import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { assignment, coordinationAction, coordinationActions, messageTypes, permittedTool, resolveRole, workerRoles } from './lib/orca-policy.mjs';
+import { assignment, coordinationAction, coordinationActions, messageTypes, permittedTool, resolveRole, workerRoles, isPlanningWrite, isPlanningTool } from './lib/orca-policy.mjs';
+import { createPlanningScope } from './lib/github-plan-scope.mjs';
 
 const execute = promisify(execFile);
 const instructions = `Teck Orca role contract:
 The coordinator only plans and manages GitHub metadata, Orca Tasks/Dispatches and messages.
 Never inspect source, implement, integrate code, run tests or publish code as coordinator.
 Workers are not coordinators: implement only their assigned scope using their role's allowed tools.
+Use orca_dispatch(role=planner,issue=<authorized parent issue URL>) to delegate canonical GitHub planning writes on the existing slow model role. One plan writer at a time: the coordinator pauses its plan edits while the planner owns the assignment. Planners create/reuse children, record acceptance/test expectations and real dependencies, and return exact issue IDs and read-back evidence. Researchers and native technical-planner research helpers remain read-only. The coordinator checks the returned graph before dispatching execution.
+If an executor finds a missed blocker, diagnose the failing layer and report evidence, the affected acceptance criterion, prerequisite/decision and proposed next action. Keep its goal incomplete. The coordinator sends only the affected question to planner/researcher, revises real dependency edges and runs ready prerequisite work while unrelated work continues. Resume the existing assignment when viable; do not rebuild the whole plan or turn every failed command into an issue.
 All roles may use native OMP task/eval subagents as needed for their assignment.
 Assign canonical execution issues/sub-issues to Orca executors with bounded goals. Every role may use native helpers for its scoped work; helpers do not replace the tracked primary executor.
 Native OMP owns helper lifecycle; the parent owns scope, acceptance and the final result.
@@ -56,7 +59,8 @@ export default function activate(pi, dependencies = {}) {
     const result = JSON.parse(stdout);
     return result.ok === true ? result.result : result;
   });
-  let role = 'coordinator', launchRole, currentAssignment, authority, assignmentGoal, goal, pendingReport, lastReport, baselineTools, initialized = false, nativeChild = false;
+  let role = 'coordinator', launchRole, currentAssignment, authority, assignmentGoal, goal, pendingReport, lastReport, planningScope, baselineTools, initialized = false, nativeChild = false;
+  const plannerCalls = new Map();
   const isNative = ctx => nativeChild || ctx?.agent?.kind === 'sub';
   const parentTools = ['orca', 'orca_dispatch', 'git_inspect'];
   const requireParent = ctx => { if (isNative(ctx)) throw Error('Orca lifecycle tools belong to the owning session; return native helper results to the parent.'); };
@@ -75,12 +79,13 @@ export default function activate(pi, dependencies = {}) {
     assignmentGoal = saved?.assignmentGoal;
     pendingReport = saved?.pendingReport;
     lastReport = saved?.lastReport;
+    planningScope = role === 'planner' && currentAssignment ? createPlanningScope(currentAssignment.issue, saved?.planningScope) : undefined;
     const native = branch.filter(e => e.type === 'mode_change').at(-1);
     goal = native?.mode === 'goal' || native?.mode === 'goal_paused' ? native.data?.goal : undefined;
     if (!goal && assignmentGoal && ['complete', 'dropped'].includes(assignmentGoal.status)) goal = { ...assignmentGoal };
     initialized = true;
   }
-  const save = () => pi.appendEntry('teck-orca-contract', { version: 1, launchRole, role, assignment: currentAssignment, authority, assignmentGoal, pendingReport, lastReport });
+  const save = () => pi.appendEntry('teck-orca-contract', { version: 1, launchRole, role, assignment: currentAssignment, authority, assignmentGoal, pendingReport, lastReport, planningScope: planningScope?.state() });
   const matchingGoal = () => authority && currentAssignment && goal && assignmentGoal &&
     assignmentGoal.dispatchId === authority.dispatchId && assignmentGoal.id === goal.id &&
     assignmentGoal.objective === currentAssignment.objective && goal.objective === currentAssignment.objective;
@@ -104,8 +109,9 @@ export default function activate(pi, dependencies = {}) {
       const next = JSON.parse(match[1]); assignment(next);
       const verifiedRole = resolveRole(ctx.model, ctx.models, next.role);
       if (verifiedRole === 'coordinator') return false;
-      if (authority?.dispatchId !== worker.dispatchId) { assignmentGoal = undefined; pendingReport = undefined; lastReport = undefined; }
+      if (authority?.dispatchId !== worker.dispatchId) { assignmentGoal = undefined; pendingReport = undefined; lastReport = undefined; planningScope = undefined; plannerCalls.clear(); }
       role = verifiedRole; launchRole = verifiedRole === 'publisher' ? 'executor' : verifiedRole; currentAssignment = next;
+      if (role === 'planner') planningScope ??= createPlanningScope(next.issue);
       authority = { taskId: worker.taskId, dispatchId: worker.dispatchId, handle: dispatch.assigneeHandle, runId: worker.runId };
       save();
       return true;
@@ -120,8 +126,8 @@ export default function activate(pi, dependencies = {}) {
       ...(role === 'coordinator' ? ['orca_dispatch'] : [])])];
     for (const name of ['task', 'eval', 'wait', 'write']) if (available.includes(name)) names.push(name);
     // Argument-sensitive tools stay visible; tool_call is the authoritative boundary.
-    for (const name of available) if (/github/.test(name) && ['pull_request_read', 'manage_project', 'manage_issues', 'manage_milestones', 'manage_labels', 'manage_status_updates']
-      .some(suffix => name.endsWith(suffix))) names.push(name);
+    for (const name of available) if (/github/.test(name) && (isPlanningTool(name) || ['pull_request_read', 'manage_project', 'manage_issues', 'manage_milestones', 'manage_labels', 'manage_status_updates']
+      .some(suffix => name.endsWith(suffix)))) names.push(name);
     await pi.setActiveTools([...new Set(names)]);
   }
   pi.on('session_start', async (_event, ctx) => {
@@ -164,6 +170,13 @@ export default function activate(pi, dependencies = {}) {
   pi.on('goal_updated', (event, ctx) => { if (!isNative(ctx)) goal = event.goal ?? undefined; });
   pi.on('tool_result', async (event, ctx) => {
     if (isNative(ctx)) return;
+    const planningCall = plannerCalls.get(event.toolCallId);
+    if (planningCall) {
+      plannerCalls.delete(event.toolCallId);
+      if (role === 'planner' && planningScope && planningCall.dispatchId === authority?.dispatchId) {
+        planningScope.observe(event.toolName, planningCall.input, event); save();
+      }
+    }
     // Bind only a successfully CREATED native goal, never an accounting update,
     // failed create, unrelated resumed goal or a status copied from a prompt.
     const data = event.details;
@@ -186,7 +199,12 @@ export default function activate(pi, dependencies = {}) {
   });
   pi.on('tool_call', (event, ctx) => {
     const { toolName: name, input = {} } = event;
-    if (isNative(ctx)) return parentTools.includes(name) ? { block: true, reason: 'Return native helper results to the parent; its Orca lifecycle belongs to the owning session.' } : undefined;
+    if (isNative(ctx)) {
+      if (parentTools.includes(name)) return { block: true, reason: 'Return native helper results to the parent; its Orca lifecycle belongs to the owning session.' };
+      if (ctx?.agent?.name === 'technical-planner' && name !== 'yield' && !permittedTool('researcher', name, input))
+        return { block: true, reason: 'Native planning research is read-only. Return findings to the assigned Orca planner for canonical GitHub writes.' };
+      return;
+    }
     if (!permittedTool(role, name, input)) return { block: true, reason: `${role}: ${name} is outside this role. Dispatch the appropriate Orca worker.` };
     if (role !== 'coordinator' && !currentAssignment && !['orca', 'read'].includes(name))
       return { block: true, reason: 'This worker needs an Orca assignment and live Task/Dispatch before starting a native goal or implementation.' };
@@ -208,6 +226,10 @@ export default function activate(pi, dependencies = {}) {
     if (!['goal', 'todo', 'read', 'orca', 'ask'].includes(name) &&
         (goal?.status !== 'active' || role !== 'coordinator' && !matchingGoal()))
       return { block: true, reason: 'Create/resume the native goal before work. A completed, paused or budget-limited goal does not authorize further work.' };
+    if (role === 'planner' && isPlanningWrite(name) && !planningScope?.allows(name, input))
+      return { block: true, reason: 'Planner writes are limited to the assigned issue subtree in its repository. Read back existing/created children before using their IDs; closure, reparenting and publication remain outside this assignment.' };
+    if (role === 'planner' && /github/.test(name) && event.toolCallId)
+      plannerCalls.set(event.toolCallId, { input, dispatchId: authority?.dispatchId });
     if (revision) return { input: revision };
   });
   function withAuthority(input) {
@@ -264,7 +286,7 @@ export default function activate(pi, dependencies = {}) {
   });
   pi.registerTool({ name: 'orca_dispatch', label: 'Dispatch Orca goal', approval: 'write', strict: true,
     description: 'Assign an acceptance-bounded native OMP goal to a visible Orca worker using the existing configured task/slow/advisor roles. Start ready tasks only; inspect uncertain receipts before retry.',
-    parameters: z.object({ role: z.enum(['executor', 'researcher', 'reviewer', 'publisher']), objective: z.string().describe('Observable deliverable only. Keep lifecycle/reporting instructions in constraints, not the native goal objective.'),
+    parameters: z.object({ role: z.enum(['executor', 'planner', 'researcher', 'reviewer', 'publisher']), objective: z.string().describe('Observable deliverable only. Keep lifecycle/reporting instructions in constraints, not the native goal objective.'),
       issue: z.string().optional(), acceptance: z.array(z.string()).min(1), constraints: z.string(), worktree: z.string(),
       name: z.string().optional(), run: z.string().optional(), deps: z.array(z.string()).optional(),
       token_budget: z.number().int().positive().optional(),

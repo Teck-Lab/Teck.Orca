@@ -39,8 +39,12 @@ Risk changes verification depth; it does not itself require sub-issues.
 The coordinator plans from GitHub metadata and helper/worker evidence. Use native
 OMP task/eval helpers or an Orca researcher on the configured slow role for source
 investigation and design questions; follow the [research contract](references/technical-planning.md).
-Every role may delegate natively as needed. Keep the coordinator as canonical plan
-writer and project code read-only during investigation.
+Every role may delegate natively as needed. For GitHub plan writing, assign
+`orca_dispatch(role=planner,issue=<canonical parent URL>)` on the existing slow
+role. The planner creates/reuses useful execution children, acceptance/test
+expectations and actual dependencies; the orchestrator checks its returned IDs
+and read-back evidence. Keep one plan writer at a time and project code read-only.
+For missed blockers, follow the affected-scope reassessment loop in the issue-structure reference.
 
 Assign canonical execution issues/sub-issues to Orca executors on the configured
 task role, with bounded native goals. Executors may use native helpers for any

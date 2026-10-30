@@ -29,6 +29,7 @@ test('workflow upgrade preserves existing models, config and unrelated tools; in
   assert.match(script, /orca-orchestration.mjs/);
   assert.match(script, /omp-launch-policy.mjs/);
   assert.match(script, /agents\/technical-planner\.md/);
+  assert.match(script, /extensions\/lib\/github-plan-scope\.mjs/);
   const syntax = spawnSync(bash, ['-n'], { input: script, encoding: 'utf8' });
   assert.equal(syntax.status, 0, syntax.stderr);
   assert.equal(await ensureWorkflowPolicy({ name: 'owned-test-vm', assetRoot: root, run }), false);

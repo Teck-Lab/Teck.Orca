@@ -107,3 +107,37 @@ ownership, or a material blocker; do not split merely because an initial attempt
 failed. Promote the existing issue to the parent if needed, preserving its
 investigation, accepted work, existing IDs and agreed acceptance criteria.
 Reconcile the work map so exactly one current Dispatch owns each editing scope.
+
+## When an executor discovers a missed blocker
+
+1. The executor diagnoses the failing layer within its assignment. A restore,
+   image pull, test setup or tool error is not automatically a missing feature.
+   Use native research helpers for a bounded question when useful; do not keep
+   retrying the same failed approach without new evidence.
+2. Resolve an ordinary implementation detail within scope using the normal
+   test-first cycle. If a prerequisite, contract decision or scope change is
+   needed, send a structured escalation/ask to the coordinator with the actual
+   failure/evidence path, affected acceptance criterion, suspected prerequisite,
+   work already completed and proposed next action. Keep the goal incomplete;
+   never report success or quietly broaden scope.
+3. The coordinator pauses only dependent work and assigns the smallest useful
+   reassessment to a planner and/or read-only researcher. Supply the canonical
+   parent and exact affected issue IDs so the existing graph is revised rather
+   than replaced. One planner owns those plan edits while the coordinator pauses
+   its own edits to that plan.
+4. The planner reuses the existing prerequisite or creates a useful in-scope
+   deliverable, updates actual dependency edges and reads them back. An external
+   prerequisite may be linked without adopting it into this parent or taking
+   ownership of another repository. If the needed work exceeds authorized scope,
+   return that decision to the coordinator; time passing does not authorize it.
+5. The coordinator checks the revised records and evidence, dispatches newly
+   ready prerequisites and lets unrelated ready branches continue. Resume the
+   existing executor/checkout once its prerequisite is accepted. Preserve issue
+   IDs, accepted changes, evidence and the canonical integration PR; do not reset
+   the entire plan or order another full review for the blocker alone.
+
+If the attempt cannot continue, use the existing terminal-failure lifecycle:
+record the blocker, drop the assignment goal without completing it, report failed
+and preserve the checkout for a later Dispatch. The GitHub issue remains open;
+an ended attempt is not a completed deliverable. Do not retain unused live
+workers just to represent a durable blocked issue.

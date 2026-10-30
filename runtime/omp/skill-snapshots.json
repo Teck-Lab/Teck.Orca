@@ -151,7 +151,7 @@
     },
     {
       "name": "github-execution-planning/references/issue-structure.md",
-      "sha256": "e3d5be8cde04b89eb33054e14f83d47e9b970bd9bc6f5895eee14fcd1c656ef0"
+      "sha256": "9175e4c9481f3245ddaf825d41d864e030a29728c7bc1015fcf0d49d9fa08eb0"
     },
     {
       "name": "github-execution-planning/references/pr-stacks.md",
@@ -163,7 +163,7 @@
     },
     {
       "name": "github-execution-planning/SKILL.md",
-      "sha256": "8942e13abe7579d6b086d1228d80606209ae91281330cedc0346dee46f76f4b6"
+      "sha256": "f69276815f3bed634723eb7c431c401d45ac1ab9c7560030e85143af3eae5e3f"
     },
     {
       "name": "github-publication/SKILL.md",
@@ -299,7 +299,7 @@
     },
     {
       "name": "orca-feature-workflow/references/goals-and-milestones.md",
-      "sha256": "68611701e45405ad8748a5e8d282efff61a9b8fea1c56d3d73d7a208f9379a83"
+      "sha256": "83d76458742f703daf1c79be901fd029f12e8d8ba3cd5c40e60c50cdf8e9dcc3"
     },
     {
       "name": "orca-feature-workflow/references/review-gates.md",
@@ -307,7 +307,7 @@
     },
     {
       "name": "orca-feature-workflow/references/technical-planning.md",
-      "sha256": "4408e38cdb2f567dbf992a08591e735c327c38222051c8634b36b482ad7ea304"
+      "sha256": "61787f1c1e8e4a35df0ac3462316dfcfc0612c4d89828a11f0365cdaf6c7dda5"
     },
     {
       "name": "orca-feature-workflow/references/testing.md",
@@ -315,11 +315,11 @@
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "59fba6103f90c314e6dd66b1fef15b63ae8a25f6aa6db3bbb22a966ace2e8390"
+      "sha256": "99dd57a4e5a3cb19fbb0b92793964ed8e8ced3446545ade1bf470d7996d4a66c"
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "a8d1f47eda7eca71826a411316f253b94b15a55a43408de91b8490442f1a919d"
+      "sha256": "c143a4efc2a0483cebba1baaccf7e17bf2d51956bea8d3242f0dedbde5af834e"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",

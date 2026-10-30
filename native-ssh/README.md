@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.9.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.10.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 
@@ -138,3 +138,5 @@ That pack documents the project-shared Run on recipe pattern; its current shell
 implementation is macOS/Linux-only and uses its own sshd. This preview uses
 Node on Windows and Docker-managed `.sbx` SSH with our existing workload.
 
+
+Canonical GitHub plan writing can use a verified Orca planner assignment on the existing slow model role. The planner creates/reuses scoped children and dependencies, while the coordinator checks the returned graph and dispatches execution. Native planning/research helpers remain read-only. Missed blockers trigger focused reassessment of the affected scope; independent ready work continues. See the [planner contract](../runtime/omp/skills/orca-feature-workflow/references/technical-planning.md).

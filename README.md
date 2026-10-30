@@ -196,7 +196,17 @@ and is not an OS isolation boundary. Independent deliverable/integration reviews
 replace periodic WATCHDOG loops and per-helper full reviews. See the
 [runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md).
 
-Bundled daemon plugin 0.5.14 includes Orca 1.4.245 and Node 24.22.1. Both image
-paths pin OMP 18.14.0 and Bun 1.4.4. Native SSH preview 0.1.9 uses the
+Bundled daemon plugin 0.5.15 includes Orca 1.4.245 and Node 24.22.1. Both image
+paths pin OMP 18.14.0 and Bun 1.4.4. Native SSH preview 0.1.10 uses the
 Orca desktop-managed guest daemon after the desktop update. See the
 [release changes and validation](docs/validation-orca-omp-2026-10-30.md).
+
+## Planner-owned issue decomposition
+
+The orchestrator can assign a verified Orca planner on the existing slow model
+role to create/reuse execution children and real dependencies. One writer owns
+the canonical plan at a time; the orchestrator checks returned IDs and evidence
+before dispatch. Researchers/native planning helpers remain read-only. A missed
+blocker triggers reassessment of only the affected scope while unrelated work
+continues. See the [planner validation](docs/validation-planner-decomposition-2026-10-30.md)
+and the standalone [issue-flow diagram](issue-flow.html).

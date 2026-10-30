@@ -15,7 +15,8 @@ The live injected Dispatch is the authority for your task, scope, issue, role,
 and reporting command. Implement/test only the assigned work, use its blocking
 ask/reply channel, check follow-ups at natural checkpoints and before reporting,
 then send worker_done with the actual outcome and idle. The coordinator owns
-integration, publication, and terminal release. Do not create a new issue tree,
+integration, publication, and terminal release. A verified planner may maintain
+the assigned canonical issue subtree; other workers do not create a new issue tree,
 abandon ownership of the assignment, close your own terminal, or start another
 sandbox/daemon.
 
@@ -25,9 +26,12 @@ and execution-host orchestration guide own exact lifecycle flags and heartbeats.
 
 A technical planning/research assignment follows the
 [research contract](../orca-feature-workflow/references/technical-planning.md).
-Return evidence and a proposed plan to the coordinator; preserve read-only scope.
-Use the existing slow role for research, through native helpers or a visible
-Orca researcher Dispatch. Researchers and reviewers may also delegate natively.
+A researcher/native planning helper returns read-only evidence. A verified
+Orca planner creates/reuses scoped GitHub children and dependencies, then returns
+exact IDs, execution waves and read-back evidence. Both use the existing slow
+model role; only the verified planner receives planning-write authority. All
+roles may delegate natively. A missed blocker is escalated with evidence and
+reassessed only for its affected scope; preserve the incomplete goal and checkout.
 
 ## Coordinator: dispatch
 

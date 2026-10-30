@@ -24,7 +24,7 @@ Canonical execution issues/sub-issues retain tracked Orca executors and bounded
 native goals; native helpers support their owner without replacing that record.
 Use orca_dispatch with role, objective, issue URL where applicable, observable
 acceptance criteria, constraints and explicit worktree placement. It resolves
-task/slow/advisor from OMP's live configuration; publisher uses task. The wrapper
+task/slow/advisor from OMP's live configuration; planner/researcher use slow and publisher uses task. The wrapper
 adds the assignment contract to Orca's Task spec. Native OMP task/eval helpers are
 allowed for every role, including researchers and reviewers, without separate
 Orca records. Use existing model roles and let OMP own helper lifecycle. Dispatch
@@ -48,7 +48,9 @@ researcher and reviewer stay read-only; publisher may inspect the approved
 checkout and use App-backed MCP but must not edit it or merge.
 
 All roles may create native helpers as needed. The parent is accountable for
-scope, permissions, editing coordination and evidence. Helpers use their native
+scope, permissions, editing coordination and evidence. A tracked planner owns
+canonical GitHub plan edits while the coordinator pauses its own edits to that
+plan; native research/planning helpers remain read-only. Helpers use their native
 OMP agent preset and task brief, not the parent's Orca identity or exact native
 goal. They return results to the parent, which retains final acceptance and
 Orca settlement. Native task/eval execution is permitted; role boundaries are
