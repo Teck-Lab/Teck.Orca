@@ -1,142 +1,29 @@
-# Teck OMP Native SSH Preview
+# Native SSH runtime
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.11.
-It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
-The original Teck plugin, sandbox and connection remain separate.
+This directory contains the native SSH provider used by the main **Teck OMP Docker Sandbox** plugin (version 0.6.0). It is an internal runtime module, with no separate plugin manifest, npm package or installation step.
 
-Project names are retained across recipe resume and repaired automatically in
-managed terminal/OMP startup if Orca falls back to the checkout label `project`.
-The hook uses Orca's public metadata API, preserves intentional custom names,
-and never moves folders or changes worktree IDs. Refresh this preview plugin
-after updating to 0.1.5; no manual project rename is part of the workflow.
-An older preview sandbox receives the missing naming hook on its next normal
-recipe reuse/resume; its OMP profile and sessions are retained.
+## Install and use
 
-## Use the existing GUI workflow
+From the repository root, run npm run build, npm test, npm run check and npm run setup. Install or refresh **plugin/** in Orca Settings > Plugins. Select **Teck OMP Project** in the GUI **Run on** picker for each workspace. The first workspace creates a project sandbox if absent; later workspaces reuse it. Orca registers SSH and manages its matching guest daemon. No manual VM creation or SSH-host addition is part of this flow.
 
-1. Refresh or reinstall **Teck OMP Native SSH Preview** from `native-ssh/plugin`
-   in Orca Settings > Plugins. Approve its lifecycle commands when Orca asks.
-2. Create a workspace from your local project and select **Run on >
-   Teck OMP SSH Project (Preview)** (inside Per-Workspace Environments if grouped).
-3. Orca runs the recipe, creates the project sandbox if absent, configures OMP,
-   clones the repository once, registers its SSH connection, and creates the
-   requested linked worktree. Orca installs/manages its own guest daemon.
-4. For another worktree, select **the same preview recipe** again. It reuses
-   the same project VM and clone. No Prepare command or manual SSH host setup
-   is part of this flow.
+If **Teck OMP Native SSH Preview** is still installed, remove that old plugin entry after refreshing the main plugin. Keep its VM, saved workspaces and ownership records. The main plugin retains the native recipe ID (teck-native-ssh-project), sandbox names (teck-orca-ssh-<hash>), project configuration (native-ssh/projects.json), release store and ownership root (~/.teck-orca-native-ssh). Existing native VMs are reused. Existing workspaces keep their immutable lifecycle snapshots; new/reused recipe runs install the current managed policy without replacing user model configuration or sessions.
 
-The local Teck.Monorepo checkout is a valid starting point. Existing sessions
-on the original Teck connection retain their own sandbox and data. This preview
-makes a fresh remote clone and does not copy uncommitted work or merge profiles.
+The older bundled-daemon sandboxes retain their own records and data. The main plugin keeps **Teck: Reconnect sandboxes** for recovery; it does not migrate those checkouts into native SSH VMs.
 
-## Ownership and lifecycle
+## Lifecycle and ownership
 
-One persistent VM is named `teck-orca-ssh-<project-hash>`. Ownership lives under
-`~/.teck-orca-native-ssh/`, separately from the original plugin?s records.
-Concurrent creation is serialized. Later creates reuse the VM and leave OMP
-user model configuration and sessions untouched. Versioned Teck workflow assets
-are updated on normal recipe reuse/resume. A manually deleted VM can be replaced by a new create;
-resume requires the original provider identity and never silently replaces it.
-Unowned, renamed or replaced VMs are refused.
+Creation is serialized and checks the original provider identity. A manually deleted VM can be replaced by a new workspace create; resume never replaces it. Unowned, renamed or substituted VMs are refused. Suspend is a provider no-op and destroy is disabled: sleeping/deleting a worktree retains the project VM. Build, tests, setup and plugin activation create no project VM or workspace.
 
-The recipe returns Orca?s native `connection.type: ssh` result. Orca owns the
-workspace SSH records and its managed server lifecycle. These records are
-workspace-scoped even when the provider VM is project-shared; one VM does not
-imply one workspace-owned record. Cross-workspace orchestration and reconnect
-behavior on Orca 1.4.237 still require live acceptance checks.
+The provider emits schema version 1 and connection.type=ssh, allowing Orca to create linked worktrees. Docker Sandboxes supplies the .sbx SSH transport; Docker Engine inside the VM runs application/test containers. Project naming and OMP-session recovery hooks run on normal startup. Existing custom models, settings, credentials and conversations are retained.
 
-Suspend is a provider no-op; destroy is disabled. Sleeping/deleting one workspace
-does not stop or remove the shared VM. Sandbox deletion is a separate explicit
-action after preserving work. Docker Engine inside the VM runs application/test
-containers; Docker Sandboxes manages the VM and native `.sbx` SSH transport.
+## Runtime and local Kubernetes
 
-## Runtime and requirements
+Requires Orca 1.4.245+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH and Docker-managed service authentication. The desktop manages the guest Orca server. OMP 18.14.0 and Bun 1.4.4, the existing model roles, planning/execution/review policy and all native helper capabilities remain available. See the [main workflow documentation](../README.md).
 
-Orca 1.4.237+, host Node 22+, OpenSSH, Docker Sandboxes 0.48+ and a Docker login.
-For desktop 1.4.245, the native SSH connection uses Orca's matching managed guest
-server. The separate bundled-daemon plugin is updated independently; this preview
-does not install or pin that custom daemon over the managed SSH server.
-OmniRoute, MCPHub and GitHub service credentials must already be configured
-in Docker. Proxy-managed placeholders are used; host Git identity and personal
-credential helpers are not copied.
+Defaults are 8 CPU / 16g memory. Teck.Monorepo enables kubernetes=workspace in projects.json. New enabled VMs use the existing 60g Docker / 30g root settings; existing VMs are not resized. Bootstrap installs one persistent single-node KIND cluster with isolated worktree namespaces, dedicated kubeconfig and ownership/UID-safe cleanup. Base startup installs no Argo CD, Kargo, registry or Git server; CNPG, Rollouts and Gateway API/kgateway/TLS remain optional add-ons.
 
-Defaults are 8 CPU / 16g memory, applied at creation. `projects.json` supplies
-Teck.Monorepo defaults; other Orca projects use their supplied repository URL
-or local origin. Each project gets its own sandbox. OMP 18.14.0, its model roles,
-technical research agent, TDD/review guidance, session recovery and development
-toolchain are snapshotted from the existing runtime. The network policy includes
-`quay.io:443` and `*.quay.io:443`.
+Use Docker build -> kind load docker-image -> kubectl apply -k deployment/local. teck-kube provides ownership, image/source identity, readiness, Job and initial-analysis checks around this flow. Keep platform definitions in GitOps apps/local categories, cluster-resources/local and bootstrap/local; application manifests stay in each source repository's deployment/ directory. The full WSL2/Cilium/Istio profile remains disabled. See [KIND validation](../docs/validation-official-kind-2026-10-25.md).
 
-The default/plan OMP session only coordinates through Orca and GitHub metadata.
-Task-role workers implement/test/integrate, slow-role workers research,
-advisor-role workers review and a task-role publication worker verifies/publishes
-the approved snapshot. Existing modelRoles are preserved. Native OMP goals and
-todo phases track the milestone/delivery scope and each bounded assignment;
-Orca owns its visible workers and OMP owns native helper state. Canonical execution issues/sub-issues retain tracked Orca executors and bounded goals. Every role,
-including researchers and reviewers, may use native task/eval subagents as needed.
-The parent retains scope and acceptance; native helpers do not claim its Orca
-Dispatch or goal. Direct coordinator implementation tools remain scoped.
-Explicit reviews replace duplicate WATCHDOG loops. Refresh the preview plugin,
-then use its normal GUI recipe create/reuse/resume to install the updated policy;
-existing running OMP processes retain their loaded policy until restarted.
+## Development and validation
 
-The workload includes checksum-pinned kind 0.33.0 and kubectl 1.35.8. Teck.Monorepo
-now opts into the managed workspace profile with "kubernetes": "workspace" in
-projects.json. On normal recipe create/reuse/resume, the plugin installs the
-immutable guest helper and starts bootstrap without holding up SSH/OMP. Interactive
-terminal startup also checks it, so a stopped VM recovers its existing cluster.
-Build/setup/plugin activation still create no VM or cluster. Existing workspaces
-retain their older immutable recipe snapshots: after refreshing, create an
-additional workspace with the same preview recipe to apply this update to the
-shared VM. Once installed, the terminal hook also covers older workspaces.
-
-## Local Kubernetes
-
-Enable kubernetes: workspace in the existing project configuration. The separate native SSH preview keeps the GUI Run on workflow and starts one persistent, single-node KIND cluster. Base startup installs no Argo CD, Kargo, registry or Git server.
-
-Use Docker build -> kind load docker-image -> kubectl apply -k deployment/local. teck-kube deploy is a convenience around these operations with source/image records, namespace ownership checks, apply phases, readiness and initial analysis checks. Optional shared add-ons are installed with teck-kube addon cnpg|rollouts|gateway, or the application build declaration's addons list. No local promotion destination is created.
-
-Each worktree owns its namespace and databases. teck-kube kubectl supplies the dedicated kubeconfig; cleanup removes only the owned namespace and preserves shared operators/other worktrees. See docs/local-development.md in Teck.GitOps and ../docs/validation-official-kind-2026-10-25.md.
-
-Keep platform definitions in GitOps apps/local categories, cluster-resources/local and bootstrap/local; app manifests remain in the source repo deployment/. Package definitions with npm run bundle:kubernetes -- --gitops ../Teck.GitOps, then build/check/setup the preview. Existing enabled VMs are not resized or silently migrated. Old draft delivery clusters require explicit migration; their data is retained.
-
-New enabled VMs retain the existing 8 CPU/16g memory, 60g Docker/30g root resource settings. The full WSL2/Cilium/Istio profile is still disabled.
-
-## Development and installation
-
-From the repository root:
-
-```text
-npm run build --prefix native-ssh
-npm test --prefix native-ssh
-npm run check --prefix native-ssh
-npm run setup --prefix native-ssh
-```
-
-Setup installs an immutable, checksum-verified snapshot under
-`~/.teck-orca-native-ssh/releases/<digest>`. The small plugin recipe points to
-that exact snapshot, so it works independently of the current checkout.
-Build, check, tests, setup, and plugin activation create no sandbox or workspace.
-Install **native-ssh/plugin**, not the repository root. Refresh the preview
-after rebuilding and running setup.
-
-The Windows Node launcher preserves UTF-8 lifecycle JSON and exit codes.
-Provider logs go to Orca?s recipe progress/error stream; stdout contains only
-the final connection JSON. The shared Docker kit builder is checked for at least
-32 GiB capacity and 12 GiB free; it is not pruned or replaced automatically.
-
-## Live acceptance
-
-After refreshing the plugin, create two GUI worktrees with the preview recipe.
-Confirm a single preview VM, OMP in both workspaces, the correct guest CLI target,
-and supervised worker creation, messaging, settlement and cleanup. Then check
-Orca restart, stopped-sandbox reconnect and exact OMP session continuation.
-Portable tests do not establish these live results. See `VALIDATION.md`.
-
-Workflow reference: [mattjohnson/orca-sbx-recipes](https://github.com/mattjohnson/orca-sbx-recipes).
-That pack documents the project-shared Run on recipe pattern; its current shell
-implementation is macOS/Linux-only and uses its own sshd. This preview uses
-Node on Windows and Docker-managed `.sbx` SSH with our existing workload.
-
-
-Canonical GitHub plan writing can use a verified Orca planner assignment on the existing slow model role. The planner creates/reuses scoped children and dependencies, while the coordinator checks the returned graph and dispatches execution. Native planning/research helpers remain read-only. Missed blockers trigger focused reassessment of the affected scope; independent ready work continues. See the [planner contract](../runtime/omp/skills/orca-feature-workflow/references/technical-planning.md).
+All native provider tests run in the root npm test command and CI matrix. Root setup installs the integrity-verified native runtime snapshot and older recovery runtime; plugin/ contains only the small manifest, license, recovery entry and native recipe. Historical preview validation is retained in [VALIDATION.md](VALIDATION.md); current packaging validation is recorded in [the consolidation report](../docs/validation-unified-plugin-2026-10-30.md). Portable tests establish package generation, immutable installation and mocked provider behavior, not a new GUI/reboot acceptance result.

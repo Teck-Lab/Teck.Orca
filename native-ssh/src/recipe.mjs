@@ -16,7 +16,7 @@ export function createLifecycle({ env = process.env, assetRoot = root, stateRoot
     const id = env.ORCA_PROJECT_ID?.trim() || previous?.projectId;
     const instanceId = env.ORCA_VM_INSTANCE_ID?.trim() || env.ORCA_WORKSPACE_ID?.trim() || previous?.instanceId;
     const name = sandboxName(id);
-    if (!instanceId) throw Error('Choose Teck OMP SSH Project (Preview) in Orca Run on');
+    if (!instanceId) throw Error('Choose Teck OMP Project in Orca Run on');
     if (mode !== 'create' && (previous?.version !== 1 || previous.projectId !== id || previous.instanceId !== instanceId ||
         previous.sandboxName !== name || previous.connectionMode !== 'native-ssh' || !previous.sandboxId)) throw Error('Lifecycle belongs to another project or workspace');
     // Worktree sleep/deletion never stops or deletes a project-shared VM.

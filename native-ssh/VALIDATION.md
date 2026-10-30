@@ -1,3 +1,5 @@
+> Historical preview validation. Since v0.6.0 the native provider is part of the main plugin; use ../README.md for installation and ../docs/validation-unified-plugin-2026-10-30.md for current packaging evidence.
+
 > Local Kubernetes delivery was simplified in v0.1.6. See ../docs/validation-official-kind-2026-10-25.md for current acceptance; earlier Argo CD/Kargo results below are historical.
 
 # Native SSH preview 0.1.5 Kubernetes pilot - 2026-10-25

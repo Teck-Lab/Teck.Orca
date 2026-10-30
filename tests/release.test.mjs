@@ -48,13 +48,13 @@ test('generated recipe runs through the host shell, forwards JSON stdin and reje
 
 test('plugin recipes use pinned launchers and fit Orca and cmd limits', () => {
   const manifest = JSON.parse(readFileSync(join(repositoryRoot, 'orca-plugin.json')));
-  assert.deepEqual(manifest.contributes.vmRecipes, [{ path: 'recipes/sbx-project-sandbox.json' }]);
-  for (const item of [...manifest.contributes.vmRecipes, { path: 'recipes/sbx-feature-sandbox.json' }]) {
+  assert.deepEqual(manifest.contributes.vmRecipes, [{ path: 'recipes/native-ssh-project.json' }]);
+  for (const item of [...manifest.contributes.vmRecipes, { path: 'recipes/sbx-feature-sandbox.json' }, { path: 'recipes/sbx-project-sandbox.json' }]) {
     const path = typeof item === 'string' ? item : item.path;
     const recipe = JSON.parse(readFileSync(join(repositoryRoot, path)));
     assert.equal(recipe.schemaVersion, 1);
     for (const mode of ['create', 'suspend', 'resume', 'destroy']) {
-      if (mode === 'destroy' && recipe.id === 'teck-sbx-project') { assert.equal(recipe[mode], 'none'); continue; }
+      if (mode === 'destroy' && ['teck-sbx-project', 'teck-native-ssh-project'].includes(recipe.id)) { assert.equal(recipe[mode], 'none'); continue; }
       assert.ok(recipe[mode].length < 8191);
       assert.ok(recipe[mode].startsWith('node -e '));
     }
