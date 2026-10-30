@@ -151,7 +151,7 @@
     },
     {
       "name": "github-execution-planning/references/issue-structure.md",
-      "sha256": "ed8f4cdad88fe8109cfb35c7111ab02177a9814cd0cd406c5c4fa12508733f6f"
+      "sha256": "781c74e34cc96baf06ad474a2dbbf287f9e7c6946146a05bd79511d555675ba7"
     },
     {
       "name": "github-execution-planning/references/pr-stacks.md",
@@ -167,7 +167,7 @@
     },
     {
       "name": "github-publication/SKILL.md",
-      "sha256": "e13eb78a8a7ce184485a8c82ea174ee22bacc2222d61348015af13b861e60b9a"
+      "sha256": "a05de63bdfe5663623c9daaacb469cdc2d47685776b3f8b90c27b4909c249056"
     },
     {
       "name": "keycloak-administration/LICENSE.md",
@@ -299,15 +299,15 @@
     },
     {
       "name": "orca-feature-workflow/references/goals-and-milestones.md",
-      "sha256": "1d4d9c0dd26155a46f145704821015e15a0dfcbddb1ef5ed4b858eda79bf027e"
+      "sha256": "0c00bb995ef6d6cfe1fe4a5db6eee5a25488551978ce558ca6e6b8576359d654"
     },
     {
       "name": "orca-feature-workflow/references/review-gates.md",
-      "sha256": "fc58dbdb603c8ab73e4bac03293ad3ffa183b8f32cafd946a696a5a2b8ac360a"
+      "sha256": "c4cf816ca9834f454f5827f7d53babe63aaa9360dd853d6cf59c3e71d9ea3a83"
     },
     {
       "name": "orca-feature-workflow/references/technical-planning.md",
-      "sha256": "e6a4531f307302655a5673fbde1096a19c19285e17392a7d3a8883bed34176e7"
+      "sha256": "4408e38cdb2f567dbf992a08591e735c327c38222051c8634b36b482ad7ea304"
     },
     {
       "name": "orca-feature-workflow/references/testing.md",
@@ -315,11 +315,11 @@
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "dfea16447e3ab273e159022652b3fb256bc1ea10aed234f0e5f1cd28e7928d89"
+      "sha256": "27de60627b26eb6fa86c17b2552eddbbbeeeb1e8046fec82c094965f114eb5d0"
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "262e1f17159e8bf82507e57fe080c867be02fa0311b770b26f87057d44e35e79"
+      "sha256": "a8d1f47eda7eca71826a411316f253b94b15a55a43408de91b8490442f1a919d"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",
