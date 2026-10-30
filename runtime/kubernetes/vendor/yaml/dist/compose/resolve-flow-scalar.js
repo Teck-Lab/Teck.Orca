@@ -66,54 +66,40 @@ function plainValue(source, onError) {
     }
     if (badChar)
         onError(0, 'BAD_SCALAR_START', `Plain value cannot start with ${badChar}`);
-    return foldLines(source);
+    return unfoldLines(source);
 }
 function singleQuotedValue(source, onError) {
     if (source[source.length - 1] !== "'" || source.length === 1)
         onError(source.length, 'MISSING_CHAR', "Missing closing 'quote");
-    return foldLines(source.slice(1, -1)).replace(/''/g, "'");
+    return unfoldLines(source.slice(1, -1)).replace(/''/g, "'");
 }
-function foldLines(source) {
-    /**
-     * The negative lookbehind here and in the `re` RegExp is to
-     * prevent causing a polynomial search time in certain cases.
-     *
-     * The try-catch is for Safari, which doesn't support this yet:
-     * https://caniuse.com/js-regexp-lookbehind
-     */
-    let first, line;
-    try {
-        first = new RegExp('(.*?)(?<![ \t])[ \t]*\r?\n', 'sy');
-        line = new RegExp('[ \t]*(.*?)(?:(?<![ \t])[ \t]*)?\r?\n', 'sy');
+function unfoldLines(source) {
+  let newline = source.indexOf('\n');
+  if (newline === -1) return source;
+  let end = newline;
+  if (source[end - 1] === '\r') --end;
+  while (end > 0 && (source[end - 1] === ' ' || source[end - 1] === '\t')) --end;
+  const parts = [source.slice(0, end)];
+  let separator = ' ';
+  let position = newline + 1;
+  while ((newline = source.indexOf('\n', position)) !== -1) {
+    let start = position;
+    while (start < newline && (source[start] === ' ' || source[start] === '\t')) ++start;
+    end = newline;
+    if (source[end - 1] === '\r') --end;
+    while (end > start && (source[end - 1] === ' ' || source[end - 1] === '\t')) --end;
+    if (start === end) {
+      if (separator === '\n') parts.push(separator);
+      else separator = '\n';
+    } else {
+      parts.push(separator, source.slice(start, end));
+      separator = ' ';
     }
-    catch {
-        first = /(.*?)[ \t]*\r?\n/sy;
-        line = /[ \t]*(.*?)[ \t]*\r?\n/sy;
-    }
-    let match = first.exec(source);
-    if (!match)
-        return source;
-    let res = match[1];
-    let sep = ' ';
-    let pos = first.lastIndex;
-    line.lastIndex = pos;
-    while ((match = line.exec(source))) {
-        if (match[1] === '') {
-            if (sep === '\n')
-                res += sep;
-            else
-                sep = '\n';
-        }
-        else {
-            res += sep + match[1];
-            sep = ' ';
-        }
-        pos = line.lastIndex;
-    }
-    const last = /[ \t]*(.*)/sy;
-    last.lastIndex = pos;
-    match = last.exec(source);
-    return res + sep + (match?.[1] ?? '');
+    position = newline + 1;
+  }
+  while (position < source.length && (source[position] === ' ' || source[position] === '\t')) ++position;
+  parts.push(separator, source.slice(position));
+  return parts.join('');
 }
 function doubleQuotedValue(source, onError) {
     let res = '';

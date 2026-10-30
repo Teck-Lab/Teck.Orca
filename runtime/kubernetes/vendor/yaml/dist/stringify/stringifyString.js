@@ -148,14 +148,59 @@ function quotedString(value, ctx) {
     }
     return qs(value, ctx);
 }
-// The negative lookbehind avoids a polynomial search,
-// but isn't supported yet on Safari: https://caniuse.com/js-regexp-lookbehind
-let blockEndNewlines;
-try {
-    blockEndNewlines = new RegExp('(^|(?<!\n))\n+(?!\n|$)', 'g');
+function indentBlockEndNewlines(source, indent) {
+  const parts = [];
+  let from = 0;
+  let start = source.indexOf('\n');
+  while (start !== -1) {
+    let end = start + 1;
+    while (source[end] === '\n') ++end;
+    if (end === source.length) break;
+    parts.push(source.slice(from, end), indent);
+    from = end;
+    start = source.indexOf('\n', end);
+  }
+  parts.push(source.slice(from));
+  return parts.join('');
 }
-catch {
-    blockEndNewlines = /\n+(?!\n|$)/g;
+function removeFoldSeparators(source) {
+  const parts = [];
+  let from = 0;
+  let start = 0;
+  let whitespaceEnd = 0;
+  while (start < source.length) {
+    if (source[start] !== ' ' && source[start] !== '\t') {
+      const newline = source.indexOf('\n', start);
+      if (newline === -1) break;
+      start = newline + 1;
+      continue;
+    }
+    let bodyEnd = start + 1;
+    while (bodyEnd < source.length) {
+      const ch = source[bodyEnd];
+      if (ch === '\n' || ch === '\r' || ch === '\u2028' || ch === '\u2029') break;
+      ++bodyEnd;
+    }
+    // Cache the end of each whitespace run. Without this, many indented empty
+    // lines would repeatedly rescan the same suffix and remain quadratic.
+    if (bodyEnd >= whitespaceEnd) {
+      whitespaceEnd = bodyEnd;
+      while (whitespaceEnd < source.length) {
+        const ch = source[whitespaceEnd];
+        if (ch !== '\n' && ch !== '\t' && ch !== ' ') break;
+        ++whitespaceEnd;
+      }
+    }
+    const matchEnd = whitespaceEnd > bodyEnd && source[whitespaceEnd - 1] === '\n' ? whitespaceEnd : bodyEnd;
+    parts.push(source.slice(from, start === 0 ? 0 : start - 1), source.slice(start, bodyEnd));
+    if (matchEnd > bodyEnd) parts.push(source.slice(bodyEnd, matchEnd - 1));
+    from = matchEnd;
+    const newline = source.indexOf('\n', matchEnd);
+    if (newline === -1) break;
+    start = newline + 1;
+  }
+  parts.push(source.slice(from));
+  return parts.join('');
 }
 function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
     const { blockQuote, commentString, lineWidth } = ctx.options;
@@ -200,7 +245,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
         value = value.slice(0, -end.length);
         if (end[end.length - 1] === '\n')
             end = end.slice(0, -1);
-        end = end.replace(blockEndNewlines, `$&${indent}`);
+        end = indentBlockEndNewlines(end, indent);
     }
     // determine indent indicator from whitespace at value start
     let startWithSpace = false;
@@ -229,10 +274,7 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
             onComment();
     }
     if (!literal) {
-        const foldedValue = value
-            .replace(/\n+/g, '\n$&')
-            .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
-            //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
+        const foldedValue = removeFoldSeparators(value.replace(/\n+/g, '\n$&'))
             .replace(/\n+/g, `$&${indent}`);
         let literalFallback = false;
         const foldOptions = getFoldOptions(ctx, true);

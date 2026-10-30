@@ -1,0 +1,178 @@
+[
+  {
+    "value": "",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: \"\"\n"
+  },
+  {
+    "value": "",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: \"\"\n"
+  },
+  {
+    "value": "a\n\n\n",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >+\n  a\n\n\n"
+  },
+  {
+    "value": "a\n\n\n",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |+\n  a\n\n\n"
+  },
+  {
+    "value": "a\n \n\t\n",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >+\n  a\n   \n  \t\n"
+  },
+  {
+    "value": "a\n \n\t\n",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |+\n  a\n   \n  \t\n"
+  },
+  {
+    "value": "\n\n leading\ntext\n",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >2\n  \n\n   leading\n  text\n"
+  },
+  {
+    "value": "\n\n leading\ntext\n",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |2\n  \n\n   leading\n  text\n"
+  },
+  {
+    "value": "\tfirst\n\t\n\tlast",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  \tfirst\n  \t\n  \tlast\n"
+  },
+  {
+    "value": "\tfirst\n\t\n\tlast",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  \tfirst\n  \t\n  \tlast\n"
+  },
+  {
+    "value": "a\n \n\tb\nend",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  a\n   \n  \tb\n  end\n"
+  },
+  {
+    "value": "a\n \n\tb\nend",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  a\n   \n  \tb\n  end\n"
+  },
+  {
+    "value": "a\r\n b\r\n\r\n c",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: \"a\\r\\n b\\r\\n\\r\\n c\"\n"
+  },
+  {
+    "value": "a\r\n b\r\n\r\n c",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: \"a\\r\\n b\\r\\n\\r\\n c\"\n"
+  },
+  {
+    "value": "a  b\n\tc",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  a  b\n  \tc\n"
+  },
+  {
+    "value": "a  b\n\tc",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  a  b\n  \tc\n"
+  },
+  {
+    "value": "\tline tail\n\tend",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  \tline tail\n  \tend\n"
+  },
+  {
+    "value": "\tline tail\n\tend",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  \tline tail\n  \tend\n"
+  },
+  {
+    "value": "a'b\n c",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  a'b\n   c\n"
+  },
+  {
+    "value": "a'b\n c",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  a'b\n   c\n"
+  },
+  {
+    "value": "trailing spaces  \nnext",
+    "options": {
+      "blockQuote": "folded",
+      "lineWidth": 0
+    },
+    "output": "value: >-\n  trailing spaces  \n\n  next\n"
+  },
+  {
+    "value": "trailing spaces  \nnext",
+    "options": {
+      "blockQuote": "literal",
+      "lineWidth": 0
+    },
+    "output": "value: |-\n  trailing spaces  \n  next\n"
+  }
+]

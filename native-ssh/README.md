@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.10.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.11.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 

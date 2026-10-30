@@ -1,6 +1,6 @@
 {
   "name": "teck-orca",
-  "version": "0.5.15",
+  "version": "0.5.16",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "node scripts/refresh-assets.mjs && node scripts/build-recipe.mjs",
-    "check": "node scripts/build-recipe.mjs --check",
+    "check": "node scripts/vendor-yaml.mjs --check && node scripts/build-recipe.mjs --check",
     "bundle:skills": "node scripts/bundle-orca-skills.mjs",
     "bundle:labels": "node scripts/bundle-github-labels.mjs",
     "bundle:daemon": "node scripts/bundle-daemon.mjs",
@@ -30,6 +30,7 @@
     "smoke:workflow-policy": "node scripts/smoke-workflow-policy.mjs",
     "bundle:kubernetes": "node scripts/bundle-kubernetes.mjs",
     "smoke:orchestration": "node scripts/smoke-orchestration.mjs",
-    "smoke:daemon": "node scripts/smoke-daemon.mjs"
+    "smoke:daemon": "node scripts/smoke-daemon.mjs",
+    "vendor:yaml": "node scripts/vendor-yaml.mjs"
   }
 }
