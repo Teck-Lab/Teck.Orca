@@ -1,0 +1,4 @@
+apiVersion: v2
+name: local-keycloak-realm
+version: 0.1.0
+description: Render the canonical Keycloak CR definitions as a local realm import

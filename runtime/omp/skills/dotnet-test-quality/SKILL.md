@@ -32,6 +32,14 @@ interpret compatible reports. Distinguish line and branch coverage; check
 filters, generated code, target mapping, and whether the data matches current
 source. Coverage is an execution measure, not proof of effective assertions.
 
+Enforce the shared [non-regression contract](../orca-feature-workflow/references/testing.md):
+compare verified base and candidate reports with the same collector, test/source
+scope, configuration and filters. Neither line nor branch coverage may decrease
+in changed modules or measured project/repository aggregates. Meaningful new
+feature tests are required even if the total percentage increases. Missing or
+incomparable evidence is unresolved; never hide decreases with exclusions,
+weakened assertions, skipped tests or a lowered baseline/threshold.
+
 Use existing mutation tooling when requested or useful for an ambiguous gap.
 First establish a passing baseline, scope the mutation run, and inspect surviving
 mutants for meaningful behavior versus equivalent changes. Do not install or

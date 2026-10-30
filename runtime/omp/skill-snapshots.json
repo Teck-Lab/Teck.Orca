@@ -123,19 +123,19 @@
     },
     {
       "name": "dotnet-integration-testing/SKILL.md",
-      "sha256": "8b4234fa8de43b2ec998a3299b509f2bab978687c2779e38ad63a50d61797305"
+      "sha256": "a54a2d9744e6fa6dab6c02244519e0a58224d63c006cfe726ad7f2b207b6fc48"
     },
     {
       "name": "dotnet-test-execution/SKILL.md",
-      "sha256": "62a42c343cb9022f963087d1e19c0f35deada8c1f7396b41bd16f3b6bbcbf774"
+      "sha256": "eedc3ebe251b7922710c3a4317c074c4dc5c71774119d494c7bd9980c1ac5330"
     },
     {
       "name": "dotnet-test-quality/SKILL.md",
-      "sha256": "3bd14804d7f4f38f83c5b27a16d1f637cc15716b080a6a3691acb9b8a8e3fd1a"
+      "sha256": "c07ecde2686ebf5e138ff537678cca23d829490d3beb8d9783bf8e73f1338923"
     },
     {
       "name": "dotnet-unit-testing/SKILL.md",
-      "sha256": "ee9707a0fa61410cef7f3f7f8de85803e4a05c228dd99ece5fa4a93a4344d6b4"
+      "sha256": "62bd831aae18d87fbdf5d845225d865785b22a3fed546bb812a49cdaee6b1911"
     },
     {
       "name": "dotnet-upgrade/SKILL.md",
@@ -151,7 +151,7 @@
     },
     {
       "name": "github-execution-planning/references/issue-structure.md",
-      "sha256": "bca43973b8646cd664e844ea892e8ab7da119fcb3fb86ca9245f7884b504f982"
+      "sha256": "9175e4c9481f3245ddaf825d41d864e030a29728c7bc1015fcf0d49d9fa08eb0"
     },
     {
       "name": "github-execution-planning/references/pr-stacks.md",
@@ -163,11 +163,11 @@
     },
     {
       "name": "github-execution-planning/SKILL.md",
-      "sha256": "03c906cb7cac2efa82b2250b301f2702b3ea7fac2878049b9b224ca7ad907e5b"
+      "sha256": "f69276815f3bed634723eb7c431c401d45ac1ab9c7560030e85143af3eae5e3f"
     },
     {
       "name": "github-publication/SKILL.md",
-      "sha256": "1ad8a96093aeb88d844297117cf773b79e309d6bf4cdcd0c53065cbc3ea740d6"
+      "sha256": "a05de63bdfe5663623c9daaacb469cdc2d47685776b3f8b90c27b4909c249056"
     },
     {
       "name": "keycloak-administration/LICENSE.md",
@@ -295,19 +295,31 @@
     },
     {
       "name": "orca-cli/SKILL.md",
-      "sha256": "fb6eb80e55223e93ed4401fe3228ca0a840f06328f4029e694deaec70a8720cb"
+      "sha256": "59b17f69676de725ea4cf7a8af2032101ffc5f393fffd9100c6b260e6b893c31"
+    },
+    {
+      "name": "orca-feature-workflow/references/goals-and-milestones.md",
+      "sha256": "83d76458742f703daf1c79be901fd029f12e8d8ba3cd5c40e60c50cdf8e9dcc3"
     },
     {
       "name": "orca-feature-workflow/references/review-gates.md",
-      "sha256": "5c8d2e5f8fdf402b100e6c64ecbe3335bc1b553c2ec398ef484c616ba118e7b4"
+      "sha256": "c6b8f24bcebed773f057090b95d90cf8658e59290542d70b2378a29b75e71eb9"
+    },
+    {
+      "name": "orca-feature-workflow/references/technical-planning.md",
+      "sha256": "61787f1c1e8e4a35df0ac3462316dfcfc0612c4d89828a11f0365cdaf6c7dda5"
+    },
+    {
+      "name": "orca-feature-workflow/references/testing.md",
+      "sha256": "3ae1a1601aaa9bea63c2c85fb5ddd238c367e6f12f86f4d70bba49cedc1e2060"
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "96384258d9b31fe4372603a536b6a3d8fabac2e4bed5a73f8953a1de824976d1"
+      "sha256": "99dd57a4e5a3cb19fbb0b92793964ed8e8ced3446545ade1bf470d7996d4a66c"
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "53e49e1c150d0cc8e110ee6f048ce0634c28a2885df11759a21270c90fee5501"
+      "sha256": "c143a4efc2a0483cebba1baaccf7e17bf2d51956bea8d3242f0dedbde5af834e"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",

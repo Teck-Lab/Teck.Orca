@@ -32,6 +32,12 @@ modelRoles:
   memory: omniroute/teck-fast-tool
   judge: omniroute/teck-judge
 advisor:
+  enabled: false # Reviews/research are explicit Orca Dispatches; no duplicate WATCHDOG loop.
+goal:
+  enabled: true
+  statusInFooter: true
+  continuationModes: [interactive]
+todo:
   enabled: true
 enabledModels:
   - omniroute/teck-orchestrator

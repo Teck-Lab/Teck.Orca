@@ -215,7 +215,7 @@ export function syncConfiguration(name, assetRoot = root, run = command, identit
     ].join('; ');
     run('sbx', ['exec', '-u', 'root', name, 'sh', '-c', install], { progress: true });
     run('sbx', ['cp', join(assetRoot, 'runtime', 'manage-daemon.mjs'), `${name}:/usr/local/lib/teck-orca/manage-daemon.mjs`], { progress: true });
-    for (const file of ['omp-launch.mjs', 'omp-session.mjs', 'omp-session-extension.ts']) {
+    for (const file of ['project-name.mjs', 'omp-launch.mjs', 'omp-launch-policy.mjs', 'omp-session.mjs', 'omp-session-extension.ts']) {
       run('sbx', ['cp', join(assetRoot, 'runtime', file), `${name}:/usr/local/lib/teck-orca/${file}`], { progress: true });
     }
   } finally { rmSync(staging, { recursive: true, force: true }); }

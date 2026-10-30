@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+function t(){let o=globalThis.navigator?.userAgent??"";return/iP(ad|hone|od)/.test(o)||globalThis.navigator?.platform==="MacIntel"&&globalThis.navigator.maxTouchPoints>1?"ios":o.includes("Android")?"android":"web"}export{t as a};

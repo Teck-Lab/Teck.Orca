@@ -1,0 +1,8 @@
+{
+  "name": "full",
+  "enabled": false,
+  "cni": "cilium",
+  "mesh": "ambient",
+  "status": "Awaiting independent WSL2 compatibility and sandbox-to-WSL routing tests",
+  "securityValidation": true
+}

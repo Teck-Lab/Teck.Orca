@@ -7,19 +7,39 @@ description: Launch and reconcile visible OMP executor/reviewer sessions on an e
 
 ## Assigned worker
 
+This lifecycle applies to an Orca-dispatched session. A native OMP helper follows
+its parent's task brief and native OMP lifecycle instead; it needs no Orca
+Task/Dispatch or parent-goal binding. Every role may use native helpers.
+
 The live injected Dispatch is the authority for your task, scope, issue, role,
 and reporting command. Implement/test only the assigned work, use its blocking
 ask/reply channel, check follow-ups at natural checkpoints and before reporting,
 then send worker_done with the actual outcome and idle. The coordinator owns
-integration, publication, and terminal release. Do not create a new issue tree,
-redelegate the whole assignment, close your own terminal, or start another
+integration, publication, and terminal release. A verified planner may maintain
+the assigned canonical issue subtree; other workers do not create a new issue tree,
+abandon ownership of the assignment, close your own terminal, or start another
 sandbox/daemon.
 
 A reviewer follows the [review contract](../orca-feature-workflow/references/review-gates.md)
 instead of editing. Load that reference only for review work. The live preamble
 and execution-host orchestration guide own exact lifecycle flags and heartbeats.
 
+A technical planning/research assignment follows the
+[research contract](../orca-feature-workflow/references/technical-planning.md).
+A researcher/native planning helper returns read-only evidence. A verified
+Orca planner creates/reuses scoped GitHub children and dependencies, then returns
+exact IDs, execution waves and read-back evidence. Both use the existing slow
+model role; only the verified planner receives planning-write authority. All
+roles may delegate natively. A missed blocker is escalated with evidence and
+reassessed only for its affected scope; preserve the incomplete goal and checkout.
+
 ## Coordinator: dispatch
+
+The coordinator delegates implementation. Use a task-role native helper or
+orca_dispatch for an independently owned executor/worktree. Keep the
+existing issue unless separate deliverables warrant sub-issues. Every implementation owner follows the
+[test-first and coverage contract](../orca-feature-workflow/references/testing.md)
+and supplies its test/coverage evidence with delivery.
 
 Resolve the executable through [orca-cli](../orca-cli/SKILL.md). Before the first
 Orca operation, load that executable's version-matched compact orchestration
@@ -28,12 +48,26 @@ questions, coordinator-loop for DAG/reuse details, and recovery-and-cleanup when
 a receipt or uncertain lifecycle action requires it. Bundled official snapshots
 are fallback references; verify unsupported flags with the same CLI's help.
 
-From the feature's own Orca terminal, launch each ready execution task with
-worker-start --worktree new-child --agent omp and the configured modelRoles.task
-selector (bundled omniroute/teck-executor). Use the feature branch as base, with
-shared prerequisites committed before fan-out. Names/display names identify the
+From the feature's own Orca terminal, use orca_dispatch(role=executor,
+worktree=new-child) with the objective, issue and acceptance criteria. The tool
+uses public worker-start and the live configured modelRoles.task selector.
+Use the feature branch as base, with shared prerequisites committed by an
+executor/integration worker before fan-out. Names/display names identify the
 execution issue and short task title. OMP accepts --model, not worker-start
 --effort. Do not pass cross-host --on or select the feature recipe again.
+
+The installed 1.4.237 CLI supports `--surface terminal` on `agent launch` and
+agent-backed `worktree create`. For a direct OMP terminal launch in an existing
+checkout, use `orca agent launch --agent omp --surface terminal --model <role-model> --json`
+with the exact worktree selector when needed. This starts OMP through
+Orca's launcher and keeps its terminal session recovery. Do not launch OMP again
+after Orca has already started it.
+
+`orchestration worker-start` has no `--surface` option. Keep its supervised launch
+path and follow the execution host's guide and returned receipt; read output
+through `worker-read --source auto` rather than assuming every worker handle is
+a terminal. Do not add the direct-launch flag to worker-start or bypass Dispatch
+to force a terminal.
 
 Verify readiness, exact worktree id, execution host and feature parentage.
 Link its assigned GitHub issue with worktree set --issue: in a single-issue run,
@@ -41,8 +75,16 @@ both feature and executor may reference the same issue. Issue hierarchy and
 Orca child-worktree hierarchy are independent. Correct missing parentage using
 the exact feature selector before claiming successful dispatch.
 
-Keep one editing owner per checkout. OMP internal task helpers are optional for
-bounded scouting/research; they do not replace the visible implementation owner.
+Coordinate concurrent edits per file. Every role may use native OMP task/eval
+helpers for implementation, research, review or other scoped work. OMP owns their
+lifecycle; helpers return results to the parent rather than claiming its Orca
+Dispatch. Each Orca worker creates the exact native OMP assignment goal before
+work and completes it only with evidence,
+then reports through the live worker_done contract and idles.
+The structured report action stages a report submitted before native goal
+completion and delivers it after that exact goal completes. Finalize the goal
+next instead of polling for an undelivered staged report. Failed assignments
+record blockers and drop their assigned native goal; they never mark it complete.
 A quiet terminal or a timeout does not prove exit. Inspect failed start receipts
 before any retry so an uncertain launch cannot create a duplicate editor.
 Missing runtime authority is a reported blocker, not permission to switch hosts

@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+import{j as n}from"/assets/c5cb3b5bd7ca9acc90cdf60a00c58eae00641a3a55e4595c89b61b0ebe05d70c.js";var t=()=>!1;function r(e){t=e}function i(e){if(n(e)===null){console.warn("[page] refused to open a URL outside the allowed schemes",{url:e});return}t(e)||console.warn("[page] the shell did not take a URL to open",{url:e})}export{r as a,i as b};

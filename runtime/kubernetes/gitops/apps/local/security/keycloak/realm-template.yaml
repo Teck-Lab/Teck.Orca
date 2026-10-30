@@ -1,0 +1,15 @@
+{{- $realm := deepCopy (fromYaml (.Files.Get "realm.yaml")).spec.definition -}}
+{{- $source := (fromYaml (.Files.Get "gateway-client.yaml")).spec.definition -}}
+{{- $_ := set $realm "realm" "teck-cloud-local" -}}
+{{- $clients := list -}}
+{{- range $role := list "customer" "admin" -}}
+{{- $client := deepCopy $source -}}
+{{- $_ := set $client "clientId" (printf "web-%s-gateway" $role) -}}
+{{- $_ := set $client "name" (printf "Local %s web gateway" $role) -}}
+{{- $_ := set $client "secret" (index $.Values.clientSecrets $role) -}}
+{{- $_ := set $client "redirectUris" (list (printf "https://%s/*" $.Values.hostname)) -}}
+{{- $_ := set $client "webOrigins" (list (printf "https://%s" $.Values.hostname)) -}}
+{{- $clients = append $clients $client -}}
+{{- end -}}
+{{- $_ := set $realm "clients" $clients -}}
+{{ toJson $realm }}

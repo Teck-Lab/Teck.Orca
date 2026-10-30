@@ -1,0 +1,24 @@
+apiVersion: keycloak.hostzero.com/v1beta1
+kind: ClusterKeycloakRealm
+metadata:
+  name: teck-cloud-development
+spec:
+  clusterInstanceRef:
+    name: keycloak
+  definition:
+    realm: teck-cloud-development
+    displayName: Teck Cloud Development
+    enabled: true
+    accessTokenLifespan: 60
+    ssoSessionIdleTimeout: 1800
+    ssoSessionMaxLifespan: 36000
+    organizationsEnabled: true
+    roles:
+      realm:
+        - name: admin
+        - name: user
+    browserSecurityHeaders:
+      contentSecurityPolicy: "frame-src 'self'; frame-ancestors 'self'; object-src 'none';"
+      xContentTypeOptions: "nosniff"
+      xFrameOptions: "SAMEORIGIN"
+      strictTransportSecurity: "max-age=31536000; includeSubDomains"

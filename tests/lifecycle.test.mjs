@@ -194,6 +194,11 @@ test('OMP configuration preserves the Orca relay CLI path and supplies feature i
   assert.ok(script.includes(':"${PATH:-}"'));
   assert.ok(script.includes('TECK_ORCA_FEATURE_ID'));
   assert.ok(!script.includes('unset ORCA_'));
+  const launcher = readFileSync(new URL('../runtime/omp-launch.mjs', import.meta.url), 'utf8');
+  for (const [, dependency] of launcher.matchAll(/from ['"]\.\/([^'"]+)['"]/g)) {
+    assert.ok(calls.some(c => c.args[0] === 'cp' && c.args[1].replaceAll('\\', '/').endsWith('/runtime/' + dependency) &&
+      c.args[2].endsWith('/usr/local/lib/teck-orca/' + dependency)), `Fresh guest is missing launcher dependency ${dependency}`);
+  }
 });
 
 test('OMP write-access failure fails provisioning instead of returning a broken SSH workspace', async (t) => {

@@ -48,7 +48,7 @@ try {
   const status = cli(['status']);
   report.runtimeStatus = status;
   assert.equal(status.runtime.reachable, true);
-  assert.equal(status.runtime.appVersion, '1.4.224');
+  assert.equal(status.runtime.appVersion, '1.4.245');
   cli(['worktree', 'list']);
   report.checks.push('guest CLI reaches its own daemon without an SSH permission gate');
   const paired = spawnSync(process.execPath, [join(repositoryRoot, 'runtime/kits/orcad/bundle/common/out/cli/index.js'), 'status', '--pairing-code', created.pairingCode, '--json'], {

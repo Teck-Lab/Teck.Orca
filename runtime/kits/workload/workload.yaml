@@ -6,11 +6,11 @@ description: Full feature workload with OMP, .NET, Node, Bun, development tools,
 
 args:
   bunVersion:
-    default: "1.4.2"
+    default: "1.4.4"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: BUN_VERSION
   ompVersion:
-    default: "18.11.3"
+    default: "18.14.0"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: OMP_VERSION
   playwrightVersion:
@@ -23,6 +23,8 @@ provides:
   - "omp@${{ kit.args.ompVersion }}"
   - "dotnet@10.0.401"
   - "typescript@5.9.3"
+  - "kind@0.33.0"
+  - "kubectl@1.35.8"
   - "teck-language-servers@1"
   - "agent-browser@0.38.1"
   - "playwright@${{ kit.args.playwrightVersion }}"
@@ -39,6 +41,9 @@ capabilities:
           - globalcdn.nuget.org:443
           - quay.io:443
           - "*.quay.io:443"
+          - dl.k8s.io:443
+          - cdn.dl.k8s.io:443
+          - registry.k8s.io:443
           - builds.dotnet.microsoft.com:443
           - aka.ms:443
           - playwright.download.prss.microsoft.com:443
@@ -61,6 +66,8 @@ capabilities:
             test "$(agent-browser --version)" = "agent-browser 0.38.1"
             test -x /usr/local/bin/chromium
             test "$(dotnet --version)" = "10.0.401"
+            test "$(kind version | cut -d ' ' -f 2)" = "v0.33.0"
+            test "$(kubectl version --client --output=json | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).clientVersion.gitVersion')" = "v1.35.8"
             test -x /usr/local/bin/omnisharp
             test -x /usr/local/bin/typescript-language-server
             install -d -o agent -g agent -m 755 /home/agent/.dotnet /home/agent/.nuget

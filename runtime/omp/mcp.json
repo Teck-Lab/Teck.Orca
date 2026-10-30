@@ -9,6 +9,12 @@
       },
       "timeout": 120000
     },
+    "github-projects": {
+      "type": "http",
+      "url": "https://mcp.tecklab.dk/mcp/github-projects",
+      "headers": { "Authorization": "Bearer ${MCPHUB_API_KEY}" },
+      "timeout": 120000
+    },
     "searxng": {
       "type": "http",
       "url": "https://mcp.tecklab.dk/mcp/searxng",

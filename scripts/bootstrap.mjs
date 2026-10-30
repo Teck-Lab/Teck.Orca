@@ -1,5 +1,5 @@
 import { command } from './lifecycle.mjs';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { repositoryRoot } from './release.mjs';
 import { pathToFileURL } from 'node:url';
@@ -27,7 +27,12 @@ export function checkPrerequisites(run = command) {
     checkKitBuilderStorage(run);
   });
   check('Bundled Orca daemon', () => {
-    for (const arch of ['x64', 'arm64']) if (!existsSync(join(repositoryRoot, 'runtime', 'kits', 'orcad', 'bundle', 'node', `node-v24.21.0-linux-${arch}.tar.gz`))) throw new Error('Run npm run bundle:daemon before build/setup');
+    const root = join(repositoryRoot, 'runtime', 'kits', 'orcad', 'bundle');
+    const metadata = JSON.parse(readFileSync(join(root, 'provenance.json'), 'utf8'));
+    for (const arch of ['x64', 'arm64']) if (!/^[a-f0-9]{64}$/.test(metadata.nodeArchiveSha256?.[arch])) throw Error('Missing pinned Node archive hash');
+    for (const [file, item] of Object.entries(metadata.chunkedFiles ?? {})) {
+      if (file.includes('..') || file.startsWith('/') || file.includes('\\') || !item.parts.every(part => part.startsWith(file + '.gz.b64.') && existsSync(join(root, part)))) throw Error('Incomplete daemon transport assets');
+    }
   });
   check('OmniRoute and MCPHub service credentials', () => {
     // Never print secret ls output: custom-secret metadata can include partially masked values.

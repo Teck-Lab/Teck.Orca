@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: teck-local-edge
+resources:
+  - issuer-local-selfsigned.yaml
+  - certificate-local-ca.yaml
+  - issuer-local-ca.yaml
+  - certificate-local-ingress.yaml

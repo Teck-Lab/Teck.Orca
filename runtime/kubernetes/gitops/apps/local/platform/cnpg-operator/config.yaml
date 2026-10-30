@@ -1,0 +1,2 @@
+appName: local-cnpg-operator
+destNamespace: cnpg-system

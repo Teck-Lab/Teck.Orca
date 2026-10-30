@@ -1,0 +1,24 @@
+controller:
+  replicas: 1
+  trafficRouterPlugins:
+    - name: argoproj-labs/gatewayAPI
+      location: file:///plugins/rollouts-plugin-trafficrouter-gatewayapi
+  initContainers:
+    - name: copy-gateway-plugin
+      image: ghcr.io/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi:v0.17.0
+      command:
+        - /bin/sh
+        - -c
+      args:
+        - cp /bin/rollouts-plugin-trafficrouter-gatewayapi /plugins/ && chmod 755 /plugins/rollouts-plugin-trafficrouter-gatewayapi
+      volumeMounts:
+        - name: gateway-plugin
+          mountPath: /plugins
+  volumes:
+    - name: gateway-plugin
+      emptyDir: {}
+  volumeMounts:
+    - name: gateway-plugin
+      mountPath: /plugins
+dashboard:
+  enabled: false

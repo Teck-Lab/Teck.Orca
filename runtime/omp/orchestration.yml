@@ -1,0 +1,9 @@
+# Session-local policy overlay; preserve the user's modelRoles and credentials.
+advisor:
+  enabled: false
+goal:
+  enabled: true
+  statusInFooter: true
+  continuationModes: [interactive]
+todo:
+  enabled: true

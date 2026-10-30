@@ -1,28 +1,236 @@
 {
-  "version": "1.4.224",
-  "artifactVersion": "0.1.0+15ec2904eb00",
-  "nodeVersion": "24.21.0",
+  "version": "1.4.245",
+  "artifactVersions": {
+    "linux-x64-glibc": "0.1.0+9e4fc7c6495b",
+    "linux-arm64-glibc": "0.1.0+11fc821f039c"
+  },
+  "nodeVersion": "24.22.1",
   "source": "Orca packaged orcad-template; no runtime user data",
   "nodeArchiveSha256": {
-    "x64": "6e1db87ef58b8819e5d5402eff1536491b18edd8eb7bee5ef7897876e88dc5ff",
-    "arm64": "724282c3b43aec998aa9527380465b45d229e021b58035f5f4f63095eabfe5d5"
+    "x64": "eb6728e77c576a35162c122c45ccadf224d89ff00abc8dae46cc2897c6002d7c",
+    "arm64": "33c37be234ba8bee041961047b19160f4d7d0f164e8e246f78bdd10feff148b3"
+  },
+  "encodedFiles": [
+    "common/out/mobile-web/assets/02f058114c3e79b0a9f3fa7b50cd88c3f9a1cff9860101b6b50513d81d4dc48b.png",
+    "common/out/mobile-web/assets/058144d94ecb1faea3a6af708ddf25e1e204a492d6011d30b38c1f95cc3933e6.png",
+    "common/out/mobile-web/assets/179d5d5014667ad5605c92cfeb72318e40683bc28001216582f8abc600877795.png",
+    "common/out/mobile-web/assets/1828c6052fef4186671b99100501cd9601073c444901741d6b2e52531f7c11e4.png",
+    "common/out/mobile-web/assets/1910c1c724f7c7e33188885b237d2bc64a261a7d8afa38c88679cf6e42d9c432.png",
+    "common/out/mobile-web/assets/198387c8a1a445d37ba21d64f80509d08386ee4676a0af971fe19408dc8d6917.png",
+    "common/out/mobile-web/assets/1a81fbfbf0a8efe0a8a9a16f0951e679dbbda131fe014a150176056199968e06.png",
+    "common/out/mobile-web/assets/2325c53a73e54c438cbbc60dffdd8b513d471ba42e2f56713ef404b95e0ca1fc.png",
+    "common/out/mobile-web/assets/27f4d229d440925bf7212d5dfffa45d596b2c7b3bb2905c96b839b2081a1dbeb.png",
+    "common/out/mobile-web/assets/3502aa13475c725e3793eebb5c3e4ab25037c578e3977a7eda4247b879bced7a.png",
+    "common/out/mobile-web/assets/357403d2cf34fadd85d3d3b8f4d35ab504f61b023a8f4037587bd90bcbabfa93.png",
+    "common/out/mobile-web/assets/422e4f37c6446561ff2bde624b36b545046ea5a0d88ea2e4ca33279f406d8070.png",
+    "common/out/mobile-web/assets/43530e9cfe9434fe7622439cd923b9a42fafe9e76b20cb1fd7fa157663628f1c.png",
+    "common/out/mobile-web/assets/457e22cb3fbd42d111e02d9b22b57fd9fa9bf81cdc23b708b1bb29e084cfe317.png",
+    "common/out/mobile-web/assets/50651aaef44bc89330e5d87305e035468f97d2fbfce769ef19c3548193710edc.png",
+    "common/out/mobile-web/assets/59bfe9bc385ad69f50793ce4a53397316d7a875a7148a63c16df9b674c6cda64.png",
+    "common/out/mobile-web/assets/5d075e0c287c4f4441b5b5c8fc7ea5cd27c11bb617ecea09755955bcb1889083.png",
+    "common/out/mobile-web/assets/5ff6cf164fffd2e72e38096d941ebedf55b2791aceb443e6941ec3967f00e790.png",
+    "common/out/mobile-web/assets/629301790349c8423505f8ddc0ae28c2c3bd395a6d6e6da5b13ed4d71bde5a3d.png",
+    "common/out/mobile-web/assets/69ddb188bf3705889bd16c26f945efc878556cb5ae926a645fd33b3ec8e053ab.png",
+    "common/out/mobile-web/assets/6b336ccf89d444addbdf0ec8dc2863981619d1c45bd09f020365908d66bbe370.png",
+    "common/out/mobile-web/assets/6deca32b56b97fa1fa87facd6996b46cc45190a553400e7febdf1d2093099b57.png",
+    "common/out/mobile-web/assets/708a79cf561b8a2a4850ce0254584d3a5231046be08fb7fadf4b6edfdb31178b.png",
+    "common/out/mobile-web/assets/8102fa72f88effb7bc4f45025d986fd65ccb5712fe64b3a4f954169ff6c5fa9b.png",
+    "common/out/mobile-web/assets/837e7b113fba39a6258cb43db6b69a5548688912ffeac1dccad213d9ff537db3.png",
+    "common/out/mobile-web/assets/84cf5eb3b20250f69e0e4733beb4da5f417f0682892a5ad1b5e62570753c21b1.png",
+    "common/out/mobile-web/assets/8b56b0e4a07cd0fd48c21ef61f0ad9373dc824bc4c8a1da7234ae6b410dd4a1a.png",
+    "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2",
+    "common/out/mobile-web/assets/98c5b9e9c50e29557813fa2b82eff54766fc59723ed6e1f2fbfc8dce6f6d5cc3.png",
+    "common/out/mobile-web/assets/9adb8c5efca932e2b732b293da813bd2e31952263056bce9e2517fec0f0b6a76.png",
+    "common/out/mobile-web/assets/9ed5b74c5b4ada93c35f9abbf764b2972981d8252a895a8fefa7cacbf8b6d3b7.png",
+    "common/out/mobile-web/assets/9f049b383d89575326e520ca432814561417fe7fecc196f2d15ff4acf2fb3857.png",
+    "common/out/mobile-web/assets/a3abfdd2734de5b42ee2878cd446549ac14424d42fb2c06424a75aba78afa2ca.png",
+    "common/out/mobile-web/assets/a69a2edb5b6c60b8433d5b6d23c69f520ccd8a602f3f60e7996e489718bc175c.png",
+    "common/out/mobile-web/assets/acf691957a3bcce7d195856dce98a5cf14dce10bea28aa5c10b3550c078e23b5.png",
+    "common/out/mobile-web/assets/c15ec72a74d13957211808313d5c35deb7f7606c6d22dbddceb0000d4e0547ad.png",
+    "common/out/mobile-web/assets/c76c2913b058e2fde9a694d305356bc3bb48e68f46f73169d20e7ce2d3aafc41.png",
+    "common/out/mobile-web/assets/c8106add30b51df25f3c0b331b6b2607eb60161b2d3c41c2cbc2ba2fb7c809a7.png",
+    "common/out/mobile-web/assets/c86bb485eee687e06c500fc4234f51a6784b4530c2ae11d0c76481110bce3105.png",
+    "common/out/mobile-web/assets/cc5ebb57e1f1de4fb7132012915d1699c11dbfd8554ba9b2aab15922418bf182.png",
+    "common/out/mobile-web/assets/cec153d909018e31163e2f59977546813b8d9d6cc69c9d229b953d82a59f2794.png",
+    "common/out/mobile-web/assets/cedce9c78ad63f8a0b69bd3441cf7ae9d6934c0faa7a1052ab921374727bddce.png",
+    "common/out/mobile-web/assets/d13379f67874bc498468f0ccca2beea70f1fc165355a68f3cd42a6247984c136.png",
+    "common/out/mobile-web/assets/d5e18d2b2156caf9642ed46db2078c623b80cf06320eeaaefadc5e3a05221905.png",
+    "common/out/mobile-web/assets/deb002a878a055cf1313ffd1c648a77687b27a1de22ae7615ba2c418482a0c1e.png",
+    "common/out/mobile-web/assets/e3baeba92f68b6eccf2cc7ce19bb003f838bbd61e71070ae4c5e4ba728a41c73.png",
+    "common/out/mobile-web/assets/e98359f8ebfc411aa0162fcacf8cd02bd20cd349ece9840c503995bc2f0ee793.png",
+    "common/out/mobile-web/assets/efc79da3c4c97dfb1571bff6202958ab0529c5aa31e8392600578b3e359d1447.png",
+    "common/out/mobile-web/assets/f707e4d133dac2391abca834b986f78e533bcacf8959f10021d7d7872a82b3ff.png",
+    "common/out/mobile-web/assets/f9a49592809c1357495bcbe97fd253d6cbaf6954027f09a040893ca1610c0e55.png",
+    "targets/linux-x64-glibc/node_modules/@parcel/watcher/watcher.node",
+    "targets/linux-x64-glibc/node_modules/node-pty/build/Release/pty.node",
+    "targets/linux-arm64-glibc/node_modules/@parcel/watcher/watcher.node",
+    "targets/linux-arm64-glibc/node_modules/node-pty/build/Release/pty.node"
+  ],
+  "chunkedFiles": {
+    "common/claude-profile-setup-worker-entry.js": {
+      "parts": [
+        "common/claude-profile-setup-worker-entry.js.gz.b64.000"
+      ],
+      "sha256": "146b7dab7782ee08461b11bfa43ec5a04fb766cfc8f7a55c04a1a94d59cf6cc1"
+    },
+    "common/daemon-entry.js": {
+      "parts": [
+        "common/daemon-entry.js.gz.b64.000",
+        "common/daemon-entry.js.gz.b64.001"
+      ],
+      "sha256": "b6f2bab2bb870de612afa91e5c195ed2aa2ce305c729595f6e613feb76598436"
+    },
+    "common/foreign-sqlite-reader-entry.js": {
+      "parts": [
+        "common/foreign-sqlite-reader-entry.js.gz.b64.000"
+      ],
+      "sha256": "350a777ef772ef304ce9cc63f6caa7269fcfbed94805549fa7e2bff20e4f2753"
+    },
+    "common/node_modules/@linear/sdk/index.js": {
+      "parts": [
+        "common/node_modules/@linear/sdk/index.js.gz.b64.000"
+      ],
+      "sha256": "def8038dcff63873f5a9ea77ca8fe262cd1b02067f989c08911869061247a23e"
+    },
+    "common/orcad-server.js": {
+      "parts": [
+        "common/orcad-server.js.gz.b64.000",
+        "common/orcad-server.js.gz.b64.001",
+        "common/orcad-server.js.gz.b64.002",
+        "common/orcad-server.js.gz.b64.003",
+        "common/orcad-server.js.gz.b64.004",
+        "common/orcad-server.js.gz.b64.005",
+        "common/orcad-server.js.gz.b64.006",
+        "common/orcad-server.js.gz.b64.007",
+        "common/orcad-server.js.gz.b64.008",
+        "common/orcad-server.js.gz.b64.009",
+        "common/orcad-server.js.gz.b64.010",
+        "common/orcad-server.js.gz.b64.011",
+        "common/orcad-server.js.gz.b64.012",
+        "common/orcad-server.js.gz.b64.013",
+        "common/orcad-server.js.gz.b64.014",
+        "common/orcad-server.js.gz.b64.015",
+        "common/orcad-server.js.gz.b64.016",
+        "common/orcad-server.js.gz.b64.017",
+        "common/orcad-server.js.gz.b64.018"
+      ],
+      "sha256": "33458faa0690a64159776e1857ef3b40a6bea1b697ca289214064e8ed6dfff82"
+    },
+    "common/out/cli/index.js": {
+      "parts": [
+        "common/out/cli/index.js.gz.b64.000",
+        "common/out/cli/index.js.gz.b64.001",
+        "common/out/cli/index.js.gz.b64.002",
+        "common/out/cli/index.js.gz.b64.003"
+      ],
+      "sha256": "2b30294e62e96f6ddc03f0074fafcc3ae86c8eca850a48751d33f1372231733c"
+    },
+    "common/out/mobile-web/assets/2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37.js": {
+      "parts": [
+        "common/out/mobile-web/assets/2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37.js.gz.b64.000",
+        "common/out/mobile-web/assets/2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37.js.gz.b64.001"
+      ],
+      "sha256": "2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37"
+    },
+    "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js": {
+      "parts": [
+        "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js.gz.b64.000",
+        "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js.gz.b64.001",
+        "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js.gz.b64.002",
+        "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js.gz.b64.003",
+        "common/out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js.gz.b64.004"
+      ],
+      "sha256": "2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542"
+    },
+    "common/out/mobile-web/assets/74d250e8fdfc9f212b7eb8e97fdb25e13d705669d498bdbb0bb58f261d66d520.js": {
+      "parts": [
+        "common/out/mobile-web/assets/74d250e8fdfc9f212b7eb8e97fdb25e13d705669d498bdbb0bb58f261d66d520.js.gz.b64.000"
+      ],
+      "sha256": "74d250e8fdfc9f212b7eb8e97fdb25e13d705669d498bdbb0bb58f261d66d520"
+    },
+    "common/out/mobile-web/assets/7e89c8819975264b76038f887773a12a04dc50096eccf5173729887fb3355905.js": {
+      "parts": [
+        "common/out/mobile-web/assets/7e89c8819975264b76038f887773a12a04dc50096eccf5173729887fb3355905.js.gz.b64.000"
+      ],
+      "sha256": "7e89c8819975264b76038f887773a12a04dc50096eccf5173729887fb3355905"
+    },
+    "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64": {
+      "parts": [
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.000",
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.001",
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.002",
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.003",
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.004",
+        "common/out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2.b64.gz.b64.005"
+      ],
+      "sha256": "d7cfd7094649c5c53e9fa549894ff1f4f971d68efbdf985699735d9300aee0cc"
+    },
+    "common/out/mobile-web/assets/a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7.js": {
+      "parts": [
+        "common/out/mobile-web/assets/a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7.js.gz.b64.000",
+        "common/out/mobile-web/assets/a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7.js.gz.b64.001",
+        "common/out/mobile-web/assets/a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7.js.gz.b64.002"
+      ],
+      "sha256": "a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7"
+    },
+    "common/out/mobile-web/assets/f8d3a5cf9351955bbb4049b7821afc22e510ea2a03b42508af51c09ab8193707.js": {
+      "parts": [
+        "common/out/mobile-web/assets/f8d3a5cf9351955bbb4049b7821afc22e510ea2a03b42508af51c09ab8193707.js.gz.b64.000"
+      ],
+      "sha256": "f8d3a5cf9351955bbb4049b7821afc22e510ea2a03b42508af51c09ab8193707"
+    },
+    "common/session-scanner-service-entry.js": {
+      "parts": [
+        "common/session-scanner-service-entry.js.gz.b64.000",
+        "common/session-scanner-service-entry.js.gz.b64.001"
+      ],
+      "sha256": "7bd9f11f19ee7edbfcc0ed051f836ebca7926c7d16b5eef743f36fa3ec02e430"
+    },
+    "targets/linux-arm64-glibc/node_modules/@parcel/watcher/watcher.node.b64": {
+      "parts": [
+        "targets/linux-arm64-glibc/node_modules/@parcel/watcher/watcher.node.b64.gz.b64.000",
+        "targets/linux-arm64-glibc/node_modules/@parcel/watcher/watcher.node.b64.gz.b64.001"
+      ],
+      "sha256": "5b7b1a516acedbdf0c2ae85cc3925657a57e7db6633d5285b150a69141c49958"
+    },
+    "targets/linux-arm64-glibc/node_modules/node-pty/build/Release/pty.node.b64": {
+      "parts": [
+        "targets/linux-arm64-glibc/node_modules/node-pty/build/Release/pty.node.b64.gz.b64.000"
+      ],
+      "sha256": "96de3f45bb052fd72900a06e9c9c1014f354b2ab5ba53bb51f362c6f117df5bd"
+    },
+    "targets/linux-x64-glibc/node_modules/@parcel/watcher/watcher.node.b64": {
+      "parts": [
+        "targets/linux-x64-glibc/node_modules/@parcel/watcher/watcher.node.b64.gz.b64.000",
+        "targets/linux-x64-glibc/node_modules/@parcel/watcher/watcher.node.b64.gz.b64.001"
+      ],
+      "sha256": "9794b953eb6c584e3eb8fdf3b7765cdef7e395c665c13eb7c3e5efba1dd179d8"
+    }
   },
   "upstreamManifest": {
-    "schemaVersion": 3,
+    "schemaVersion": 4,
     "commonSha256": {
-      "out/cli/index.js": "5657d1a40453b6fa85a41a4df0ffda3341bd22fc367e3e8985d05648d493e1d2",
-      "out/package.json": "eb0783a4735b6b0ec484aafcb0d426e29c1a8d72397247f95dc6ba1e5d25dd05",
-      "orcad.js": "db31cc324880c29a0738d10471e52818073333f12b823d01ecf8bffa534b6393",
-      "orcad-server.js": "bea1e0ce0f5cd40a046a40c04ef5e66c9e38ce110387f35d5b54abccf65cb8ba",
-      "parcel-watcher-process-entry.js": "9d2c9b946e74d3ec1b4f158194c6be75ce0dbeddaadfd3f352500f5eb5e1811b",
-      "daemon-entry.js": "cfe6bfc622402df4b1c7982dadb8177c3c16e0f01bd4bb5dffe2a87abeef9056",
-      "profile-state-writer-worker-entry.js": "1fd99b3234460ca228b8fdc94107489bd746a7322c27c1a5c6c6b5ef754b368d",
-      "profile-state-backup-worker-entry.js": "7e84a6e571ac8f68bfb025a3be60437cd6d246e42d95cb1a77f6668341d938e5",
-      "foreign-sqlite-reader-entry.js": "2dd0e74ccf43fe47b7d3636ebd3bc970233f21bf4713ba25c11987c7c1f7f319",
-      "port-scan-command-worker-entry.js": "5df777d9eef47f91c1733f75ef90b83d07637468d32ab0b426802782fef4e161",
-      "session-scanner-service-entry.js": "11e5911dfa79f7543d73c74364c0b86c0979550550cb21e2927cf79a61dc0fab",
-      "node_modules/@parcel/watcher/index.js": "45c1a25ea1fd833eecec8539da7a12dd22b6109e2dd3ca33cf24e37cefc59838",
+      "out/cli/index.js": "2b30294e62e96f6ddc03f0074fafcc3ae86c8eca850a48751d33f1372231733c",
+      "out/package.json": "ba635025d2fc13cf856b093c9c3c4d4a0d26d0685b0247665eaca855768a17d3",
+      "orcad.js": "cbd4e00cf772f5388a646969e4d0dd288b6adc67d00a203b3485d2da831fb181",
+      "orcad-server.js": "33458faa0690a64159776e1857ef3b40a6bea1b697ca289214064e8ed6dfff82",
+      "parcel-watcher-process-entry.js": "3869998652b68aff2d4abd6405ba2edf4d7ff81b70d24302fe11d77242fa2b78",
+      "daemon-entry.js": "b6f2bab2bb870de612afa91e5c195ed2aa2ce305c729595f6e613feb76598436",
+      "profile-state-writer-worker-entry.js": "375074c475aa4f9f03726d71caa3bde0b35addfe62a2d2970f3889d1d7b47894",
+      "profile-state-backup-worker-entry.js": "575e01867225bbcb52bc9c3d8373ba8e7a2810fd75d165b0f352845e834ef110",
+      "command-path-directory-worker-entry.js": "ba4214b445049ae93ee11cc0d67a2916ae12cfcfd0f5dfe9130b0306a5d38334",
+      "foreign-sqlite-reader-entry.js": "350a777ef772ef304ce9cc63f6caa7269fcfbed94805549fa7e2bff20e4f2753",
+      "port-scan-command-worker-entry.js": "85d751966d88ee06bafb5d59012e1a49cf2e0cfc022ba4bb135782c748fc6d70",
+      "session-scanner-service-entry.js": "7bd9f11f19ee7edbfcc0ed051f836ebca7926c7d16b5eef743f36fa3ec02e430",
+      "worker-thread-child-process-entry.js": "a870d7c466c9e2b3d044e9dae1299156cb24b3d764f5c612cad9ed6ab365c7c8",
+      "claude-profile-setup-worker-entry.js": "146b7dab7782ee08461b11bfa43ec5a04fb766cfc8f7a55c04a1a94d59cf6cc1",
+      "stt-worker.js": "0d46e3b661b58e4d11796fb8afb6ad721bb823310d38badb8760675f32f40554",
+      "computer-sidecar.js": "61795949ed52d955b5727ec56f3919e286f4d6bd4247f56f8ba7a6ffd7c3416d",
+      "computer-use-linux/runtime.py": "f8112d2d209dafab1712ff704d70f94aa79f2db5f748954ca7379af2dac48826",
+      "computer-use-windows/runtime.ps1": "180996f7e4d501c68d3d76fd7c234ec01795c265ebc7d77f9075f9364f571cd6",
+      "node_modules/@parcel/watcher/index.js": "94d1566efc0ebc31d7a51b3a0aae8990c7eaa7d4c50559fb881a5bd28453c4c1",
       "node_modules/emojibase-data/en/shortcodes/emojibase.json": "db3d41edf2f190bcb81bf171a51b1f889af774eed5dc24d21ad8dfcb998b40d3",
+      "node_modules/@linear/sdk/index.js": "def8038dcff63873f5a9ea77ca8fe262cd1b02067f989c08911869061247a23e",
       "node_modules/node-pty/package.json": "f8b6a14f7022c14f1cd5d109486f5dacd32bffb63a9a63e38eced37dacb47439",
       "node_modules/node-pty/lib/conpty_console_list_agent.js": "345337d05527cc0a6e26bf618bc63cda3d98aabb677f1399e6040c90414e50ea",
       "node_modules/node-pty/lib/eventEmitter2.js": "f1c14613aa90c10def4ca7238329270871997eb26f919f7074dc25533e3e75dd",
@@ -32,11 +240,11 @@
       "node_modules/node-pty/lib/terminal.js": "7bf8b54691a735654cd9a19104fe4d8ffcbcbca455075998bc53b363c3031843",
       "node_modules/node-pty/lib/types.js": "408bf8287717b6322cc380ea66caf1b5e366dcf697707ae2f3cc454e08f3b151",
       "node_modules/node-pty/lib/unixTerminal.js": "73497355416919e4dd984eea84e267b8615f9fe3080f4a66944453292cb452fe",
-      "node_modules/node-pty/lib/utils.js": "f75ad341c13fbf1a9a6605d7ee42dff5bbc5d43b7b381e413fb97eb1b8300beb",
-      "node_modules/node-pty/lib/windowsConoutConnection.js": "1440f70908fb1f55911ac8e936a1230f68a9c00c03096fcef6788eac6aad9d62",
-      "node_modules/node-pty/lib/windowsPtyAgent.js": "b395bf47bd4f8ce9573c66987129a2c8385499887a8e9aadbd4037cb42afe8f8",
-      "node_modules/node-pty/lib/windowsTerminal.js": "8247ecd69be8b18257050fb026b290024612c5ffc6d492ff1d46f81e613be2cf",
-      "node_modules/node-pty/lib/worker/conoutSocketWorker.js": "3e4bac095ac3870c3248a7302f5d10217de625f30c32b7000fe48a34788e47ac",
+      "node_modules/node-pty/lib/utils.js": "cfc74a0c85899396b25506186b98ac71b1decd6d6af7a66687b470dc4bed0998",
+      "node_modules/node-pty/lib/windowsConoutConnection.js": "75fcaaf8a00740c340bef8b7143251e4fd1e21f53d6a811f0d14335ea4c2159c",
+      "node_modules/node-pty/lib/windowsPtyAgent.js": "309a6500fa4ac7871f79c19c04a887863fe1e2985c5e3618d0640b2ebf96fe42",
+      "node_modules/node-pty/lib/windowsTerminal.js": "22952e1f26d235b553c788e1503f2b674c16542be54dca3aede67954bd7de3be",
+      "node_modules/node-pty/lib/worker/conoutSocketWorker.js": "b74a4b1764fe94ad9cce757daff1099f138a90ee43edca8af1dbc9808a9d70dd",
       "ripgrep/licenses/JEMALLOC-COPYING": "94aa2caa98c25d942f58b956c71dba6a99ff98fc3a31cbc669fe2a4cd0268b53",
       "ripgrep/licenses/LICENSE-MIT": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
       "ripgrep/licenses/LLVM-LIBUNWIND-LICENSE.TXT": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
@@ -47,99 +255,281 @@
       "ripgrep/licenses/SLJIT-LICENSE": "17d0e3d9c9f398ad5bfe684472d56ae78d0dbfb24abaa527a9c4b3b2e6134719",
       "ripgrep/licenses/UNLICENSE": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
       "native-chat-visuals/.claude-plugin/plugin.json": "455f4597890cc2c9fea39f88de695b3750910d43cce450b6fc506c8826b8c5f4",
-      "native-chat-visuals/skills/orca-chat-visuals/SKILL.md": "dfaa8249f985387a90fe9959d05fbcb7153009c6584de84fae65c48a14be2a0f"
+      "native-chat-visuals/skills/orca-chat-visuals/SKILL.md": "8c117cbf4d7834086db4e08cd475302a561e02cb905c784d14949509d05cb90f",
+      "out/mobile-web/manifest.json": "b8f7d2e7ec808946e34be772875e678306deb54eb18d01381e5c0597683d7314",
+      "out/mobile-web/assets/013a6706a284523dd03c8554b95f5266fdc21c364da2da491b220df6d2b43e76.js": "013a6706a284523dd03c8554b95f5266fdc21c364da2da491b220df6d2b43e76",
+      "out/mobile-web/assets/02f058114c3e79b0a9f3fa7b50cd88c3f9a1cff9860101b6b50513d81d4dc48b.png": "02f058114c3e79b0a9f3fa7b50cd88c3f9a1cff9860101b6b50513d81d4dc48b",
+      "out/mobile-web/assets/035f07f43598b7f3b545d8017407b27f063daea0096137e29f4d8664fc05d8aa.js": "035f07f43598b7f3b545d8017407b27f063daea0096137e29f4d8664fc05d8aa",
+      "out/mobile-web/assets/041149446dfdce58efca98430b5f4f7a2a6edd333be37b366c7200a82358d75f.js": "041149446dfdce58efca98430b5f4f7a2a6edd333be37b366c7200a82358d75f",
+      "out/mobile-web/assets/058144d94ecb1faea3a6af708ddf25e1e204a492d6011d30b38c1f95cc3933e6.png": "058144d94ecb1faea3a6af708ddf25e1e204a492d6011d30b38c1f95cc3933e6",
+      "out/mobile-web/assets/0648fb413393b81020a17f05fe8ca61ac0c138bf290714d9314a40d597915991.js": "0648fb413393b81020a17f05fe8ca61ac0c138bf290714d9314a40d597915991",
+      "out/mobile-web/assets/0706dcba6c204f366714c3599dab47e59559f04df7153360d55c43e59df52055.js": "0706dcba6c204f366714c3599dab47e59559f04df7153360d55c43e59df52055",
+      "out/mobile-web/assets/0818c6e1c3efa396a899f7ba11809ce67481a2904daa9fb9fd941e8337c6ef3a.js": "0818c6e1c3efa396a899f7ba11809ce67481a2904daa9fb9fd941e8337c6ef3a",
+      "out/mobile-web/assets/0955d7272f75ea04de5643d283313186a86907c68ec80b85eb58603e014f0ba1.js": "0955d7272f75ea04de5643d283313186a86907c68ec80b85eb58603e014f0ba1",
+      "out/mobile-web/assets/0e6970fa0f112c0212562941dcf09d07194971ab4731bf1d799db0fb0a1fc612.js": "0e6970fa0f112c0212562941dcf09d07194971ab4731bf1d799db0fb0a1fc612",
+      "out/mobile-web/assets/0eb3c8d7d64316fbf429b65a03ee25315ca2bf1ebd28cf115673ba37783e7225.js": "0eb3c8d7d64316fbf429b65a03ee25315ca2bf1ebd28cf115673ba37783e7225",
+      "out/mobile-web/assets/10e7aa02d5beffacf956b27b49a32a893395ac2bf204b629814b3b19fa392857.js": "10e7aa02d5beffacf956b27b49a32a893395ac2bf204b629814b3b19fa392857",
+      "out/mobile-web/assets/11eaeba143407f57f123cd8442d8e2c4a01d43da74c26856bac0317f8ed604de.js": "11eaeba143407f57f123cd8442d8e2c4a01d43da74c26856bac0317f8ed604de",
+      "out/mobile-web/assets/179d5d5014667ad5605c92cfeb72318e40683bc28001216582f8abc600877795.png": "179d5d5014667ad5605c92cfeb72318e40683bc28001216582f8abc600877795",
+      "out/mobile-web/assets/1828c6052fef4186671b99100501cd9601073c444901741d6b2e52531f7c11e4.png": "1828c6052fef4186671b99100501cd9601073c444901741d6b2e52531f7c11e4",
+      "out/mobile-web/assets/1910c1c724f7c7e33188885b237d2bc64a261a7d8afa38c88679cf6e42d9c432.png": "1910c1c724f7c7e33188885b237d2bc64a261a7d8afa38c88679cf6e42d9c432",
+      "out/mobile-web/assets/198387c8a1a445d37ba21d64f80509d08386ee4676a0af971fe19408dc8d6917.png": "198387c8a1a445d37ba21d64f80509d08386ee4676a0af971fe19408dc8d6917",
+      "out/mobile-web/assets/1a81fbfbf0a8efe0a8a9a16f0951e679dbbda131fe014a150176056199968e06.png": "1a81fbfbf0a8efe0a8a9a16f0951e679dbbda131fe014a150176056199968e06",
+      "out/mobile-web/assets/1c03e571fd1ae6f989d7641b3d6c7a99ada4ba6dba3d27a0ccba41165508262c.js": "1c03e571fd1ae6f989d7641b3d6c7a99ada4ba6dba3d27a0ccba41165508262c",
+      "out/mobile-web/assets/2325c53a73e54c438cbbc60dffdd8b513d471ba42e2f56713ef404b95e0ca1fc.png": "2325c53a73e54c438cbbc60dffdd8b513d471ba42e2f56713ef404b95e0ca1fc",
+      "out/mobile-web/assets/243f51f2df2229156025f9eab62bbc940044244a21f0c9f764154821891d762a.js": "243f51f2df2229156025f9eab62bbc940044244a21f0c9f764154821891d762a",
+      "out/mobile-web/assets/255cba4b9220ec7d36b06ee05a827c85cbf0d8804675d1693bbf3f6f5b3d5240.js": "255cba4b9220ec7d36b06ee05a827c85cbf0d8804675d1693bbf3f6f5b3d5240",
+      "out/mobile-web/assets/27f4d229d440925bf7212d5dfffa45d596b2c7b3bb2905c96b839b2081a1dbeb.png": "27f4d229d440925bf7212d5dfffa45d596b2c7b3bb2905c96b839b2081a1dbeb",
+      "out/mobile-web/assets/2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37.js": "2990888f13b8c7d2453f27e89ad592a3aa04a740289e512beeb3b9b232193d37",
+      "out/mobile-web/assets/2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542.js": "2a52d1fa2e4636141c84d7e6fb66d107cb51924f2869ca435a72c41b37728542",
+      "out/mobile-web/assets/2eac47128b51fdbb02d561f3dc5f9946c4bc4d8bdd4123e9e0d1b02cd67f71bd.js": "2eac47128b51fdbb02d561f3dc5f9946c4bc4d8bdd4123e9e0d1b02cd67f71bd",
+      "out/mobile-web/assets/332e4c7391b0bd59271300dcd6cf0c8d14155291d7bd06f8b54c29d9baaf06ca.js": "332e4c7391b0bd59271300dcd6cf0c8d14155291d7bd06f8b54c29d9baaf06ca",
+      "out/mobile-web/assets/34d97d9b8c6a26ce9add79e3559fd984aef21265145b6c73de51c11ed1825ef4.js": "34d97d9b8c6a26ce9add79e3559fd984aef21265145b6c73de51c11ed1825ef4",
+      "out/mobile-web/assets/3502aa13475c725e3793eebb5c3e4ab25037c578e3977a7eda4247b879bced7a.png": "3502aa13475c725e3793eebb5c3e4ab25037c578e3977a7eda4247b879bced7a",
+      "out/mobile-web/assets/357403d2cf34fadd85d3d3b8f4d35ab504f61b023a8f4037587bd90bcbabfa93.png": "357403d2cf34fadd85d3d3b8f4d35ab504f61b023a8f4037587bd90bcbabfa93",
+      "out/mobile-web/assets/374c7ab7f86f6c0326b9f1af981dcd9d5d99c536b4e3f04392c6515367b1ffac.js": "374c7ab7f86f6c0326b9f1af981dcd9d5d99c536b4e3f04392c6515367b1ffac",
+      "out/mobile-web/assets/3b562cc41314f7732197a5528bdb70384240dfa159ec58d0200992b424096454.js": "3b562cc41314f7732197a5528bdb70384240dfa159ec58d0200992b424096454",
+      "out/mobile-web/assets/3ecc7650e7f016f192b86f9596b0b6f2a6fd54daf7b13e6ce43d4d83932a0c48.js": "3ecc7650e7f016f192b86f9596b0b6f2a6fd54daf7b13e6ce43d4d83932a0c48",
+      "out/mobile-web/assets/422e4f37c6446561ff2bde624b36b545046ea5a0d88ea2e4ca33279f406d8070.png": "422e4f37c6446561ff2bde624b36b545046ea5a0d88ea2e4ca33279f406d8070",
+      "out/mobile-web/assets/43530e9cfe9434fe7622439cd923b9a42fafe9e76b20cb1fd7fa157663628f1c.png": "43530e9cfe9434fe7622439cd923b9a42fafe9e76b20cb1fd7fa157663628f1c",
+      "out/mobile-web/assets/43ae8263780b6f23b3185d15495226c3bbebe78d17caa8c664f462ffa7ca3c85.js": "43ae8263780b6f23b3185d15495226c3bbebe78d17caa8c664f462ffa7ca3c85",
+      "out/mobile-web/assets/457e22cb3fbd42d111e02d9b22b57fd9fa9bf81cdc23b708b1bb29e084cfe317.png": "457e22cb3fbd42d111e02d9b22b57fd9fa9bf81cdc23b708b1bb29e084cfe317",
+      "out/mobile-web/assets/46832c0f052a28d506e0b407b301a1731fe47d6dc163cfe1812f388271170142.js": "46832c0f052a28d506e0b407b301a1731fe47d6dc163cfe1812f388271170142",
+      "out/mobile-web/assets/4b124e47e1293a2841c503d2feb8afa16c6afd9dca06faf25d27b4589711851b.js": "4b124e47e1293a2841c503d2feb8afa16c6afd9dca06faf25d27b4589711851b",
+      "out/mobile-web/assets/50651aaef44bc89330e5d87305e035468f97d2fbfce769ef19c3548193710edc.png": "50651aaef44bc89330e5d87305e035468f97d2fbfce769ef19c3548193710edc",
+      "out/mobile-web/assets/537ab5517a912bf206d6860ab7eefad43d90ae64ade1075fdb694717d38c1156.js": "537ab5517a912bf206d6860ab7eefad43d90ae64ade1075fdb694717d38c1156",
+      "out/mobile-web/assets/5612c44598410287c27195e0ce2989c07c6faecebee61d68c2290e7f0454c45e.js": "5612c44598410287c27195e0ce2989c07c6faecebee61d68c2290e7f0454c45e",
+      "out/mobile-web/assets/576f6dad386dc4be3832dca050eb560abe3c25bfe9619f612a86c2cbaff06b63.js": "576f6dad386dc4be3832dca050eb560abe3c25bfe9619f612a86c2cbaff06b63",
+      "out/mobile-web/assets/57e02dab19aba375a8e335161a3eda65ff4f6e1c9b8895c0077e3d6ff488b394.js": "57e02dab19aba375a8e335161a3eda65ff4f6e1c9b8895c0077e3d6ff488b394",
+      "out/mobile-web/assets/5880aa1010af3e5bb25963563bc024a389cbe1e063b2d40aaec8fb238a1b5002.js": "5880aa1010af3e5bb25963563bc024a389cbe1e063b2d40aaec8fb238a1b5002",
+      "out/mobile-web/assets/588426764b827f78a0c61ba108b9ca28a771ecf143b7b4cb13790dc728f7aaa6.js": "588426764b827f78a0c61ba108b9ca28a771ecf143b7b4cb13790dc728f7aaa6",
+      "out/mobile-web/assets/59bfe9bc385ad69f50793ce4a53397316d7a875a7148a63c16df9b674c6cda64.png": "59bfe9bc385ad69f50793ce4a53397316d7a875a7148a63c16df9b674c6cda64",
+      "out/mobile-web/assets/5a9e0fa5ce2e320c93f43e43951da3d7c0f23f01e00235d45e39140f00b73324.js": "5a9e0fa5ce2e320c93f43e43951da3d7c0f23f01e00235d45e39140f00b73324",
+      "out/mobile-web/assets/5bf0f4c7b8aef8f704176f33818329b4ec3fb73325bd19c4f8e8ae47c9f3a96b.js": "5bf0f4c7b8aef8f704176f33818329b4ec3fb73325bd19c4f8e8ae47c9f3a96b",
+      "out/mobile-web/assets/5d075e0c287c4f4441b5b5c8fc7ea5cd27c11bb617ecea09755955bcb1889083.png": "5d075e0c287c4f4441b5b5c8fc7ea5cd27c11bb617ecea09755955bcb1889083",
+      "out/mobile-web/assets/5e4e7ff4e1bdcc230c5ef1deccbd55d5c20fc370931e47161933bdbf8fb47392.js": "5e4e7ff4e1bdcc230c5ef1deccbd55d5c20fc370931e47161933bdbf8fb47392",
+      "out/mobile-web/assets/5ff6cf164fffd2e72e38096d941ebedf55b2791aceb443e6941ec3967f00e790.png": "5ff6cf164fffd2e72e38096d941ebedf55b2791aceb443e6941ec3967f00e790",
+      "out/mobile-web/assets/61b24c1b85a4c4f83f7a54572c1d193116a5cfda35bda8e90cc4b0b194bd3e9a.js": "61b24c1b85a4c4f83f7a54572c1d193116a5cfda35bda8e90cc4b0b194bd3e9a",
+      "out/mobile-web/assets/629301790349c8423505f8ddc0ae28c2c3bd395a6d6e6da5b13ed4d71bde5a3d.png": "629301790349c8423505f8ddc0ae28c2c3bd395a6d6e6da5b13ed4d71bde5a3d",
+      "out/mobile-web/assets/636e8c47ca80f3584cdef9d9c5f7b1e01a8368a162867a77bf56cb0c9a9e7269.js": "636e8c47ca80f3584cdef9d9c5f7b1e01a8368a162867a77bf56cb0c9a9e7269",
+      "out/mobile-web/assets/675343e8ce6f949d344a7693627e775a9f0726aba3c15a4754cd0fd452a64906.js": "675343e8ce6f949d344a7693627e775a9f0726aba3c15a4754cd0fd452a64906",
+      "out/mobile-web/assets/67a2f83f8cf963148e2b2651a5a1a79a97ab110c702d9942c7c52453a3e27433.js": "67a2f83f8cf963148e2b2651a5a1a79a97ab110c702d9942c7c52453a3e27433",
+      "out/mobile-web/assets/6822cce81a55028b562ca375810b3bd5a6779fc9422f6851e043dc1168fce5ea.js": "6822cce81a55028b562ca375810b3bd5a6779fc9422f6851e043dc1168fce5ea",
+      "out/mobile-web/assets/683acec02ce8bfd0d5e936f88b7cf672e43369ee77970e9273592a4b3ddfa6ce.js": "683acec02ce8bfd0d5e936f88b7cf672e43369ee77970e9273592a4b3ddfa6ce",
+      "out/mobile-web/assets/69ddb188bf3705889bd16c26f945efc878556cb5ae926a645fd33b3ec8e053ab.png": "69ddb188bf3705889bd16c26f945efc878556cb5ae926a645fd33b3ec8e053ab",
+      "out/mobile-web/assets/6a97f4d2eb08cf7e0a062986f801f13cf72df7178243c4d95d746a4fe6239b9f.js": "6a97f4d2eb08cf7e0a062986f801f13cf72df7178243c4d95d746a4fe6239b9f",
+      "out/mobile-web/assets/6b336ccf89d444addbdf0ec8dc2863981619d1c45bd09f020365908d66bbe370.png": "6b336ccf89d444addbdf0ec8dc2863981619d1c45bd09f020365908d66bbe370",
+      "out/mobile-web/assets/6bc1a537e1c4b73edc208791d93f2ed2fd272b3c9800e702fb6baa5cc8f3f8cb.js": "6bc1a537e1c4b73edc208791d93f2ed2fd272b3c9800e702fb6baa5cc8f3f8cb",
+      "out/mobile-web/assets/6cb067365dd29e2ce73de5bc743b349d7f3e34d699bd7891abc9bc7c3372abd3.js": "6cb067365dd29e2ce73de5bc743b349d7f3e34d699bd7891abc9bc7c3372abd3",
+      "out/mobile-web/assets/6deca32b56b97fa1fa87facd6996b46cc45190a553400e7febdf1d2093099b57.png": "6deca32b56b97fa1fa87facd6996b46cc45190a553400e7febdf1d2093099b57",
+      "out/mobile-web/assets/6df3c3f3c82f3d461886e4b728e564c13b7036f0c42c75857ca1dc1bef2dd0cc.js": "6df3c3f3c82f3d461886e4b728e564c13b7036f0c42c75857ca1dc1bef2dd0cc",
+      "out/mobile-web/assets/6f83e17fc87fbc39288a7aa50a30acdffe4a9a20c8d7e4835906c09e4dcba4a3.js": "6f83e17fc87fbc39288a7aa50a30acdffe4a9a20c8d7e4835906c09e4dcba4a3",
+      "out/mobile-web/assets/708a79cf561b8a2a4850ce0254584d3a5231046be08fb7fadf4b6edfdb31178b.png": "708a79cf561b8a2a4850ce0254584d3a5231046be08fb7fadf4b6edfdb31178b",
+      "out/mobile-web/assets/7241ace8920010ad9240d458b86167c13e3b50a0ef9eac29823995d263bb4a60.js": "7241ace8920010ad9240d458b86167c13e3b50a0ef9eac29823995d263bb4a60",
+      "out/mobile-web/assets/7245ee3e93cf9441785c0c6aebdad53a40c07fab84991f41d95aee3a962f30bf.js": "7245ee3e93cf9441785c0c6aebdad53a40c07fab84991f41d95aee3a962f30bf",
+      "out/mobile-web/assets/7306dd45f5e653f3fa83656fa3723e2452ae169c8120ec71ac80b353d377786a.js": "7306dd45f5e653f3fa83656fa3723e2452ae169c8120ec71ac80b353d377786a",
+      "out/mobile-web/assets/739d5bf7cd7ba27d662cc2475be9841eb856cc8b9b68c12938004cddfa5193d9.js": "739d5bf7cd7ba27d662cc2475be9841eb856cc8b9b68c12938004cddfa5193d9",
+      "out/mobile-web/assets/74d250e8fdfc9f212b7eb8e97fdb25e13d705669d498bdbb0bb58f261d66d520.js": "74d250e8fdfc9f212b7eb8e97fdb25e13d705669d498bdbb0bb58f261d66d520",
+      "out/mobile-web/assets/754103c9c279d1ca98f5565a03991cf926dc7d4bb6b2afbbc44eef3675b2a54f.js": "754103c9c279d1ca98f5565a03991cf926dc7d4bb6b2afbbc44eef3675b2a54f",
+      "out/mobile-web/assets/75792f74e5449693451dc3cd601fb58956b2d32ea5511faf94aac7cf8de27ac9.js": "75792f74e5449693451dc3cd601fb58956b2d32ea5511faf94aac7cf8de27ac9",
+      "out/mobile-web/assets/79368498aae561ebb2f20b79a9e81440955024b45b12e85c4d6e2a70242163ac.js": "79368498aae561ebb2f20b79a9e81440955024b45b12e85c4d6e2a70242163ac",
+      "out/mobile-web/assets/79e65ae4a930b73b9e36a9042f86bf76f9fbdf66fef4bae6b8da16ecd716139b.js": "79e65ae4a930b73b9e36a9042f86bf76f9fbdf66fef4bae6b8da16ecd716139b",
+      "out/mobile-web/assets/7ae618efcc9ad95d089082a733f5926def4066abb25747d5b3cc0a89bf6cdb71.js": "7ae618efcc9ad95d089082a733f5926def4066abb25747d5b3cc0a89bf6cdb71",
+      "out/mobile-web/assets/7bb3998fe09a0179020cf7c08e671f4dbd0baf06837e5d6820b75c80c75bc142.js": "7bb3998fe09a0179020cf7c08e671f4dbd0baf06837e5d6820b75c80c75bc142",
+      "out/mobile-web/assets/7e89c8819975264b76038f887773a12a04dc50096eccf5173729887fb3355905.js": "7e89c8819975264b76038f887773a12a04dc50096eccf5173729887fb3355905",
+      "out/mobile-web/assets/7f0ea8a6946b31128549a114073f50752f2dc2b90890e716c347a068058b657e.js": "7f0ea8a6946b31128549a114073f50752f2dc2b90890e716c347a068058b657e",
+      "out/mobile-web/assets/7f3f0139b36c4ea5e705b9e56f8ac1664d37e9201231706d5ddaf38d718310b9.js": "7f3f0139b36c4ea5e705b9e56f8ac1664d37e9201231706d5ddaf38d718310b9",
+      "out/mobile-web/assets/8102fa72f88effb7bc4f45025d986fd65ccb5712fe64b3a4f954169ff6c5fa9b.png": "8102fa72f88effb7bc4f45025d986fd65ccb5712fe64b3a4f954169ff6c5fa9b",
+      "out/mobile-web/assets/837e7b113fba39a6258cb43db6b69a5548688912ffeac1dccad213d9ff537db3.png": "837e7b113fba39a6258cb43db6b69a5548688912ffeac1dccad213d9ff537db3",
+      "out/mobile-web/assets/84cf5eb3b20250f69e0e4733beb4da5f417f0682892a5ad1b5e62570753c21b1.png": "84cf5eb3b20250f69e0e4733beb4da5f417f0682892a5ad1b5e62570753c21b1",
+      "out/mobile-web/assets/856bd974a8e2211c2aaa82a30fab7cd735d9dee9693b3b2e105d96c1e90f29bb.js": "856bd974a8e2211c2aaa82a30fab7cd735d9dee9693b3b2e105d96c1e90f29bb",
+      "out/mobile-web/assets/87a2a8ec07f45f4c5eaeaa7c69cc00166b60e1845e1a9aef59754f54b4ad2009.js": "87a2a8ec07f45f4c5eaeaa7c69cc00166b60e1845e1a9aef59754f54b4ad2009",
+      "out/mobile-web/assets/8b56b0e4a07cd0fd48c21ef61f0ad9373dc824bc4c8a1da7234ae6b410dd4a1a.png": "8b56b0e4a07cd0fd48c21ef61f0ad9373dc824bc4c8a1da7234ae6b410dd4a1a",
+      "out/mobile-web/assets/8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467.woff2": "8efa6ba89f0a1f3eefde028f36aa64a13e36282e15ea0ca6929c664501037467",
+      "out/mobile-web/assets/8f7e31cff2fa854f43891260254546247d3367d872a556996bf694dc7909dae5.js": "8f7e31cff2fa854f43891260254546247d3367d872a556996bf694dc7909dae5",
+      "out/mobile-web/assets/905b4d931a74783803d7bb6c5f52fc102a391cc279cf770a0fe49f66a993c7e0.js": "905b4d931a74783803d7bb6c5f52fc102a391cc279cf770a0fe49f66a993c7e0",
+      "out/mobile-web/assets/90ba446d305060b7dccc2ae3612882a59d6b5cc86b35ba1bd02554e539ea5431.js": "90ba446d305060b7dccc2ae3612882a59d6b5cc86b35ba1bd02554e539ea5431",
+      "out/mobile-web/assets/948d3efa0c3dfd95e1c087bdf4a52795ecf8db22d8d7c902451313b060583db5.js": "948d3efa0c3dfd95e1c087bdf4a52795ecf8db22d8d7c902451313b060583db5",
+      "out/mobile-web/assets/95ae24c866978af7327367ed4ae66c8a980fbc3e6281a286d7acf61a2816b494.js": "95ae24c866978af7327367ed4ae66c8a980fbc3e6281a286d7acf61a2816b494",
+      "out/mobile-web/assets/978b35745e50d7c1e4332bba19535c7ecb3b46af1a84aba1bfe35685260a69a1.js": "978b35745e50d7c1e4332bba19535c7ecb3b46af1a84aba1bfe35685260a69a1",
+      "out/mobile-web/assets/98a7e63bc68ebdb6e1b78e814cae940bb0f7ce8e01da1233020561ab955e43b4.js": "98a7e63bc68ebdb6e1b78e814cae940bb0f7ce8e01da1233020561ab955e43b4",
+      "out/mobile-web/assets/98c5b9e9c50e29557813fa2b82eff54766fc59723ed6e1f2fbfc8dce6f6d5cc3.png": "98c5b9e9c50e29557813fa2b82eff54766fc59723ed6e1f2fbfc8dce6f6d5cc3",
+      "out/mobile-web/assets/98e06d6b54ae64671b39160ff4bba012d71a2f29c24eec69c7410808c9926dfc.js": "98e06d6b54ae64671b39160ff4bba012d71a2f29c24eec69c7410808c9926dfc",
+      "out/mobile-web/assets/99e076b0a8c996395d91b667795b4aee4a48c3d1be272f9576b5e6e1ff1ed2dc.js": "99e076b0a8c996395d91b667795b4aee4a48c3d1be272f9576b5e6e1ff1ed2dc",
+      "out/mobile-web/assets/9adb8c5efca932e2b732b293da813bd2e31952263056bce9e2517fec0f0b6a76.png": "9adb8c5efca932e2b732b293da813bd2e31952263056bce9e2517fec0f0b6a76",
+      "out/mobile-web/assets/9bb73fd429adfc859080f4f5407313e1886ed37edfa5a7ed91f47eea6f9d7164.js": "9bb73fd429adfc859080f4f5407313e1886ed37edfa5a7ed91f47eea6f9d7164",
+      "out/mobile-web/assets/9c831a76fb4551ada701f56c1a98b0c253cff80dc4eb81f147c4b8f0621d0d2d.js": "9c831a76fb4551ada701f56c1a98b0c253cff80dc4eb81f147c4b8f0621d0d2d",
+      "out/mobile-web/assets/9e17cc8dd5821558c2bccf274807d8b8373a0e856faa3756a188b022b4f133c4.js": "9e17cc8dd5821558c2bccf274807d8b8373a0e856faa3756a188b022b4f133c4",
+      "out/mobile-web/assets/9ed5b74c5b4ada93c35f9abbf764b2972981d8252a895a8fefa7cacbf8b6d3b7.png": "9ed5b74c5b4ada93c35f9abbf764b2972981d8252a895a8fefa7cacbf8b6d3b7",
+      "out/mobile-web/assets/9f049b383d89575326e520ca432814561417fe7fecc196f2d15ff4acf2fb3857.png": "9f049b383d89575326e520ca432814561417fe7fecc196f2d15ff4acf2fb3857",
+      "out/mobile-web/assets/a16af32a5de5a00e810ef3279e72043243f9297c11de55448d61ee9d8c17aa8d.js": "a16af32a5de5a00e810ef3279e72043243f9297c11de55448d61ee9d8c17aa8d",
+      "out/mobile-web/assets/a3abfdd2734de5b42ee2878cd446549ac14424d42fb2c06424a75aba78afa2ca.png": "a3abfdd2734de5b42ee2878cd446549ac14424d42fb2c06424a75aba78afa2ca",
+      "out/mobile-web/assets/a69a2edb5b6c60b8433d5b6d23c69f520ccd8a602f3f60e7996e489718bc175c.png": "a69a2edb5b6c60b8433d5b6d23c69f520ccd8a602f3f60e7996e489718bc175c",
+      "out/mobile-web/assets/a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7.js": "a722357f0d639b62fac0c837fba61105c4957db43c20e7e06284cc09874fd0a7",
+      "out/mobile-web/assets/a7cc9158bc0d060616c2a7315f9ae254415e0d917d1ce784e5d9511d81edf794.js": "a7cc9158bc0d060616c2a7315f9ae254415e0d917d1ce784e5d9511d81edf794",
+      "out/mobile-web/assets/ac23f97047096b0508e3412b36d99c4bc2900356d8f4b662ab8c12f13bd70fc5.js": "ac23f97047096b0508e3412b36d99c4bc2900356d8f4b662ab8c12f13bd70fc5",
+      "out/mobile-web/assets/acb47f8866eea600e12b7f93bc2ebba8a66cb40e38bd72bfe42e60fec77d35b6.js": "acb47f8866eea600e12b7f93bc2ebba8a66cb40e38bd72bfe42e60fec77d35b6",
+      "out/mobile-web/assets/acf691957a3bcce7d195856dce98a5cf14dce10bea28aa5c10b3550c078e23b5.png": "acf691957a3bcce7d195856dce98a5cf14dce10bea28aa5c10b3550c078e23b5",
+      "out/mobile-web/assets/ada2f16e5b6dc92438879be066ef8aa79d704d4ded008a39a8c654bbc118b861.js": "ada2f16e5b6dc92438879be066ef8aa79d704d4ded008a39a8c654bbc118b861",
+      "out/mobile-web/assets/b9a63ec089623a67de1a12489c775346ba381245bf221f5b86b892deba67a0aa.js": "b9a63ec089623a67de1a12489c775346ba381245bf221f5b86b892deba67a0aa",
+      "out/mobile-web/assets/bc49cd8f526c5bdbe48496fef626f6bea9e13b443830a5f013f8d2a101fc7c3b.js": "bc49cd8f526c5bdbe48496fef626f6bea9e13b443830a5f013f8d2a101fc7c3b",
+      "out/mobile-web/assets/c15ec72a74d13957211808313d5c35deb7f7606c6d22dbddceb0000d4e0547ad.png": "c15ec72a74d13957211808313d5c35deb7f7606c6d22dbddceb0000d4e0547ad",
+      "out/mobile-web/assets/c48d2a20ed918fbaf4339432fce10d3293fd9a2fa22c8862aa1b2fc5f6e54238.js": "c48d2a20ed918fbaf4339432fce10d3293fd9a2fa22c8862aa1b2fc5f6e54238",
+      "out/mobile-web/assets/c5cb3b5bd7ca9acc90cdf60a00c58eae00641a3a55e4595c89b61b0ebe05d70c.js": "c5cb3b5bd7ca9acc90cdf60a00c58eae00641a3a55e4595c89b61b0ebe05d70c",
+      "out/mobile-web/assets/c76c2913b058e2fde9a694d305356bc3bb48e68f46f73169d20e7ce2d3aafc41.png": "c76c2913b058e2fde9a694d305356bc3bb48e68f46f73169d20e7ce2d3aafc41",
+      "out/mobile-web/assets/c8106add30b51df25f3c0b331b6b2607eb60161b2d3c41c2cbc2ba2fb7c809a7.png": "c8106add30b51df25f3c0b331b6b2607eb60161b2d3c41c2cbc2ba2fb7c809a7",
+      "out/mobile-web/assets/c84c3786074ca4b3c55b5644f9695deb18b16b505bf92f5e7c6dbdff42347426.js": "c84c3786074ca4b3c55b5644f9695deb18b16b505bf92f5e7c6dbdff42347426",
+      "out/mobile-web/assets/c86bb485eee687e06c500fc4234f51a6784b4530c2ae11d0c76481110bce3105.png": "c86bb485eee687e06c500fc4234f51a6784b4530c2ae11d0c76481110bce3105",
+      "out/mobile-web/assets/c877ded8757f9e560699cdcff53809ba08361c26ad79a2c345fcad7ac46b476f.js": "c877ded8757f9e560699cdcff53809ba08361c26ad79a2c345fcad7ac46b476f",
+      "out/mobile-web/assets/cb9177e31f4ff9e683ba68d79da439a38646a51ee34a2dc4adadbdcc60d2091d.js": "cb9177e31f4ff9e683ba68d79da439a38646a51ee34a2dc4adadbdcc60d2091d",
+      "out/mobile-web/assets/cc5ebb57e1f1de4fb7132012915d1699c11dbfd8554ba9b2aab15922418bf182.png": "cc5ebb57e1f1de4fb7132012915d1699c11dbfd8554ba9b2aab15922418bf182",
+      "out/mobile-web/assets/cec153d909018e31163e2f59977546813b8d9d6cc69c9d229b953d82a59f2794.png": "cec153d909018e31163e2f59977546813b8d9d6cc69c9d229b953d82a59f2794",
+      "out/mobile-web/assets/cedce9c78ad63f8a0b69bd3441cf7ae9d6934c0faa7a1052ab921374727bddce.png": "cedce9c78ad63f8a0b69bd3441cf7ae9d6934c0faa7a1052ab921374727bddce",
+      "out/mobile-web/assets/d13379f67874bc498468f0ccca2beea70f1fc165355a68f3cd42a6247984c136.png": "d13379f67874bc498468f0ccca2beea70f1fc165355a68f3cd42a6247984c136",
+      "out/mobile-web/assets/d22b590de289ebf48181155e53e3371db5406d34df846544ed5640c69ceba9c0.js": "d22b590de289ebf48181155e53e3371db5406d34df846544ed5640c69ceba9c0",
+      "out/mobile-web/assets/d4a21f5caef563f62c7f52873ce58d92555ec168f803f48b9050462f02b7708f.js": "d4a21f5caef563f62c7f52873ce58d92555ec168f803f48b9050462f02b7708f",
+      "out/mobile-web/assets/d5e18d2b2156caf9642ed46db2078c623b80cf06320eeaaefadc5e3a05221905.png": "d5e18d2b2156caf9642ed46db2078c623b80cf06320eeaaefadc5e3a05221905",
+      "out/mobile-web/assets/d7507147cac173371a1ef7b36997ff15ea6a83e97fe0ad309bb3951e46ad09c9.js": "d7507147cac173371a1ef7b36997ff15ea6a83e97fe0ad309bb3951e46ad09c9",
+      "out/mobile-web/assets/dd3a80bf932d3669b7164b62f329c37e70c298792aa804e6705730584d8bde82.js": "dd3a80bf932d3669b7164b62f329c37e70c298792aa804e6705730584d8bde82",
+      "out/mobile-web/assets/de51622b414cd5696a923e60d19936a7d562d7c2dc4ac5d3c521426ca235c42e.js": "de51622b414cd5696a923e60d19936a7d562d7c2dc4ac5d3c521426ca235c42e",
+      "out/mobile-web/assets/deb002a878a055cf1313ffd1c648a77687b27a1de22ae7615ba2c418482a0c1e.png": "deb002a878a055cf1313ffd1c648a77687b27a1de22ae7615ba2c418482a0c1e",
+      "out/mobile-web/assets/e055b3af128b74326b337fc26ab2c0b961fbb399d7bae0f04b2ecea4e5731d75.js": "e055b3af128b74326b337fc26ab2c0b961fbb399d7bae0f04b2ecea4e5731d75",
+      "out/mobile-web/assets/e347ead5f8433cbc13f12babbddf2fc0659a1c9866b735e66030077e4f40e159.js": "e347ead5f8433cbc13f12babbddf2fc0659a1c9866b735e66030077e4f40e159",
+      "out/mobile-web/assets/e3baeba92f68b6eccf2cc7ce19bb003f838bbd61e71070ae4c5e4ba728a41c73.png": "e3baeba92f68b6eccf2cc7ce19bb003f838bbd61e71070ae4c5e4ba728a41c73",
+      "out/mobile-web/assets/e3f42f0d5b72077d6bce8686bf45f27a294dbc33147e90e4a9c60f690f75e6fd.js": "e3f42f0d5b72077d6bce8686bf45f27a294dbc33147e90e4a9c60f690f75e6fd",
+      "out/mobile-web/assets/e52aafa61f1f454aa2203f46374a5a463509a1a96a035131eede91ecb8fa042e.js": "e52aafa61f1f454aa2203f46374a5a463509a1a96a035131eede91ecb8fa042e",
+      "out/mobile-web/assets/e80bc5e9bf1dbca9b7493a4a6b7b2b7592b37e04615e3eda74bcf70ba9e9dbf6.js": "e80bc5e9bf1dbca9b7493a4a6b7b2b7592b37e04615e3eda74bcf70ba9e9dbf6",
+      "out/mobile-web/assets/e89520f5e2e187e6bcddf0b167a0cf5de47a68c52fb7cd60f7a772b74038718a.js": "e89520f5e2e187e6bcddf0b167a0cf5de47a68c52fb7cd60f7a772b74038718a",
+      "out/mobile-web/assets/e98359f8ebfc411aa0162fcacf8cd02bd20cd349ece9840c503995bc2f0ee793.png": "e98359f8ebfc411aa0162fcacf8cd02bd20cd349ece9840c503995bc2f0ee793",
+      "out/mobile-web/assets/ea9f02d03009ff5e045b56f2a3368bfbbb5b177cfe78187093f1b7e63b225710.js": "ea9f02d03009ff5e045b56f2a3368bfbbb5b177cfe78187093f1b7e63b225710",
+      "out/mobile-web/assets/ed10fe7846a12bfaefbe5932d3df35d61ef0201bed573b8cb6467860735e6923.js": "ed10fe7846a12bfaefbe5932d3df35d61ef0201bed573b8cb6467860735e6923",
+      "out/mobile-web/assets/ee55eb7a141c29d2b8c52f57838de18d2586043da7c5fc1c3939cfd7e236a4ea.js": "ee55eb7a141c29d2b8c52f57838de18d2586043da7c5fc1c3939cfd7e236a4ea",
+      "out/mobile-web/assets/ef451ccf8f1d3d33b68537b9df6b9cb9d5ffa39dc9510e26e31041719439c4dd.js": "ef451ccf8f1d3d33b68537b9df6b9cb9d5ffa39dc9510e26e31041719439c4dd",
+      "out/mobile-web/assets/efc79da3c4c97dfb1571bff6202958ab0529c5aa31e8392600578b3e359d1447.png": "efc79da3c4c97dfb1571bff6202958ab0529c5aa31e8392600578b3e359d1447",
+      "out/mobile-web/assets/f58078c9866b514c759fb7dd387b364376f6f7199bf5d121b1289dbde3ace946.js": "f58078c9866b514c759fb7dd387b364376f6f7199bf5d121b1289dbde3ace946",
+      "out/mobile-web/assets/f707e4d133dac2391abca834b986f78e533bcacf8959f10021d7d7872a82b3ff.png": "f707e4d133dac2391abca834b986f78e533bcacf8959f10021d7d7872a82b3ff",
+      "out/mobile-web/assets/f80d075da27d9e018ce9eccdc32d195eff1d19eba14f21269440b6a525e5f49e.js": "f80d075da27d9e018ce9eccdc32d195eff1d19eba14f21269440b6a525e5f49e",
+      "out/mobile-web/assets/f8d3a5cf9351955bbb4049b7821afc22e510ea2a03b42508af51c09ab8193707.js": "f8d3a5cf9351955bbb4049b7821afc22e510ea2a03b42508af51c09ab8193707",
+      "out/mobile-web/assets/f9a49592809c1357495bcbe97fd253d6cbaf6954027f09a040893ca1610c0e55.png": "f9a49592809c1357495bcbe97fd253d6cbaf6954027f09a040893ca1610c0e55",
+      "out/mobile-web/assets/fba9883fbd8092605701f8619ea75b18c3f8ad1ae693a72d52bb4590084bd4f8.js": "fba9883fbd8092605701f8619ea75b18c3f8ad1ae693a72d52bb4590084bd4f8",
+      "out/mobile-web/assets/fbb004ca22454c6dab759a7d06ee11f013a3054d487eb4c90602209e5bd6a267.js": "fbb004ca22454c6dab759a7d06ee11f013a3054d487eb4c90602209e5bd6a267",
+      "out/mobile-web/assets/fe36b96108b1485eb4c6c0be0a1d8c47b54fea439e62fe55a82e3d52aa0248de.js": "fe36b96108b1485eb4c6c0be0a1d8c47b54fea439e62fe55a82e3d52aa0248de",
+      "out/mobile-web/index.html": "f374a1610c15af6fc952cdf571143d63e192605005d4ecd549a0a8ae2c571d83"
     },
     "targets": {
       "darwin-arm64": {
         "files": {
           ".server-target": "8d881856b9e9a2991794a6cb91599bddc227db867a3ff50402438c3d5a02cb57",
-          ".runtime-node": "070aba0455d5e422f33a9e57c97d49b8ec5bace5d12c82a173f3c9e596884503",
+          ".runtime-node": "145a3ef235cf3db422c69d1a3b497a448fb49a70e902f46d704e5ba445dd8d28",
           "node_modules/@parcel/watcher/watcher.node": "ab8bc3d89413ab68ddca894b9b0a217c9209dace11a2056f299d144fba38f230",
-          "node_modules/node-pty/build/Release/pty.node": "e3a6110196742c9db2d2d702b3309578b483d8e107a94e61fe27bbefada97dcd",
-          "node_modules/node-pty/build/Release/spawn-helper": "11f032a7893cacf16d626544f3a5da27ed78b355ef6e8c99a3ae5c51792cbd5b",
+          "node_modules/node-pty/build/Release/pty.node": "a9f097385286dedf13dfabbc8ac6d7eeebfce86d73f961df633fe224a0aec660",
+          "node_modules/node-pty/build/Release/spawn-helper": "0bf73ced73d4bdeef41f72bc2aa9a13bd0f1373abbb8fd57c830ebf2882694bb",
           "ripgrep/darwin-arm64/rg": "6ef40346bf31fcce79d9614c7745c198542925a0c7d4911e1ffe794c53392ac1"
         }
       },
       "darwin-x64": {
         "files": {
           ".server-target": "2c5ace2d43ad1f7672ed7d113ccf72b831ea468fa659cca1592d901c7066e5ec",
-          ".runtime-node": "e303e87e0ff79a08b57855770a04839adbef14518973da0c13753a2bc8bedcbd",
+          ".runtime-node": "fcd25a40dc2ba3c211130025c529a6976894976fe8debe8ce623e0c3d2605745",
           "node_modules/@parcel/watcher/watcher.node": "60c098886f67801f27644d60cfe57201f5b8cca67c1897407349b0454a806eff",
-          "node_modules/node-pty/build/Release/pty.node": "d76e7e86d5c789bb1e938dc8f9bbb9c546efedea955851003a42d62ba766f448",
-          "node_modules/node-pty/build/Release/spawn-helper": "56441541570c80fa6a3ecaea572e917c0cb201987c999e2ba5f21258836eff19",
+          "node_modules/node-pty/build/Release/pty.node": "bea03a56d7274f580056413ccefbea9f8f270324cade006f10a43697d7e95267",
+          "node_modules/node-pty/build/Release/spawn-helper": "c2466d3e258527f7af4b29c3f1b957c2d291696788b5516d0acfc4c6a7ef2216",
           "ripgrep/darwin-x64/rg": "f999495980a5e6f1e7d26461ef5768b4013a62df610ed7d77a8b2de247a5b228"
         }
       },
       "linux-arm64-glibc": {
         "files": {
           ".server-target": "71fdd002e8a09963523a72fa1f611ec06f454c33525130b0a404f089a100b158",
-          ".runtime-node": "d054be0f2bc68de7cfdeb934e08e93b50a00c27d5a17b29e0d98ac3058599e99",
+          ".runtime-node": "bd6b15a828f600a82d2a7a8baaa087db65d68d07571e67a702570e360d6cf77c",
           "node_modules/@parcel/watcher/watcher.node": "7c05ea16fe5d983c4bab7b39abe07c3622bfbc7acdbce9c816a6d1936d855222",
-          "node_modules/node-pty/build/Release/pty.node": "f6460eb0835a353bcb2bdab32ff5b56455f85a432f3d2c70082274cb8ec64768",
+          "node_modules/node-pty/build/Release/pty.node": "221b7e44f343de873f318fce5117887c11337963f5d5b83c2388a605531ec9f9",
           "ripgrep/linux-arm64/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda"
-        }
+        },
+        "packagedRipgrep": true
       },
       "linux-x64-glibc": {
         "files": {
           ".server-target": "ffed780ac8653bacfdaa1dd591acf15a0f9c969d0097cc51cfef2ea54952fd98",
-          ".runtime-node": "923a4d31d9d9fed1874d583aeda69d26cd546fc7c4c525a883ac5c3249f7528b",
+          ".runtime-node": "3067dc7b5a5936bbd8256487029ef2831a1442eb5f3f4ca62eb93cc37c41dc5e",
           "node_modules/@parcel/watcher/watcher.node": "f5a86a5231fb33c6c1830649eafd2c9e72647edb45aad753148d08cee6a42dea",
-          "node_modules/node-pty/build/Release/pty.node": "7958845dd174cef8bde8d1f8ecf03f4d0e8448954332e21002424b053ffd027e",
+          "node_modules/node-pty/build/Release/pty.node": "a72a3e4c751533cde1f6438a4f912f2595fba43a877cd9a49f0e8374e9da4765",
           "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
-        }
+        },
+        "packagedRipgrep": true,
+        "browserName": "agent-browser-linux-x64",
+        "browserSha256": "aa82c8ee81a38b8ad9ba61af02ced6dcbbb8af36dd8b2b479384177f8aa077a6",
+        "packagedBrowser": true
       },
       "linux-arm64-musl": {
         "files": {
           ".server-target": "9054b0b271cb949791124f04098a2dff343a8117df3824a874087a0fda1faf7c",
-          ".runtime-node": "2d948129b2463032ae4b1509d60c0db9059d339d412b8cdeb7cf3d512faf32e8",
+          ".runtime-node": "8227928aa8b37932798a2cf5fb616da7e914dc47d6e1b1af510a5b3d882fdb28",
           "node_modules/@parcel/watcher/watcher.node": "d2851a5a42053a91f8df28e0f81da539809cd2f30752215a6a10358113194cc6",
-          "node_modules/node-pty/build/Release/pty.node": "a0050fc6fcd4810a93c48d7ca35f096da2011c1e29129d0deddea33082dbe5df",
+          "node_modules/node-pty/build/Release/pty.node": "13881954191af84639934cddc0ee2216b8dcda7936a9fb7290a696c47b45f94a",
           "ripgrep/linux-arm64/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda"
-        }
+        },
+        "packagedRipgrep": true
       },
       "linux-x64-musl": {
         "files": {
           ".server-target": "ba69a3e982cc2a74091968fe45c3b60a93bd383b277f62c0b0d779003cfd8667",
-          ".runtime-node": "cc3fc59820ff794db8f7f2b702f0a049de26bacc3deef7e2281451b13c59e455",
+          ".runtime-node": "912c17fee8910c8f4b755c7bbd648f4dd3fcc028164458c1474a9f7bf5bfd62c",
           "node_modules/@parcel/watcher/watcher.node": "fea0cee2d578a5aa62c6cdceb61bc4392031d5a3c37a75afb4a3e109a99061f6",
-          "node_modules/node-pty/build/Release/pty.node": "8fbd60eee2d3a95032a29712139004dda5a2a136c99b93796e8d483b5c222232",
+          "node_modules/node-pty/build/Release/pty.node": "ad094361b3d891d89c7ea33782f2034efe038119925e41580fcb760bf02475dc",
           "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
-        }
+        },
+        "packagedRipgrep": true
       },
       "win32-arm64": {
         "files": {
           ".server-target": "bfe7ef81988d092c602bf7ec846c92e9cc3efd47e836c63e5fc93b6b3cf3e8a9",
-          ".runtime-node": "c59c709f4904fe3378c87e448050362e46b6f76dfdd44ec87797b7c5bab35b64",
-          "node_modules/@parcel/watcher/watcher.node": "0973af9423367edd1f10643f5c4265dac7d6e487d376a2d4d29f884b6d8725fc",
-          "node_modules/node-pty/build/Release/conpty.node": "566f8276861418e220cb69c5d4270fcb7910af00c28c309e4bde2e0fbaed340e",
-          "node_modules/node-pty/build/Release/conpty_console_list.node": "38dc1131a39f9831500078610ff6f133188a0040df3b52dc7b74ba57bf748fa0",
+          ".runtime-node": "bf8da14605254bd8d2cc5e8cf87ede2ca523e8a5b0e1d386b5c640f96ada13a3",
+          "node_modules/@parcel/watcher/watcher.node": "567e692999ed7ba444518f7a91a5fbfd03c241e5dc3ed33241c1a7e522df67a0",
+          "node_modules/node-pty/build/Release/conpty.node": "e64d1f2c98b5b2c2e80703496ffd3e1e73fdb8d806a88be8febf9bad347c6e8c",
+          "node_modules/node-pty/build/Release/conpty_console_list.node": "fda76b16afb3bf9a4de085c943b5fb4138ecbeb08e8254c09d5555ea5426bd4e",
           "node_modules/node-pty/build/Release/conpty/conpty.dll": "b6cca5f1081111f59e5255eec043d924ebd11a86d09986c0d121b680540b3380",
           "node_modules/node-pty/build/Release/conpty/OpenConsole.exe": "b7763ba27e80d5e84f9e60d1368ec2ddb25dfd10283336c0c9f3f252d35cb2f8",
-          "ripgrep/win32-arm64/rg.exe": "b5a8a2dfecc1d7135dfb31a53565b460bfaf475a670b2bb101d96b5276ee63a1",
-          "windows-process-tree.node": "387ceb7e0faff18f44632a6898cd0ef972c0ca34f7d9e4c34e0242b18b61144c"
-        }
+          "node_modules/node-pty/build/Release/pty.node": "eae1266e3c34f4c7b67a756a6ff342b699847deaf29c944b7a6bed190ec61982",
+          "node_modules/node-pty/build/Release/winpty.dll": "0247b4d007fcb8059cc2221ec41d736fa548246ce1e10256c15c96d1ef6f2e9c",
+          "node_modules/node-pty/build/Release/winpty-agent.exe": "9a5f66fbe444728988f51e8099d0d84c515945a1873dbbbec65aec6e07eac50a",
+          "ripgrep/win32-arm64/rg.exe": "0015ba7dfb2d8b62c39332d64e50c6e85f75230125e10c50a950ed14995c79bf",
+          "windows-process-tree.node": "3b9434a3a258d08edf74dc316d302ff8e574c3386e353d323895ace2c9b76821",
+          "windows-security.node": "3f4cd0b51cc8b681406042032d8e7110dc541b62b455e14a01785edeaf537c52",
+          "bin/orca.exe": "3aa8ff347f4a506d5dadf6d642dd78b26ea071c7f848dc6d9eb81b54eb40a441"
+        },
+        "packagedRipgrep": true
       },
       "win32-x64": {
         "files": {
           ".server-target": "47865cb70f3801831acc971cb8fa442c22587d52136e7eb50e44d430d60e152f",
-          ".runtime-node": "cf7540d3587df8e2c154cfbbbcbd7fc16d89f04eb0a66c9d0a4b408793a38f22",
-          "node_modules/@parcel/watcher/watcher.node": "d413706789f565f197870a7fa4cb5618deb0ea463d8b5ecbf65c16c7b4fb1cf5",
-          "node_modules/node-pty/build/Release/conpty.node": "dbafac4d07096a972182fe783b741968413cf67d7d913e28744c85d47a01cbbf",
-          "node_modules/node-pty/build/Release/conpty_console_list.node": "72b016971b9c01fe8beeaa58937e26db1de4bf4cb16aa1fac755f262eb29e088",
+          ".runtime-node": "f0a2f3a3c4bfaa0975093fd6e1c6bf9a31f1460fe20113bc8acaf61aab8cc128",
+          "node_modules/@parcel/watcher/watcher.node": "f316d0bcd926c4651f967a0d193609de1fc18d3b0408f525f7ce0d08e566774b",
+          "node_modules/node-pty/build/Release/conpty.node": "795677a0ebd0197335ea55ceaa213e595733dd493c85d75f740223530a6fcb13",
+          "node_modules/node-pty/build/Release/conpty_console_list.node": "879dd94cfc79f1e263a00077597ae9448a5394b7d193381aaa50d992a1f91090",
           "node_modules/node-pty/build/Release/conpty/conpty.dll": "7c7430632052ff703540b68371ec43821820aa1335d8e11dfbcd9ff00e9daaed",
           "node_modules/node-pty/build/Release/conpty/OpenConsole.exe": "d1fe7faa62f9e955e2ac2371f95d7e5513df4d496255097158f979c94782c5fc",
-          "ripgrep/win32-x64/rg.exe": "2b727484d978fb2242433c66b1d819ccdb8ed43c9b9bf6573758c29ae7ae2aa2",
-          "windows-process-tree.node": "52d56400cf1d31b0e3ddc5dba03ad7e3d3691cee0fa3b4ad6c62e066837754a8"
-        }
+          "node_modules/node-pty/build/Release/pty.node": "ae323edd0835ee7b9e18cc96a7b2bb4b8173ff768317d178af2788406feb71ff",
+          "node_modules/node-pty/build/Release/winpty.dll": "e1cb26d868c954ba26817bedf3e4a5744e4ca2030adf51a7156e5ff2fadb881b",
+          "node_modules/node-pty/build/Release/winpty-agent.exe": "0c4834a0ab2a4f8c855a2f1db9b21fa6e5fc324ae8e3c82addd53d503d999825",
+          "ripgrep/win32-x64/rg.exe": "f9dde63498b3193f098355dbec97af99dc4f6b8fa0df5ed04114a03012c042cb",
+          "windows-process-tree.node": "8f754e889fa40bad8019e70a032c1995cdc45245c5af1953d04259b17c1f86e4",
+          "windows-security.node": "d6a0d244a78ff92d554d2b4e071ab3b908c0a750a5307d4f04fabd834b0a5557",
+          "bin/orca.exe": "be867db9f60e3cae0e9973239cb851bfcf2c6840bc89667f98b0e5aafc18b5ce"
+        },
+        "packagedRipgrep": true
       },
       "linux-x64-glibc217": {
         "files": {
           ".server-target": "c68cb72de5f5bd4454cdd517b10d5ce40ac9499f143ee7c2b0f513be5aeb2ce5",
-          ".runtime-node": "b4cb3a0cb80a39f924726900e82bb8cf724525b571c41b8d3b9081d6ee5f2037",
+          ".runtime-node": "fac75a1ca26672244e3ace642468b187fbe410e078ab8c50835fef8625dbc738",
           "node_modules/@parcel/watcher/watcher.node": "110f2f5f8078c6cd9cc2edb527946c52b6c8b46e6d6fffb5939382e3fa010772",
-          "node_modules/node-pty/build/Release/pty.node": "0a1f271402b06c4ad7d8bf421386dd6618130b87527b1a61dad3405bc3bc88a2",
+          "node_modules/node-pty/build/Release/pty.node": "edc2dfef08ce2d1066caea2fc6c6b87286363114e1e59cf5f441a53c4615048c",
           "ripgrep/linux-x64/rg": "193906679498de4d939345b937fa24e0e69a03c244bd70c859f5e41232713f21"
-        }
+        },
+        "packagedRipgrep": true,
+        "browserName": "agent-browser-linux-x64",
+        "browserSha256": "aa82c8ee81a38b8ad9ba61af02ced6dcbbb8af36dd8b2b479384177f8aa077a6",
+        "packagedBrowser": true
       }
     }
   }

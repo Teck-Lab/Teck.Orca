@@ -1,0 +1,4 @@
+appName: local-argo-rollouts
+destNamespace: argo-rollouts
+annotations:
+  argocd.argoproj.io/sync-wave: "0"

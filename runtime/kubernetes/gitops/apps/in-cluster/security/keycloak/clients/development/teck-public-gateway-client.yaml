@@ -1,0 +1,27 @@
+apiVersion: keycloak.hostzero.com/v1beta1
+kind: KeycloakClient
+metadata:
+  name: teck-public-gateway-teck-cloud-development
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  clusterRealmRef:
+    name: teck-cloud-development
+  definition:
+    clientId: teck-public-gateway
+    name: Teck Public Gateway (Development)
+    protocol: openid-connect
+    publicClient: false
+    serviceAccountsEnabled: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    attributes:
+      pkce.code.challenge.method: S256
+      standard.token.exchange.enabled: "true"
+      access.token.lifespan: "300"
+    redirectUris:
+      - https://dev-api.teck.dk/*
+    webOrigins:
+      - https://dev-api.teck.dk
+  clientSecretRef:
+    name: yarp-gateway-keycloak-dev

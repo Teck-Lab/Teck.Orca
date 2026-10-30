@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-orca-scrollbars="sleek">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:," />
+<title>Orca</title>
+<style id="expo-reset">html,body{height:100%}body{overflow:hidden}#root{display:flex;height:100%;flex:1}</style>
+<style id="orca-native-parity">:where(input:focus,textarea:focus){outline:none}:where(body){-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}:where(input,textarea,[contenteditable]){-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}</style>
+<style id="orca-scrollbars">/* Mobile defaults stay below explicit scroll-indicator visibility rules. */
+
+.scrollbar-sleek,
+:where([data-orca-scrollbars='sleek'] *) {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground, #737373) 34%, transparent) transparent;
+}
+
+.scrollbar-sleek::-webkit-scrollbar,
+:where([data-orca-scrollbars='sleek'] *)::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-track,
+:where([data-orca-scrollbars='sleek'] *)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb,
+:where([data-orca-scrollbars='sleek'] *)::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground, #737373) 28%, transparent);
+  border: 3px solid transparent;
+  border-radius: 0;
+  background-clip: padding-box;
+  min-height: 28px;
+}
+
+/* Thicker variant for dense data tables where the default 6px-thumb is hard to grab. */
+.scrollbar-sleek-lg {
+  scrollbar-width: auto;
+}
+
+.scrollbar-sleek-lg::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+.scrollbar-sleek-lg::-webkit-scrollbar-thumb {
+  border-width: 3px;
+  min-height: 36px;
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb:hover,
+:where([data-orca-scrollbars='sleek'] *)::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--muted-foreground, #737373) 48%, transparent);
+}
+
+.scrollbar-sleek::-webkit-scrollbar-thumb:active,
+:where([data-orca-scrollbars='sleek'] *)::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in srgb, var(--foreground, #171717) 36%, transparent);
+}
+
+.scrollbar-sleek-parent:hover .scrollbar-sleek,
+.scrollbar-sleek:hover,
+:where([data-orca-scrollbars='sleek'] *:hover) {
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground, #737373) 48%, transparent) transparent;
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/assets/7f0ea8a6946b31128549a114073f50752f2dc2b90890e716c347a068058b657e.js"></script>
+</body>
+</html>

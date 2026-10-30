@@ -46,9 +46,17 @@ isolation boundary. This does not disable HTTPS certificate validation.
 ## Development toolchain
 
 .NET SDK 10.0.401 (with matching .NET/ASP.NET Core runtimes), Node/npm, Bun,
-TypeScript, GCC/G++/Make, Python 3/pip/uv, Go, Java, Docker Engine/Compose/Buildx, Git/LFS/GPG and GitHub CLI are installed.
+TypeScript, GCC/G++/Make, Python 3/pip/uv, Go, Java, Docker Engine/Compose/Buildx,
+kind 0.33.0, kubectl 1.37.1, Git/LFS/GPG and GitHub CLI are installed.
 Next.js DevTools MCP and Biome are available. Language servers for C#,
 TypeScript/JavaScript, HTML/CSS/JSON, ESLint, Tailwind, Python, Bash, YAML,
 Dockerfiles, Markdown, Terraform and Helm are on PATH. OMP discovers applicable
 servers from this worktree?s project markers; an empty LSP override preserves
 its built-in defaults. Use repository SDK/version requirements when present.
+
+For Kubernetes tests, kind uses the Docker Engine inside this project sandbox.
+Clusters are created on demand, never at sandbox startup. Give each concurrent
+task a unique cluster name and explicit kubeconfig path; pass that kubeconfig
+to kubectl instead of changing another session's default context. Remove only
+the cluster created for your task when its tests finish. Select a kind-supported
+node image matching the application's Kubernetes version when required.

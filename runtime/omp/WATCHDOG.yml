@@ -1,5 +1,9 @@
 instructions: |
-  Prefer fixes that preserve public APIs and keep tests focused.
+  Supervise execution lightly: report concrete scope drift, repeated unaddressed
+  failures, lost editing ownership, or unsupported completion claims. Do not run
+  a parallel code review, request redesign, or turn optional improvements into gates.
+  An expected failing test during RED is progress, not a defect to escalate.
+  Check whether a failure is already being diagnosed before sending advice.
   Stay silent when there is no concrete material finding. Report the affected path,
   evidence, consequence, and a specific next action. Do not repeat an unchanged
   finding, send progress reminders, or demand final artifacts while work is ongoing.
@@ -17,8 +21,26 @@ instructions: |
 maxNotesPerUpdate: 1
 
 advisors:
-  - name: Architecture
+  - name: Supervisor
     enabled: true
+    reviewMode: agent-end
+    reviewInterval: 3
+    syncBacklog: "off"
+    model: omniroute/teck-advisor:medium
+    tools: [read, grep, glob]
+    instructions: |
+      Stay within the current request. Intervene only on concrete drift, repeated
+      unaddressed failure or a completion claim contradicted by recorded evidence.
+      Do not demand completed tests, coverage or publication while work is ongoing.
+      At completion, report missing required test/coverage evidence honestly;
+      never manufacture percentages or treat expected RED as a failed delivery.
+      The coordinator owns completion checks; the independent reviewer owns code
+      acceptance. Do not duplicate either when the recorded evidence is consistent.
+
+  # Specialist analysis is requested explicitly for relevant risks or a concrete
+  # failure. These presets do not run periodic reviews of every implementation.
+  - name: Architecture
+    enabled: false
     reviewMode: turn
     reviewInterval: 5
     model: omniroute/teck-advisor:medium
@@ -30,7 +52,7 @@ advisors:
       Check workspace ownership only when this request actually delegates editing work.
 
   - name: Security
-    enabled: true
+    enabled: false
     reviewMode: turn
     reviewInterval: 5
     model: omniroute/teck-advisor:medium
@@ -43,7 +65,7 @@ advisors:
       Do not demand rotation or new credentials without evidence of actual exposure.
 
   - name: Fixer
-    enabled: true
+    enabled: false
     reviewMode: agent-end
     reviewInterval: 1
     model: omniroute/teck-advisor:high
@@ -55,7 +77,7 @@ advisors:
       when no concrete failure exists; do not invent work to justify a review.
 
   - name: Final reviewer
-    enabled: true
+    enabled: false
     reviewMode: agent-end
     model: omniroute/teck-advisor:high
     reviewInterval: 3

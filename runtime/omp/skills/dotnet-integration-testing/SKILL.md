@@ -10,6 +10,12 @@ settings, and CI commands before adding infrastructure. Reuse the repository's
 test host and fixture lifecycle. Keep unit tests isolated from containers; do
 not replace existing infrastructure just to standardize an example.
 
+Apply the shared [test-first and coverage contract](../orca-feature-workflow/references/testing.md)
+at the real boundary: execute the new regression/acceptance scenario before
+the fix, establish its behavioral RED, then implement and verify GREEN. A failed
+image pull, unready service or missing dependency is not that RED. Preserve
+comparable line/branch coverage and reuse fixtures for focused iterations.
+
 ## Define the boundary
 
 - Use a real database for SQL translation, constraints, transactions, migrations,

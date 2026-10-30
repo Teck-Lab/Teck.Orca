@@ -1,0 +1,4 @@
+appName: local-kgateway
+destNamespace: kgateway-system
+annotations:
+  argocd.argoproj.io/sync-wave: "1"

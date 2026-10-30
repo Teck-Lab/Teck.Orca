@@ -11,7 +11,7 @@ runtime_hash=$(cat "$payload/targets/$target/.runtime-node")
 install -d -m 755 /opt/teck-orcad/server "/opt/teck-orcad/runtimes/node-$runtime_hash"
 cp -R "$payload/common/." /opt/teck-orcad/server/
 cp -R "$payload/targets/$target/." /opt/teck-orcad/server/
-tar -xzf "$payload/node/node-v24.21.0-linux-$arch.tar.gz" --strip-components=1 -C "/opt/teck-orcad/runtimes/node-$runtime_hash" -- "node-v24.21.0-linux-$arch/bin/node" "node-v24.21.0-linux-$arch/LICENSE"
+tar -xzf "$payload/node/node-v24.22.1-linux-$arch.tar.gz" --strip-components=1 -C "/opt/teck-orcad/runtimes/node-$runtime_hash" -- "node-v24.22.1-linux-$arch/bin/node" "node-v24.22.1-linux-$arch/LICENSE"
 printf '%s  %s\n' "$runtime_hash" "/opt/teck-orcad/runtimes/node-$runtime_hash/bin/node" | sha256sum --check
 chmod 755 "/opt/teck-orcad/runtimes/node-$runtime_hash/bin/node" "/opt/teck-orcad/server/ripgrep/linux-$arch/rg"
 install -m 755 /usr/share/teck-orcad/orca /usr/local/bin/orca-ide

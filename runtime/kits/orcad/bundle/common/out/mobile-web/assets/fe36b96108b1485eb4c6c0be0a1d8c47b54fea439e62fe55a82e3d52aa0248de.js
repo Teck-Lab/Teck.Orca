@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+var t="accounts.codex-reset-credit.v1",s="accounts.import-host-credentials.v1",I="accounts.claude-sign-in.v1",c="accounts.antigravity-native.v1",o="accounts.antigravity-chat-sign-in.v1",n="accounts.managed-data-profiles.v1",T="accounts.usage-credentials.v1",A="accounts.host-sign-in.v1",_=[s,I,c,o,n,t,T,A];export{t as a,_ as b};

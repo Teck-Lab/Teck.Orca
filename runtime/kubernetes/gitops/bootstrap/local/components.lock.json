@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kubernetes": {
+    "version": "1.35.8",
+    "nodeImage": "kindest/node:v1.35.8@sha256:07b2536e30b803ed61d1677a79df6115f798ce64c80f9e22f6ed45afd09323c0"
+  },
+  "helm": {
+    "version": "3.22.1",
+    "sha256": {
+      "x64": "896cf63684a42a723d61c980369d6e588330927deb13676ca0d85006dd6da0ea",
+      "arm64": "4c29e286b279d170fa048ddfc3e4e83dcd069ca9c52102766ba672d7149e694d"
+    }
+  },
+  "gatewayAPI": {
+    "version": "1.5.1",
+    "url": "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml",
+    "sha256": "64ec76609a6ac885e0405dea79ca509c229fa019d342f0857aa8b6bdc8b8ba92"
+  },
+  "charts": [
+    {
+      "name": "cert-manager",
+      "namespace": "cert-manager",
+      "chart": "cert-manager",
+      "repository": "https://charts.jetstack.io",
+      "version": "v1.21.3",
+      "archive": "cert-manager-v1.21.3.tgz",
+      "sha256": "9ec67938b2981d8b333af61b3fcf53e26b4f6f5deb7ccda3de4ea116bb373a17",
+      "values": "apps/local/platform/cert-manager/values.yaml",
+      "source": "apps/local/platform/cert-manager"
+    },
+    {
+      "name": "kgateway-crds",
+      "namespace": "kgateway-system",
+      "chart": "oci://ghcr.io/kgateway-dev/charts/kgateway-crds",
+      "version": "v2.4.7",
+      "archive": "kgateway-crds-v2.4.7.tgz",
+      "sha256": "c1e627a1823af90504e09eabc779eff49707c5aa477b8486b1cbe386ef92c021",
+      "values": "apps/local/network/kgateway-crds/values.yaml",
+      "source": "apps/local/network/kgateway-crds"
+    },
+    {
+      "name": "kgateway",
+      "namespace": "kgateway-system",
+      "chart": "oci://ghcr.io/kgateway-dev/charts/kgateway",
+      "version": "v2.4.7",
+      "archive": "kgateway-v2.4.7.tgz",
+      "sha256": "34b0841392362828e4b1da2341207e6d634dbb8e415a7c289b1f06290b99d69d",
+      "values": "apps/local/network/kgateway/values.yaml",
+      "source": "apps/local/network/kgateway"
+    },
+    {
+      "name": "argo-rollouts",
+      "namespace": "argo-rollouts",
+      "chart": "argo-rollouts",
+      "repository": "https://argoproj.github.io/argo-helm",
+      "version": "2.43.8",
+      "archive": "argo-rollouts-2.43.8.tgz",
+      "sha256": "1c998ee3cd72a078ca73ba399644198fe8a446399b5fc5bbff94af5043a0747d",
+      "values": "apps/local/system/argo-rollouts/values.yaml",
+      "source": "apps/local/system/argo-rollouts"
+    },
+    {
+      "name": "cloudnative-pg",
+      "namespace": "cnpg-system",
+      "chart": "cloudnative-pg",
+      "repository": "https://cloudnative-pg.github.io/charts",
+      "version": "0.28.0",
+      "archive": "cloudnative-pg-0.28.0.tgz",
+      "sha256": "81d37894f3606df9bd91c5519053f41a79e833d28aca252ffb39294cb9cb19ae",
+      "values": "apps/local/platform/cnpg-operator/values.yaml",
+      "source": "apps/local/platform/cnpg-operator"
+    }
+  ]
+}
