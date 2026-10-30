@@ -3,7 +3,7 @@
   "id": "teck-native-ssh-preview",
   "publisher": "teck-lab",
   "name": "Teck OMP Native SSH Preview",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Run on recipe: create or reuse one Docker Sandbox per project, connect automatically over native Docker SSH, and let Orca manage its daemon and linked worktrees.",
   "engines": {
     "orca": ">=1.4.237"

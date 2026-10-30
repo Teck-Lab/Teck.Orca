@@ -7,12 +7,16 @@ description: Launch and reconcile visible OMP executor/reviewer sessions on an e
 
 ## Assigned worker
 
+This lifecycle applies to an Orca-dispatched session. A native OMP helper follows
+its parent's task brief and native OMP lifecycle instead; it needs no Orca
+Task/Dispatch or parent-goal binding. Every role may use native helpers.
+
 The live injected Dispatch is the authority for your task, scope, issue, role,
 and reporting command. Implement/test only the assigned work, use its blocking
 ask/reply channel, check follow-ups at natural checkpoints and before reporting,
 then send worker_done with the actual outcome and idle. The coordinator owns
 integration, publication, and terminal release. Do not create a new issue tree,
-redelegate the whole assignment, close your own terminal, or start another
+abandon ownership of the assignment, close your own terminal, or start another
 sandbox/daemon.
 
 A reviewer follows the [review contract](../orca-feature-workflow/references/review-gates.md)
@@ -22,13 +26,13 @@ and execution-host orchestration guide own exact lifecycle flags and heartbeats.
 A technical planning/research assignment follows the
 [research contract](../orca-feature-workflow/references/technical-planning.md).
 Return evidence and a proposed plan to the coordinator; preserve read-only scope.
-Use a visible Orca researcher Dispatch with the existing slow role; native
-technical-planner/task helpers are disabled in this workflow.
+Use the existing slow role for research, through native helpers or a visible
+Orca researcher Dispatch. Researchers and reviewers may also delegate natively.
 
 ## Coordinator: dispatch
 
-The coordinator never implements. Every implementation issue, including a
-contained fix, receives a task-role executor through orca_dispatch. Keep the
+The coordinator delegates implementation. Use a task-role native helper or
+orca_dispatch for an independently owned executor/worktree. Keep the
 existing issue unless separate deliverables warrant sub-issues. Every implementation owner follows the
 [test-first and coverage contract](../orca-feature-workflow/references/testing.md)
 and supplies its test/coverage evidence with delivery.
@@ -67,9 +71,11 @@ both feature and executor may reference the same issue. Issue hierarchy and
 Orca child-worktree hierarchy are independent. Correct missing parentage using
 the exact feature selector before claiming successful dispatch.
 
-Keep one editing owner per checkout. All scouting/research also uses Orca
-Dispatches; native OMP task/eval helpers are disabled. Each worker creates the
-exact native OMP assignment goal before work and completes it only with evidence,
+Coordinate concurrent edits per file. Every role may use native OMP task/eval
+helpers for implementation, research, review or other scoped work. OMP owns their
+lifecycle; helpers return results to the parent rather than claiming its Orca
+Dispatch. Each Orca worker creates the exact native OMP assignment goal before
+work and completes it only with evidence,
 then reports through the live worker_done contract and idles.
 The structured report action stages a report submitted before native goal
 completion and delivers it after that exact goal completes. Finalize the goal

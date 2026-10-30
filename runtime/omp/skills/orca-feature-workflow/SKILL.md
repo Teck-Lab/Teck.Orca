@@ -36,18 +36,19 @@ implementation. Select issue structure using the planning skill's
 A single issue remains sufficient for a contained change, including its tests.
 Risk changes verification depth; it does not itself require sub-issues.
 
-The coordinator plans from GitHub metadata and worker evidence. Dispatch source
-investigation and uncertain design questions through Orca on the configured slow
-role; follow the [research contract](references/technical-planning.md). Do not use
-native task/scout helpers. Keep the coordinator as canonical plan writer and
-project code read-only during investigation.
+The coordinator plans from GitHub metadata and helper/worker evidence. Use native
+OMP task/eval helpers or an Orca researcher on the configured slow role for source
+investigation and design questions; follow the [research contract](references/technical-planning.md).
+Every role may delegate natively as needed. Keep the coordinator as canonical plan
+writer and project code read-only during investigation.
 
-Every implementation is delegated to the configured task-role OMP executor,
-including contained fixes. Each editing worker uses its own visible checkout.
+Delegate implementation to the configured task role, using native OMP helpers or
+an independently owned Orca executor/worktree as appropriate.
 When supervising workers, record issue -> Orca Task -> Dispatch -> worktree;
 create/reuse one Run and dispatch ready work against actual dependencies. Direct
-implementation still uses an Orca Task/Dispatch, but needs no synthetic GitHub
-sub-issue or second orchestration layer. Use orca_dispatch with an explicit
+implementation needs no synthetic GitHub sub-issue or second orchestration layer.
+Native helpers keep their OMP lifecycle and return results to their parent; they
+need no separate Orca records. For visible Orca workers use orca_dispatch with an explicit
 objective, acceptance criteria and constraints; it resolves existing model roles.
 Code changes follow the [test-first and coverage contract](references/testing.md).
 
@@ -71,8 +72,8 @@ An implementation/fix request in the user's repository includes the tracked
 issue plan and canonical PR creation/update, subject to explicit read-only,
 planning-only, local-only or no-publication instructions. Respect human closure,
 existing ownership, and the user's concurrency budget. An assigned executor uses
-its supplied issue/plan and Dispatch; it does not recursively plan/delegate the
-assignment or publish a competing PR.
+its supplied issue/plan and Dispatch, may use native helpers as needed, and remains
+responsible for acceptance rather than publishing a competing PR.
 
 Removing worktrees requires the user's cleanup scope and accepted integration/
 publication. Use Orca, never raw filesystem cleanup. Feature/worktree deletion

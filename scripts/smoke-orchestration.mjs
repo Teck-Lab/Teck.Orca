@@ -30,13 +30,13 @@ const cli = args => { const result = JSON.parse(guest(['orca-ide', ...args, '--j
 const put = (path, content) => guest(['node', '-e', `require('fs').writeFileSync(process.argv[1],Buffer.from(process.argv[2],'base64'))`, path, Buffer.from(content).toString('base64')]);
 async function launchPolicyProbe(worktree) {
   put('/tmp/teck-conflicting.yml', 'goal: { enabled: false }\nadvisor: { enabled: true }\n');
-  put('/tmp/teck-policy-inspector.mjs', `import fs from 'node:fs';export default function(pi){pi.on('before_agent_start',(_event,ctx)=>{const tools=pi.getActiveTools();fs.writeFileSync('/tmp/teck-launch-policy-proof.json',JSON.stringify({policyLoaded:ctx.sessionManager.getBranch().some(e=>e.customType==='teck-orca-contract'),nativeGoalAvailable:tools.includes('goal'),forbiddenToolsAbsent:['bash','edit','write','eval','task'].every(t=>!tools.includes(t)),noExtensionsFlag:process.argv.includes('--no-extensions'),configOrder:process.argv.filter((a,i)=>process.argv[i-1]==='--config')}));});}`);
+  put('/tmp/teck-policy-inspector.mjs', `import fs from 'node:fs';export default function(pi){pi.on('before_agent_start',(_event,ctx)=>{const tools=pi.getActiveTools();fs.writeFileSync('/tmp/teck-launch-policy-proof.json',JSON.stringify({policyLoaded:ctx.sessionManager.getBranch().some(e=>e.customType==='teck-orca-contract'),nativeGoalAvailable:tools.includes('goal'),directExecutionToolsAbsent:['bash','edit'].every(t=>!tools.includes(t)),nativeDelegationAvailable:['task','eval','wait','write'].every(t=>tools.includes(t)),noExtensionsFlag:process.argv.includes('--no-extensions'),configOrder:process.argv.filter((a,i)=>process.argv[i-1]==='--config')}));});}`);
   const terminal = cli(['terminal', 'create', '--worktree', `id:${worktree}`, '--title', 'Launch policy probe', '--command',
     "omp --no-title --no-extensions --config /tmp/teck-conflicting.yml --extension /tmp/teck-policy-inspector.mjs 'Read-only launch-policy probe. Reply POLICY_PROBE_OK. Do not create tasks or change records.'"]);
   for (let i = 0; i < 40; i++) {
     const value = JSON.parse(guest(['node', '-e', "const fs=require('fs');console.log(fs.existsSync('/tmp/teck-launch-policy-proof.json')?fs.readFileSync('/tmp/teck-launch-policy-proof.json','utf8'):'null')"]));
     if (value) {
-      assert.ok(value.policyLoaded && value.nativeGoalAvailable && value.forbiddenToolsAbsent && value.noExtensionsFlag);
+      assert.ok(value.policyLoaded && value.nativeGoalAvailable && value.directExecutionToolsAbsent && value.nativeDelegationAvailable && value.noExtensionsFlag);
       assert.equal(value.configOrder.at(-1), '/home/agent/.omp/agent/orchestration.yml');
       return { ...value, terminal };
     }
@@ -52,15 +52,20 @@ try {
   const repoId = added.repo?.id ?? added.id ?? added.repoId;
   const parent = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'goal-coordinator', '--no-parent', '--setup', 'skip']).worktree;
   report.worktree = parent.id;
+  if (process.argv.includes('--launch-policy-only')) {
+    report.launchPolicy = await launchPolicyProbe(parent.id);
+    report.ok = true;
+  } else {
   const prompt = `Controlled isolated workflow validation. LOCAL ONLY: no GitHub records, remote Git operations, publication or merge.
 Your authorized goal is: deliver a reviewed clamp fix through Orca workers in this disposable fixture.
 You are only the coordinator. Create the native goal and native todos, then use orca to create/bind one Run.
+Before implementation, use native task to consult technical-planner. If its configured provider is unavailable, try it only once and use a default native helper with a read-only planning brief; do not remap models. Ask the planner to use one native read-only helper to inspect the clamp fixture. Pass the precise requirement (min>max throws RangeError, all other behavior preserved) and the exact GREEN/coverage command below to both helpers. Return a short proposed plan, then adopt it. Native helpers return to their parent; they must not claim an Orca Dispatch or its native goal.
 Dispatch an executor through orca_dispatch in new-child named clamp-executor. Objective: clamp rejects inverted ranges.
 Acceptance: existing clamping behavior preserved; inverted min>max throws RangeError; a behavioral test demonstrates RED then GREEN;
 node --test --experimental-test-coverage --test-coverage-include=**/clamp.mjs clamp.test.mjs passes; coverage does not decrease.
-The executor must keep its native goal exact, return its worktree and evidence, send worker_done then idle. Do not create sub-issues or PRs.
+The executor must keep its native goal exact. It writes/runs the regression test to demonstrate RED, then uses a native implementation helper to implement the guard in clamp.mjs; the executor runs GREEN/coverage and accepts the result. Save a concise validation-evidence.md in the child checkout containing the actual baseline, RED failure, GREEN command/results and comparable coverage. Include this evidence path in the report, then idle. Require the helper and evidence file in assignment acceptance. Do not create sub-issues or PRs.
 Then dispatch one independent reviewer in that exact child checkout, never a fresh child, using the reviewer role.
-Its acceptance is an explicit verdict about actual code, behavior and recorded RED/GREEN/coverage evidence; use git_inspect for the diff.
+Its acceptance is an explicit verdict about actual code, tests and validation-evidence.md; use git_inspect for the diff. Pass the evidence path directly, so the reviewer need not reconstruct console/session history. Require one native read-only helper for a focused edge-case check, then independently own the final verdict. Limit review to the stated finite-bound contract; do not add speculative nonnumeric requirements or repeat accepted checks without a finding. Native delegation is allowed for every role.
 Require REVIEW_VERDICT=approve, REVIEW_VERDICT=request_changes or REVIEW_VERDICT=blocked in its report body.
 If corrections are needed, dispatch them to an executor and obtain a delta review. Do not implement or run tests yourself.
 Reconcile and release settled workers using their actual Dispatch IDs. Finish your native goal and todos only after approve and no reclaimable workers.
@@ -69,7 +74,7 @@ Do not publish anything. This is the explicit local-only acceptance gate. Stop w
     '--model', 'omniroute/teck-orchestrator', '--prompt', prompt]);
   writeFileSync(join(root, 'live.json'), JSON.stringify({ sandbox: name, worktree: parent.id, launch: report.launch }));
   const probe = `const fs=require('fs'),p=require('path');const folder='/home/agent/.local/state/teck-orca/omp-terminals';const rows=fs.existsSync(folder)?fs.readdirSync(folder).filter(n=>n.endsWith('.json')).map(n=>JSON.parse(fs.readFileSync(p.join(folder,n)))):[];const out=[];for(const r of rows){if(!r.sessionFile||!fs.existsSync(r.sessionFile))continue;const entries=fs.readFileSync(r.sessionFile,'utf8').trim().split('\\n').map(l=>JSON.parse(l));const calls=entries.filter(e=>e.type==='message'&&e.message?.role==='assistant').flatMap(e=>e.message.content??[]).filter(c=>c.type==='toolCall').map(c=>({name:c.name,args:c.arguments}));out.push({owner:r.owner,sessionId:r.sessionId,roles:entries.filter(e=>e.type==='custom'&&e.customType==='teck-orca-contract').map(e=>e.data),goals:entries.filter(e=>e.type==='mode_change'&&e.data?.goal).map(e=>e.data.goal),calls,errors:entries.filter(e=>e.type==='message'&&e.message?.role==='toolResult'&&e.message.isError).map(e=>({tool:e.message.toolName,content:e.message.content})).slice(-5)});}process.stdout.write(JSON.stringify(out));`;
-  const deadline = Date.now() + 18 * 60_000;
+  const deadline = Date.now() + 25 * 60_000;
   let last = '';
   while (Date.now() < deadline) {
     report.sessions = JSON.parse(guest(['node', '-e', probe]));
@@ -83,7 +88,11 @@ Do not publish anything. This is the explicit local-only acceptance gate. Stop w
       const reviewers = report.sessions.filter(s => s.roles.at(-1)?.role === 'reviewer' && s.roles.at(-1)?.authority?.runId === runId);
       assert.ok(reviewers.some(s => s.goals.some(g => g.status === 'complete')));
       assert.ok(reviewers.some(s => s.calls.some(c => c.name === 'orca' && c.args.action === 'report' && /REVIEW_VERDICT=approve/.test(c.args.body))), 'This Run has explicit independent code approval');
-      assert.ok(coordinator.calls.every(c => !['bash', 'eval', 'edit', 'write', 'task', 'git_inspect'].includes(c.name)));
+      assert.ok(coordinator.calls.some(c => ['task', 'eval'].includes(c.name)), 'Coordinator used a real native planner');
+      assert.ok(executor.calls.some(c => ['task', 'eval'].includes(c.name)), 'Executor used a native implementation helper');
+      assert.ok(reviewers.some(s => s.calls.some(c => ['task', 'eval'].includes(c.name))), 'Reviewer used a native helper');
+      assert.ok(coordinator.calls.every(c => !['bash', 'edit', 'git_inspect'].includes(c.name) &&
+        (c.name !== 'write' || c.args.path?.startsWith('agent://'))));
       const run = coordinator.calls.find(c => c.name === 'orca' && (c.args.action === 'run_create' || c.args.args?.[1] === 'run-create'));
       assert.ok(run, 'Coordinator used real Orca orchestration');
       report.workers = cli(['orchestration', 'worker-list', '--run', runId]);
@@ -96,6 +105,7 @@ Do not publish anything. This is the explicit local-only acceptance gate. Stop w
       break;
     }
     await delay(5000);
+  }
   }
   assert.equal(report.ok, true, 'Goal orchestration exceeded its deadline');
 } catch (error) { report.error = error.message; process.exitCode = 1; }

@@ -23,10 +23,12 @@ Projects/milestone CRUD. No PAT, raw remote Git transport or new MCP is needed.
 Use orca_dispatch with role, objective, issue URL where applicable, observable
 acceptance criteria, constraints and explicit worktree placement. It resolves
 task/slow/advisor from OMP's live configuration; publisher uses task. The wrapper
-adds the assignment contract to Orca's Task spec. No separate model hierarchy,
-native task helpers or recursively delegating workers are allowed. Start at
-most two editing workers, subject to a narrower user/runtime limit, and dispatch
-only ready dependencies. Review/research consume the same finite capacity.
+adds the assignment contract to Orca's Task spec. Native OMP task/eval helpers are
+allowed for every role, including researchers and reviewers, without separate
+Orca records. Use existing model roles and let OMP own helper lifecycle. Dispatch
+as much independently ready work as the user's concurrency budget and actual
+provider/runtime capacity allow. Review/research and nested helpers consume that
+same finite capacity; avoid overlapping file writers or redundant investigation.
 
 The coordinator cannot inspect implementation code, edit, run tests, integrate
 or publish code. Assign investigation to researcher; implementation/testing and
@@ -42,6 +44,13 @@ use phased todos for the acceptance criteria, implementation/TDD and evidence.
 Do not invent a new issue, goal scope, milestone or PR. Executor owns code/tests;
 researcher and reviewer stay read-only; publisher may inspect the approved
 checkout and use App-backed MCP but must not edit it or merge.
+
+All roles may create native helpers as needed. The parent is accountable for
+scope, permissions, editing coordination and evidence. Helpers use their native
+OMP agent preset and task brief, not the parent's Orca identity or exact native
+goal. They return results to the parent, which retains final acceptance and
+Orca settlement. Native task/eval execution is permitted; role boundaries are
+behavioral instructions rather than isolation from delegated code execution.
 
 Only complete a goal once every assigned criterion has current evidence. A
 review assignment is complete when its report/verdict is ready, including

@@ -1,5 +1,9 @@
 # Coordinated OMP goals validation — 2026-10-28
 
+Historical evidence: the native task/eval prohibition described below was removed
+on 2026-10-30. All roles may now use native helpers; see the current
+[workflow policy](../runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md).
+
 The KIND/native SSH preview now carries the coordinated OMP workflow. Existing
 modelRoles are retained: default/plan coordinate, task implements and publishes
 through separate assignments, slow researches when needed, and advisor reviews.

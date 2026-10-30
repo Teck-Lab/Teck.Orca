@@ -37,6 +37,10 @@ function mcpName(name) {
   return name.replace(/^.*github(?:-projects)?[\/_-]+/, '');
 }
 export function permittedTool(role, name, input = {}) {
+  // Native OMP delegation is available to every role. The parent remains
+  // accountable for the helper's scope, permissions and returned evidence.
+  if (['task', 'eval', 'wait'].includes(name)) return true;
+  if (['read', 'write'].includes(name) && /^agent:\/\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_./-]+)?$/.test(input.path ?? '') && !input.path.includes('..')) return true;
   if (name === 'ask') return role === 'coordinator';
   if (['goal', 'todo', 'orca', 'orca_dispatch'].includes(name)) return name !== 'orca_dispatch' || role === 'coordinator';
   if (name === 'read') {
@@ -63,7 +67,7 @@ export function permittedTool(role, name, input = {}) {
   }
   if (role === 'executor') return ['edit', 'write', 'bash', 'grep', 'glob', 'find', 'lsp', 'ast_edit', 'ast_grep', 'debug', 'web_search'].includes(name);
   if (['researcher', 'reviewer', 'publisher'].includes(role)) return ['grep', 'glob', 'find', 'ast_grep', 'web_search'].includes(name);
-  return false; // Includes native task, eval, xd://, native github and arbitrary MCP bridges.
+  return false; // Includes xd://, native github and arbitrary MCP bridges.
 }
 
 const verbs = {
@@ -154,7 +158,7 @@ export function assignment(input) {
   if (!workerRoles[input.role] || !input.objective?.trim() || !input.acceptance?.length || input.acceptance.some(a => !a.trim())) throw Error('Worker role, objective and acceptance criteria are required');
   return `TECK_ORCA_ASSIGNMENT ${JSON.stringify(input)}\n\n` +
     'Use the native OMP goal tool to create this assignment objective before work. Keep its acceptance criteria in native todos. ' +
-    'Follow the live Orca Task/Dispatch preamble. Do only this assignment; no recursive delegation or competing PR. ' +
+    'Follow the live Orca Task/Dispatch preamble. Own this assignment; native OMP helpers are allowed as needed, without separate Orca Dispatches. Do not create a competing PR. ' +
     'Complete the native goal only with evidence for every criterion, then send worker_done and idle. ' +
     'A review goal completes when its explicit verdict/report is ready, including request_changes; it does not accept implementation. ' +
     'If blocked, ask the coordinator and leave the goal incomplete while awaiting a reply. For terminal failure, record blockers, drop the native goal without completing it, report failed and idle. ' +

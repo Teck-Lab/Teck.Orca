@@ -8,9 +8,9 @@ Research is conditional, not a mandatory phase or a new review/approval gate.
 
 ## Assign a bounded question
 
-Use orca_dispatch(role=researcher) in the existing checkout. It resolves `@slow`
-through the live `modelRoles.slow` setting. Native OMP task agents, including
-the retained technical-planner preset, are not the execution path. Do not replace
+Use the native technical-planner/research helper, or orca_dispatch(role=researcher)
+when independent visible ownership is useful. Both use the existing slow role.
+Researchers may use their own native helpers as needed. Do not replace
 the main session model or remap all planning to the specialist. `plan`, `default`,
 `task`, `advisor` and `smol` retain their existing assignments. The concrete model
 behind the researcher alias is configured in OmniRoute; do not infer it from its name.
@@ -22,10 +22,10 @@ ask for the smallest useful investigation rather than "research everything".
 Reuse prior research while its assumptions and inputs remain valid. Investigate
 new uncertainty during implementation when it could change the next step.
 
-Use one bounded Orca research Task/Dispatch on the current execution host with
-its own exact native OMP goal and acceptance criteria. Follow the user's
-concurrency limit; no recursive delegation. The worker follows reporting/release
-lifecycle without a new issue, editing checkout, sandbox or orchestration layer.
+Keep research bounded by the question and acceptance criteria. Native helpers
+return findings through OMP; an Orca researcher owns a Task/Dispatch and native
+goal and follows its reporting/release lifecycle. Follow the user's concurrency
+limit without creating a new issue, editing checkout or sandbox merely to research.
 
 ## Investigate and return a proposed plan
 

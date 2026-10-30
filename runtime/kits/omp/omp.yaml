@@ -6,11 +6,11 @@ description: Pinned OMP and Bun runtime built into the reusable mixin image.
 
 args:
   bunVersion:
-    default: "1.4.0"
+    default: "1.4.4"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: BUN_VERSION
   ompVersion:
-    default: "18.12.5"
+    default: "18.14.0"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: OMP_VERSION
 

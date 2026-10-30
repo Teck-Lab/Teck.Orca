@@ -15,7 +15,7 @@ and remote commit state. Explicit read-only, planning-only, local-only or
 no-publication instructions take precedence. Missing publication tools or access
 must be reported as a blocker. PR creation does not authorize merging.
 The feature coordinator owns the canonical PR identity and dispatches one
-task-role publication worker after independent approval. That worker inspects
+task-role publication worker or native helper after independent approval. That owner inspects
 the approved snapshot and performs this MCP/signature workflow; it must not
 edit code, merge or publish a different snapshot. Implementation workers report
 their tested changes instead of opening competing PRs. Return remote tree,

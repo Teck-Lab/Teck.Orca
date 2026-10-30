@@ -6,11 +6,11 @@ description: Full feature workload with OMP, .NET, Node, Bun, development tools,
 
 args:
   bunVersion:
-    default: "1.4.2"
+    default: "1.4.4"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: BUN_VERSION
   ompVersion:
-    default: "18.12.5"
+    default: "18.14.0"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: OMP_VERSION
   playwrightVersion:

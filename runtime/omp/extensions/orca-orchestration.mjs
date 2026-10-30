@@ -10,8 +10,11 @@ const instructions = `Teck Orca role contract:
 The coordinator only plans and manages GitHub metadata, Orca Tasks/Dispatches and messages.
 Never inspect source, implement, integrate code, run tests or publish code as coordinator.
 Workers are not coordinators: implement only their assigned scope using their role's allowed tools.
-Use orca_dispatch for EVERY implementation, research, verification/review, integration and publication assignment.
-No native task/eval subagents. Use existing OMP roles; never invent model aliases.
+All roles may use native OMP task/eval subagents as needed for their assignment.
+Choose native helpers for scoped work and Orca Dispatches for independently owned, visible sessions/worktrees.
+Native OMP owns helper lifecycle; the parent owns scope, acceptance and the final result.
+Use native wait and agent:// reads/messages for helper results and follow-ups. Settle or cancel owned helpers before final parent settlement.
+Use existing OMP roles; never invent model aliases.
 Use a native OMP goal for the authorized delivery scope, matching the GitHub milestone when supplied.
 Use native todo phases for your next coordination actions; Orca owns parallel worker state.
 Create the native goal with goal(op=create) before dispatch. Workers also create their assigned goal before work.
@@ -53,7 +56,10 @@ export default function activate(pi, dependencies = {}) {
     const result = JSON.parse(stdout);
     return result.ok === true ? result.result : result;
   });
-  let role = 'coordinator', launchRole, currentAssignment, authority, assignmentGoal, goal, pendingReport, lastReport, baselineTools, initialized = false;
+  let role = 'coordinator', launchRole, currentAssignment, authority, assignmentGoal, goal, pendingReport, lastReport, baselineTools, initialized = false, nativeChild = false;
+  const isNative = ctx => nativeChild || ctx?.agent?.kind === 'sub';
+  const parentTools = ['orca', 'orca_dispatch', 'git_inspect'];
+  const requireParent = ctx => { if (isNative(ctx)) throw Error('Orca lifecycle tools belong to the owning session; return native helper results to the parent.'); };
   const z = pi.zod;
   const environment = dependencies.environment ?? process.env;
   const reply = data => ({ content: [{ type: 'text', text: JSON.stringify(data) }], details: data,
@@ -109,15 +115,23 @@ export default function activate(pi, dependencies = {}) {
   async function tools(ctx) {
     const available = pi.getAllTools().map(t => t.name);
     const active = baselineTools ??= pi.getActiveTools();
-    // A registered native goal is explicitly activatable before the first goal exists (OMP 18.12.5).
+    // Native task/eval remain available alongside the root session's goal tools.
     const names = [...new Set([...active.filter(n => permittedTool(role, n, {})), 'read', 'goal', 'todo', 'orca', 'git_inspect',
       ...(role === 'coordinator' ? ['orca_dispatch'] : [])])];
+    for (const name of ['task', 'eval', 'wait', 'write']) if (available.includes(name)) names.push(name);
     // Argument-sensitive tools stay visible; tool_call is the authoritative boundary.
     for (const name of available) if (/github/.test(name) && ['pull_request_read', 'manage_project', 'manage_issues', 'manage_milestones', 'manage_labels', 'manage_status_updates']
       .some(suffix => name.endsWith(suffix))) names.push(name);
     await pi.setActiveTools([...new Set(names)]);
   }
   pi.on('session_start', async (_event, ctx) => {
+    nativeChild = ctx?.agent?.kind === 'sub';
+    if (nativeChild) {
+      // OMP rebinds this factory per helper. Preserve its agent preset and own
+      // lifecycle instead of claiming the parent's pane/Dispatch/goal.
+      await pi.setActiveTools(pi.getActiveTools().filter(name => !parentTools.includes(name)));
+      return;
+    }
     restore(ctx); save(); await tools(ctx);
     // Orca may accept terminal input before OMP finishes starting. Recover only
     // this pane's exact live assignment via public records, then deliver through
@@ -130,8 +144,10 @@ export default function activate(pi, dependencies = {}) {
       }
     }, 1500);
   });
-  for (const event of ['session_switch', 'session_branch', 'session_tree']) pi.on(event, async (_event, ctx) => { restore(ctx); await tools(ctx); });
+  for (const event of ['session_switch', 'session_branch', 'session_tree']) pi.on(event, async (_event, ctx) => { if (isNative(ctx)) return; restore(ctx); await tools(ctx); });
   pi.on('before_agent_start', async (event, ctx) => {
+    if (isNative(ctx)) return { systemPrompt: [...event.systemPrompt,
+      'You are a native OMP helper. Follow your parent assignment, agent preset and permissions. Native delegation is allowed as needed. Return evidence/results to the parent; it owns its Orca Task/Dispatch, native goal and final settlement. Do not claim or settle the parent session\'s lifecycle.'] };
     if (!initialized) restore(ctx);
     // Prompt text cannot mint authority, change role or narrow the assignment.
     let bound = false;
@@ -145,8 +161,9 @@ export default function activate(pi, dependencies = {}) {
       `Current fixed role: ${role}. ${currentAssignment ? `Assigned native goal: ${JSON.stringify(currentAssignment.objective)}. Acceptance: ${JSON.stringify(currentAssignment.acceptance)}.` :
         'Before substantial delivery work create the authorized native goal. Do not invent or select a different GitHub milestone.'}`] };
   });
-  pi.on('goal_updated', event => { goal = event.goal ?? undefined; });
-  pi.on('tool_result', async event => {
+  pi.on('goal_updated', (event, ctx) => { if (!isNative(ctx)) goal = event.goal ?? undefined; });
+  pi.on('tool_result', async (event, ctx) => {
+    if (isNative(ctx)) return;
     // Bind only a successfully CREATED native goal, never an accounting update,
     // failed create, unrelated resumed goal or a status copied from a prompt.
     const data = event.details;
@@ -167,9 +184,9 @@ export default function activate(pi, dependencies = {}) {
       }
     }
   });
-  pi.on('before_subagent_spawn', () => ({ block: true, reason: 'Use an Orca Task and Dispatch; native subagents are disabled for this workflow.' }));
-  pi.on('tool_call', event => {
+  pi.on('tool_call', (event, ctx) => {
     const { toolName: name, input = {} } = event;
+    if (isNative(ctx)) return parentTools.includes(name) ? { block: true, reason: 'Return native helper results to the parent; its Orca lifecycle belongs to the owning session.' } : undefined;
     if (!permittedTool(role, name, input)) return { block: true, reason: `${role}: ${name} is outside this role. Dispatch the appropriate Orca worker.` };
     if (role !== 'coordinator' && !currentAssignment && !['orca', 'read'].includes(name))
       return { block: true, reason: 'This worker needs an Orca assignment and live Task/Dispatch before starting a native goal or implementation.' };
@@ -231,7 +248,8 @@ export default function activate(pi, dependencies = {}) {
       outcome: z.enum(['succeeded', 'failed']).optional(), phase: z.string().optional(),
       types: z.string().optional(), ack: z.string().optional(), resume: z.string().optional(), timeout_ms: z.number().optional(), limit: z.number().optional(),
       worktree: z.string().optional(), issue: z.string().optional(), reference: z.string().optional() }),
-    async execute(_id, input, signal) {
+    async execute(_id, input, signal, _update, ctx) {
+      requireParent(ctx);
       if (input.action === 'report') {
         withAuthority(input);
         if (lastReport?.dispatchId === authority?.dispatchId) return reply(lastReport.receipt);
@@ -252,6 +270,7 @@ export default function activate(pi, dependencies = {}) {
       token_budget: z.number().int().positive().optional(),
       terminal: z.string().optional(), retry_request: z.string().optional() }),
     async execute(_id, input, signal, _update, ctx) {
+      requireParent(ctx);
       if (role !== 'coordinator' || goal?.status !== 'active') throw Error('An active coordinator goal is required');
       const model = ctx.models.resolve(`@${workerRoles[input.role]}`);
       if (!model) throw Error(`Configured OMP ${workerRoles[input.role]} model is unavailable`);

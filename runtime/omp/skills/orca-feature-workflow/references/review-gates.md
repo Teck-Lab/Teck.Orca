@@ -8,7 +8,8 @@ These are dedicated, independent, read-only reviews of completed changes.
 ## Select the review path
 
 The coordinator only dispatches and reconciles evidence; it never reads the code
-or runs checks itself. Use orca_dispatch(role=reviewer) on the existing checkout;
+or runs checks itself. Use an independent native OMP reviewer or
+orca_dispatch(role=reviewer) on the existing checkout;
 the independent reviewer inspects code, acceptance criteria and test evidence.
 Use one independent final review before publication for both single issues and
 features with execution sub-issues. Review the implementation owner's stable
@@ -23,13 +24,13 @@ checkout is reviewed. In the final review, reuse accepted child evidence and
 focus additional attention on integration interactions and subsequent changes.
 
 Risk can require more expertise, deeper tests or additional targeted review
-without creating sub-issues. Research/review sessions are Orca tasks referencing
+without creating sub-issues. Research/review uses native helpers or Orca tasks referencing
 the existing issue; they do not need new GitHub issues. Accepting an executor's
 delivery for integration is provisional and never substitutes for final approval.
 
 ## Reviewer placement and model
 
-The coordinator creates a bounded Orca review Task and Dispatch with its own
+For a visible Orca reviewer, the coordinator creates a bounded review Task and Dispatch with its own
 native OMP goal (deliver the verdict/report, including request_changes) on the existing
 feature Run. Launch the independent OMP reviewer in the exact existing checkout
 for the chosen review. The implementation owner must be settled/idle and that checkout
@@ -54,6 +55,12 @@ overlay to disable their own WATCHDOG advisors. An explicit --advisor request
 overrides that default. Keep custom reviewer launches equally free of nested
 background reviews; do not edit shared user settings to achieve it.
 
+Native review helpers are also allowed, including helpers used by the reviewer.
+The final reviewer must be independent of the implementation owner, own the
+verdict and inspect the stable snapshot; its helpers do not replace that gate.
+OMP owns native helper lifecycle, while an Orca reviewer uses the settlement
+contract below. Do not create an Orca Dispatch solely for a native helper.
+
 Reviewers follow the injected Dispatch contract, send `worker_done` with the
 review result, then idle. The coordinator accepts the delivered review report
 and releases its terminal through the official lifecycle. An accepted review
@@ -69,6 +76,9 @@ and comparable baseline/candidate line and branch coverage from the
 [testing contract](testing.md). Check any affected module and measured aggregate
 for decreases; missing or incomparable evidence is unresolved, not a pass.
 Include added/deleted/untracked files that belong to the work.
+Pass the executor's exact evidence artifact path/link with the assignment, with
+actual outputs/report links. Reuse that evidence instead of mining an entire
+session transcript; ask for a specific missing result when it is insufficient.
 For uncommitted changes, record their status and a content/diff fingerprint so
 the reviewed snapshot can be rechecked; do not require a signed local checkpoint
 just to perform review. Preserve unrelated user changes.

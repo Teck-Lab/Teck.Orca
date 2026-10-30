@@ -15,8 +15,8 @@ test('roles follow existing OMP configuration, with ambiguous or unknown models 
   assert.equal(resolveRole({ provider: 'gateway', id: 'doer' }, overridden, 'executor'), 'executor');
   assert.equal(resolveRole({ provider: 'gateway', id: 'lead' }, models, 'executor'), 'coordinator');
 });
-test('coordinator cannot implement, inspect source, use alternate execution bridges or publish code', () => {
-  for (const name of ['bash', 'eval', 'edit', 'write', 'task', 'github', 'lsp', 'computer', 'manage_skill', 'github__push_files']) {
+test('direct coordinator tools cannot implement, inspect source or publish code', () => {
+  for (const name of ['bash', 'edit', 'write', 'github', 'lsp', 'computer', 'manage_skill', 'github__push_files']) {
     assert.equal(permittedTool('coordinator', name, {}), false, name);
   }
   assert.equal(permittedTool('coordinator', 'read', { path: '/project/src/app.ts' }), false);
@@ -28,10 +28,13 @@ test('coordinator cannot implement, inspect source, use alternate execution brid
   assert.equal(permittedTool('coordinator', 'read', { path: 'skill://orca-workers' }), true);
   assert.equal(permittedTool('coordinator', 'read', { path: 'skill://orca-workers/../../secrets' }), false);
 });
-test('review/research stay read-only and every role must use Orca rather than native subagents', () => {
+test('every role may delegate through native task/eval while direct role-specific tools stay scoped', () => {
   for (const role of ['coordinator', 'executor', 'reviewer', 'researcher', 'publisher']) {
-    assert.equal(permittedTool(role, 'task', {}), false);
-    assert.equal(permittedTool(role, 'eval', {}), false);
+    assert.equal(permittedTool(role, 'task', {}), true, role);
+    assert.equal(permittedTool(role, 'eval', {}), true, role);
+    assert.equal(permittedTool(role, 'wait', {}), true, role);
+    assert.equal(permittedTool(role, 'read', { path: 'agent://0-Helper' }), true, role);
+    assert.equal(permittedTool(role, 'write', { path: 'agent://0-Helper' }), true, role);
     assert.equal(permittedTool(role, 'github__merge_pull_request', {}), false);
   }
   assert.equal(permittedTool('reviewer', 'edit', {}), false);
@@ -114,7 +117,25 @@ test('loaded extension requires an active native goal, dispatches configured rol
   await s.tools.get('orca_dispatch').execute('test', input, undefined, undefined, s.ctx);
   assert.ok(s.calls.some(call => call.args?.includes('gateway/doer')));
   assert.ok(s.calls.some(call => call.args?.includes('new-child')));
-  assert.equal(s.handlers.get('before_subagent_spawn')().block, true);
+  assert.equal(s.handlers.has('before_subagent_spawn'), false, 'No blanket native spawn veto is registered');
+});
+
+test('native helpers retain OMP tools and lifecycle rather than acquiring their parent Orca assignment', async () => {
+  const s = session('doer');
+  s.ctx.agent = { kind: 'sub', id: '0-helper', name: 'task', depth: 1, parentId: 'Main' };
+  s.setAssignment({ role: 'executor', objective: 'Parent assignment', acceptance: ['Verified'], constraints: 'Scope' });
+  await s.handlers.get('session_start')({}, s.ctx);
+  const result = await s.handlers.get('before_agent_start')({ prompt: 'Help parent', systemPrompt: ['Native OMP task brief'] }, s.ctx);
+  assert.ok(s.pi.getActiveTools().includes('task'));
+  assert.ok(s.pi.getActiveTools().includes('eval'));
+  assert.ok(s.pi.getActiveTools().includes('edit'), 'OMP agent preset owns native helper tools');
+  assert.equal(s.guard('edit'), undefined);
+  assert.equal(s.guard('goal', { op: 'create', objective: 'Native helper objective' }), undefined);
+  assert.ok(!s.calls.some(c => c.args), 'Native helpers do not claim the parent pane Dispatch');
+  assert.ok(!s.branch.some(e => e.customType === 'teck-orca-contract'));
+  assert.match(result.systemPrompt.join('\n'), /native OMP helper/i);
+  assert.doesNotMatch(result.systemPrompt.join('\n'), /Current fixed role|Assigned native goal/);
+  await assert.rejects(s.tools.get('orca_dispatch').execute('nested', { role: 'executor', objective: 'Nested' }, undefined, undefined, s.ctx), /parent|owning session/i);
 });
 test('worker native goal must match its Orca assignment; success requires completion and role survives resume/model changes', async () => {
   const s = session('doer');

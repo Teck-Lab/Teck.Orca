@@ -14,10 +14,10 @@ a child checkout does not require a GitHub sub-issue.
 Use this path for one coherent deliverable, even if it spans several files,
 requires research, has multiple implementation steps, or is high risk. Risk
 determines investigation, test depth and review expertise, not issue count.
-Research, test runs, reviews and revision rounds are Orca tasks/checklist items
+Research, test runs, reviews and revision rounds are native helper assignments or Orca tasks/checklist items
 under the same issue unless they are independently scoped deliverables.
 
-Flow: issue -> Orca executor goal with tests -> relevant combined checks -> one
+Flow: issue -> native executor or Orca executor goal with tests -> relevant combined checks -> one
 final independent review -> publication worker -> canonical PR. The coordinator
 never implements, including contained work. Delegation does not require a new
 GitHub sub-issue. The review reference defines the exact gate.
@@ -46,6 +46,34 @@ Flow: parent plan -> ready child executors -> integration and combined checks ->
 one final independent review -> canonical PR. An early targeted review is added
 only for a concrete high-risk boundary or required contract acceptance gate;
 sub-issue count alone does not create additional review gates.
+
+## Apply the same workflow within a sub-issue
+
+An executor owns its assigned issue and may plan its local work, use a native
+planner, and fan out native helpers for frontend, backend, database, testing or
+other useful purposes. Researchers and reviewers can also use native helpers.
+The parent accepts their evidence and remains responsible for the complete result.
+
+Apply the splitting decision at any level. A sub-sub-issue is useful when it has
+its own acceptance criteria, owner, durable blocker or independently trackable
+deliverable. An OMP helper alone never requires a GitHub issue. Executors propose
+durable decomposition/dependency changes to the main coordinator so the shared
+GitHub plan stays consistent; do not create competing issue trees or PRs.
+
+Parentage describes containment; dependency edges determine execution waves.
+For example, 1 -> {2,3} -> 4 runs 1 first, then 2 and 3 concurrently, then 4 once
+its actual prerequisites are accepted and available in the execution checkout.
+If 4 needs both 2 and 3, record both blockers; if it needs only 2, record only 2.
+Several blockers mean all listed prerequisites, not interchangeable alternatives.
+Start every independently ready branch within the user's/provider's/runtime's
+capacity. Recompute readiness as work is accepted or a new blocker is discovered.
+
+Dependency acceptance requires actual tests/artifact evidence, not merely a
+helper's completion message. Within one integration PR, record prerequisite
+readiness without closing GitHub issues merely to advance scheduling; issue/PR
+closure still follows its agreed delivery gate. A final independent review covers
+the deliverable/integration; do not add a full review for each small helper or
+wave unless a concrete risk or contract requires that early gate.
 
 ## Blockers
 

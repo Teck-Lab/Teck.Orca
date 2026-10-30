@@ -30,7 +30,8 @@ test('approved launcher runs through the host shell, preserves UTF-8 stdin and r
 test('the immutable runtime contains OMP and network policy with no bundled custom daemon', () => {
   const files = runtimeFiles();
   assert.match(files['assets/kits/workload/workload.yaml'].toString(), /\*\.quay\.io:443/);
-  assert.match(files['assets/kits/workload/workload.yaml'].toString(), /18\.12\.5/);
+  assert.match(files['assets/kits/workload/workload.yaml'].toString(), /18\.14\.0/);
+  assert.match(files['assets/kits/workload/workload.yaml'].toString(), /1\.4\.4/);
   assert.ok(!Object.keys(files).some(name => /orcad|entry\.mjs|job\.mjs|manage-daemon/.test(name)));
   assert.ok(!files['assets/kits/workload/context.md'].toString().includes('bundled Orca daemon'));
 });

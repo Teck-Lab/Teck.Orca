@@ -86,3 +86,10 @@ relevant suite counts/skips, and baseline/candidate line and branch coverage wit
 report paths, scope and any unresolved limitation. Include the exact reviewed
 snapshot. Reuse this evidence during independent review; rerun checks only for
 changed inputs, a failed check or an unresolved concern.
+
+Keep a concise durable evidence artifact using the repository's existing
+convention or an Orca artifact, and pass its exact path/link in the handoff.
+Include the real command outputs or report links needed to verify the claims.
+The reviewer should not need to reconstruct RED/GREEN or coverage by searching
+an entire terminal/session transcript. Update the artifact for changed inputs;
+do not manufacture another test run merely to reformat accepted evidence.

@@ -1,6 +1,6 @@
 # Teck OMP Native SSH Preview
 
-The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.8.
+The separate preview plugin is `teck-lab.teck-native-ssh-preview` version 0.1.9.
 It contributes **Teck OMP SSH Project (Preview)** to Orca?s **Run on** picker.
 The original Teck plugin, sandbox and connection remain separate.
 
@@ -53,7 +53,7 @@ containers; Docker Sandboxes manages the VM and native `.sbx` SSH transport.
 ## Runtime and requirements
 
 Orca 1.4.237+, host Node 22+, OpenSSH, Docker Sandboxes 0.48+ and a Docker login.
-For desktop 1.4.244, the native SSH connection uses Orca's matching managed guest
+For desktop 1.4.245, the native SSH connection uses Orca's matching managed guest
 server. The separate bundled-daemon plugin is updated independently; this preview
 does not install or pin that custom daemon over the managed SSH server.
 OmniRoute, MCPHub and GitHub service credentials must already be configured
@@ -62,7 +62,7 @@ credential helpers are not copied.
 
 Defaults are 8 CPU / 16g memory, applied at creation. `projects.json` supplies
 Teck.Monorepo defaults; other Orca projects use their supplied repository URL
-or local origin. Each project gets its own sandbox. OMP 18.12.5, its model roles,
+or local origin. Each project gets its own sandbox. OMP 18.14.0, its model roles,
 technical research agent, TDD/review guidance, session recovery and development
 toolchain are snapshotted from the existing runtime. The network policy includes
 `quay.io:443` and `*.quay.io:443`.
@@ -72,8 +72,10 @@ Task-role workers implement/test/integrate, slow-role workers research,
 advisor-role workers review and a task-role publication worker verifies/publishes
 the approved snapshot. Existing modelRoles are preserved. Native OMP goals and
 todo phases track the milestone/delivery scope and each bounded assignment;
-Orca remains authoritative for parallel worker state. The policy denies
-coordinator editing/shell/source inspection and native task/eval delegation.
+Orca owns its visible workers and OMP owns native helper state. Every role,
+including researchers and reviewers, may use native task/eval subagents as needed.
+The parent retains scope and acceptance; native helpers do not claim its Orca
+Dispatch or goal. Direct coordinator implementation tools remain scoped.
 Explicit reviews replace duplicate WATCHDOG loops. Refresh the preview plugin,
 then use its normal GUI recipe create/reuse/resume to install the updated policy;
 existing running OMP processes retain their loaded policy until restarted.

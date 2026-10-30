@@ -40,7 +40,7 @@ OMP records interactive conversations by project, worktree, working directory an
 
 ## Runtime and validation
 
-The workload retains OMP 18.11.3, Bun 1.4.2, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. The guest daemon remains Orca 1.4.224 with checksum-verified Node 24.21.0; desktop integration requires 1.4.229. No initialized runtime identity is baked into the image.
+The workload retains OMP 18.14.0, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. The bundled guest daemon is Orca 1.4.245 with checksum-verified Node 24.22.1; the native SSH preview uses the desktop-managed server. No initialized runtime identity is baked into the image.
 
 `TECK_ORCA_CPUS` (default `8`) and `TECK_ORCA_MEMORY` (default `16g`) configure new project sandboxes. Existing sizes do not change. `TECK_ORCA_PROJECTS_DIR` and `TECK_ORCA_RELEASES_DIR` override host storage for diagnostics/tests. Project setup retains model configuration, toolkit, skills, workflow rules, Docker-managed service authentication and Git author identity. Repeated setup preserves existing guest configuration.
 
@@ -178,15 +178,24 @@ cluster with isolated worktree deployments and optional application operators. S
 
 ## Coordinated OMP goals
 
-The existing configured model roles are retained. Default/plan sessions only
-coordinate GitHub metadata and Orca Tasks/Dispatches/messages. All implementation,
-research, review, integration and publication uses visible Orca workers with
-acceptance-bounded native OMP goals. The coordinator goal matches the authorized
-GitHub milestone/delivery scope; phased todos track its next coordination action.
-The tool guard prevents coordinator source inspection, editing, test execution
-and code publication, and blocks native task/eval helpers. Explicit independent
-reviews replace periodic WATCHDOG loops. See
-[runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md)
-and [isolated validation](docs/validation-omp-coordination-2026-10-28.md).
+Existing OMP model roles are retained. The coordinator owns the authorized
+GitHub milestone/delivery goal, canonical issue plan and final acceptance. Orca
+Tasks/Dispatches provide visible workers with independent sessions/checkouts.
+Every role may also use native OMP task/eval helpers: planner, researcher,
+executor, reviewer and coordinator. OMP owns those helpers' lifecycle; their
+parent owns scope, evidence and acceptance. Native helpers do not each need an
+Orca Dispatch or GitHub issue.
 
-The separately bundled daemon plugin 0.5.13 includes Orca 1.4.244 and its matching Node 24.22.1 runtime. See [runtime validation](docs/validation-orca-1.4.244-2026-10-29.md). The native SSH preview uses the desktop-managed server after the desktop update.
+Apply planning and dependency waves recursively inside sub-issues. Create
+sub-sub-issues for independently trackable deliverables, then start all ready
+branches within configured capacity. For 1 -> {2,3} -> 4, accept 1 before starting
+2 and 3 in parallel; start 4 when its actual prerequisites are accepted. Direct
+coordinator tool calls remain scoped; native delegation follows the parent brief
+and is not an OS isolation boundary. Independent deliverable/integration reviews
+replace periodic WATCHDOG loops and per-helper full reviews. See the
+[runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md).
+
+Bundled daemon plugin 0.5.14 includes Orca 1.4.245 and Node 24.22.1. Both image
+paths pin OMP 18.14.0 and Bun 1.4.4. Native SSH preview 0.1.9 uses the
+Orca desktop-managed guest daemon after the desktop update. See the
+[release changes and validation](docs/validation-orca-omp-2026-10-30.md).
