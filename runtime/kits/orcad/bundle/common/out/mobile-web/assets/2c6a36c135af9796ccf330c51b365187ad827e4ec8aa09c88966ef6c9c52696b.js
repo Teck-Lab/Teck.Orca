@@ -1,2 +1,0 @@
-globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
-import{a as o}from"/assets/177234ceab5bc1c8d9a2b75ed97bd7d491d64a879f156c609585961ee44ecb31.js";import{d as t}from"/assets/683acec02ce8bfd0d5e936f88b7cf672e43369ee77970e9273592a4b3ddfa6ce.js";var e=t(o()),n=(0,e.createContext)(null);function r(){return(0,e.useContext)(n)}export{n as a,r as b};
