@@ -1,13 +1,14 @@
-import { cpSync, mkdtempSync, rmSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { cpSync, mkdtempSync, rmSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { quote } from './system.mjs';
+import { workflowFiles, workflowDigest } from '../workflow-assets.mjs';
 
 // Orca owns every ORCA_* value and the CLI's PATH precedence in its terminals.
 export function nativeEnvironment(project) {
   return {
     OMNIROUTE_API_KEY: 'proxy-managed', MCPHUB_API_KEY: 'proxy-managed',
+    HINDSIGHT_API_KEY: 'proxy-managed', HINDSIGHT_API_TOKEN: 'proxy-managed',
     OMNIROUTE_BASE_URL: 'https://omniroute.tecklab.dk/v1', OMNIROUTE_MODEL: 'teck-orchestrator', OMNIROUTE_RESEARCH_ENABLED: '1',
     MNEMOPI_DATA_DIR: '/home/agent/.local/share/teck-orca/memory', OMP_SKIP_SETUP: '1', ONNXRUNTIME_NODE_INSTALL: 'skip',
     AGENT_BROWSER_EXECUTABLE_PATH: '/usr/local/bin/chromium', AGENT_BROWSER_ARGS: '--no-sandbox,--disable-dev-shm-usage',
@@ -19,7 +20,8 @@ export function nativeEnvironment(project) {
 }
 
 export const environmentScript = project => Object.entries(nativeEnvironment(project))
-  .map(([key, value]) => `export ${key}=${quote(value)}`).join('\n') + '\n';
+  .map(([key, value]) => key === 'HINDSIGHT_API_KEY' ? 'export HINDSIGHT_API_KEY="${HINDSIGHT_API_KEY:-proxy-managed}"' :
+    key === 'HINDSIGHT_API_TOKEN' ? 'export HINDSIGHT_API_TOKEN="$HINDSIGHT_API_KEY"' : `export ${key}=${quote(value)}`).join('\n') + '\n';
 
 export function installationScript(staging, project = { id: 'preview' }) {
   if (!/^\/tmp\/teck-native-ssh-[A-Za-z0-9-]+$/.test(staging)) throw Error('Invalid guest staging path');
@@ -96,25 +98,8 @@ export async function ensureNamingHook({ name, project, assetRoot, run }) {
 // Copy only Teck-maintained workflow assets; preserve models, user config,
 // credentials, sessions, unrelated extensions and project files.
 export async function ensureWorkflowPolicy({ name, assetRoot, run }) {
-  const roots = ['extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'extensions/lib/github-plan-scope.mjs', 'orchestration.yml', 'RULES.md',
-    'agents/technical-planner.md',
-    'skills/orca-feature-workflow', 'skills/orca-workers', 'skills/github-execution-planning', 'skills/github-publication'];
-  const files = [];
-  const walk = (path, relative) => {
-    const children = readdirSync(path, { withFileTypes: true });
-    for (const child of children) {
-      if (child.isSymbolicLink()) throw Error('Workflow asset symlink refused');
-      if (child.isDirectory()) walk(join(path, child.name), `${relative}/${child.name}`);
-      else files.push([`${relative}/${child.name}`, readFileSync(join(path, child.name))]);
-    }
-  };
-  for (const relative of roots) {
-    const path = join(assetRoot, 'assets/omp', relative);
-    if (relative.endsWith('.mjs') || relative.endsWith('.yml') || relative.endsWith('.md')) files.push([relative, readFileSync(path)]);
-    else walk(path, relative);
-  }
-  for (const file of ['omp-launch.mjs', 'omp-launch-policy.mjs']) files.push([`runtime/${file}`, readFileSync(join(assetRoot, 'assets', file))]);
-  const digest = createHash('sha256').update(Buffer.concat(files.flatMap(([path, bytes]) => [Buffer.from(path), bytes]))).digest('hex');
+  const files = workflowFiles(join(assetRoot, 'assets/omp'), join(assetRoot, 'assets'));
+  const digest = workflowDigest(files);
   const present = await run('sbx', ['exec', '-u', 'agent', name, 'sh', '-c', 'cat /home/agent/.omp/agent/teck-workflow.sha256 2>/dev/null || true']);
   if (present.trim() === digest) return false;
   const staging = mkdtempSync(join(tmpdir(), 'teck-native-ssh-'));
@@ -129,7 +114,7 @@ export async function ensureWorkflowPolicy({ name, assetRoot, run }) {
       `cp ${quote(`${remote}/${relative}`)} ${quote(`/usr/local/lib/teck-orca/${relative.slice(8)}`)}` :
       `install -D -o agent -g agent -m 600 ${quote(`${remote}/${relative}`)} ${quote(`/home/agent/.omp/agent/${relative}`)}`);
     // Merge the additional MCP binding without replacing existing servers/settings.
-    const merge = `const fs=require('node:fs');const p='/home/agent/.omp/agent/mcp.json';const c=JSON.parse(fs.readFileSync(p));c.mcpServers??={};c.mcpServers['github-projects']??={type:'http',url:'https://mcp.tecklab.dk/mcp/github-projects',headers:{Authorization:'Bearer '+String.fromCharCode(36)+'{MCPHUB_API_KEY}'},timeout:120000};fs.writeFileSync(p,JSON.stringify(c,null,2)+'\\n');`;
+    const merge = `const fs=require('node:fs');const p='/home/agent/.omp/agent/mcp.json';const c=JSON.parse(fs.readFileSync(p));c.mcpServers??={};for(const name of ['github-projects','firecrawl'])c.mcpServers[name]??={type:'http',url:'https://mcp.tecklab.dk/mcp/'+name,headers:{Authorization:'Bearer '+String.fromCharCode(36)+'{MCPHUB_API_KEY}'},timeout:120000};fs.writeFileSync(p,JSON.stringify(c,null,2)+'\\n');`;
     await run('sbx', ['exec', '-i', '-u', 'root', name, 'sh', '-s'], { input: [
       'set -eu', ...copy, `node -e ${quote(merge)}`, 'chown agent:agent /home/agent/.omp/agent/mcp.json',
       `printf '%s' ${quote(digest)} > /home/agent/.omp/agent/teck-workflow.sha256`,

@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { configureSandbox, ensureNamingHook, ensureWorkflowPolicy, environmentScript, installationScript } from '../src/configuration.mjs';
 import { runtimeFiles } from '../build.mjs';
 import { ensureKitBuilder } from '../src/provider.mjs';
+const bash = process.platform === 'win32' ? 'C:/Program Files/Git/bin/bash.exe' : '/bin/bash';
 
 test('workflow upgrade preserves existing models, config and unrelated tools; installs a versioned policy once', async t => {
   const root = mkdtempSync(join(tmpdir(), 'teck-workflow-upgrade-'));
@@ -30,6 +31,9 @@ test('workflow upgrade preserves existing models, config and unrelated tools; in
   assert.match(script, /omp-launch-policy.mjs/);
   assert.match(script, /agents\/technical-planner\.md/);
   assert.match(script, /extensions\/lib\/github-plan-scope\.mjs/);
+  assert.match(script, /skills\/orchestration\/SKILL\.md/);
+  assert.match(script, /skills\/orca-per-workspace-env\/SKILL\.md/);
+  assert.match(script, /orca-guides\.json/);
   const syntax = spawnSync(bash, ['-n'], { input: script, encoding: 'utf8' });
   assert.equal(syntax.status, 0, syntax.stderr);
   assert.equal(await ensureWorkflowPolicy({ name: 'owned-test-vm', assetRoot: root, run }), false);
@@ -56,7 +60,14 @@ test('native configuration stages the bundled policy and launchers, never a daem
   assert.match(calls[2].args.at(-1), /agents\.invalid/);
 });
 
-const bash = process.platform === 'win32' ? 'C:/Program Files/Git/bin/bash.exe' : '/bin/bash';
+test('Hindsight maps the Docker secret placeholder to OMP without changing other credential bindings', { skip: !existsSync(bash) }, () => {
+  const script = environmentScript({ id: 'test' }) + 'printf "%s\\n" "$HINDSIGHT_API_KEY" "$HINDSIGHT_API_TOKEN" "$MCPHUB_API_KEY"';
+  const result = spawnSync(bash, ['--noprofile', '--norc', '-c', script], { encoding: 'utf8',
+    env: { ...process.env, HINDSIGHT_API_KEY: 'sbx-cs-test-placeholder' } });
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(result.stdout.trim().split(/\r?\n/), ['sbx-cs-test-placeholder', 'sbx-cs-test-placeholder', 'proxy-managed']);
+});
+
 test('guest scripts parse in a real shell and preserve an Orca terminal routing environment', { skip: !existsSync(bash) }, () => {
   const project = { id: "github:example/o'reilly" };
   const syntax = spawnSync(bash, ['-n'], { input: installationScript('/tmp/teck-native-ssh-check', project), encoding: 'utf8' });

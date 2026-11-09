@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { command, directory, quote, readJson, withLock, writeJson } from './system.mjs';
 import { configureSandbox, ensureNamingHook, ensureWorkflowPolicy, nativeEnvironment } from './configuration.mjs';
 import {configureKubernetes} from './kubernetes.mjs';
+import {ensureKubernetesPrerequisites} from './kubernetes-prerequisites.mjs';
 
 export const stateDirectory = () => join(homedir(), '.teck-orca-native-ssh');
 export const projectRoot = '/home/agent/project';
@@ -59,7 +60,7 @@ export async function ensureKitBuilder({ run = command, lockRoot = join(homedir(
 }
 
 export async function prepareProject({ project, assetRoot, stateRoot = stateDirectory(), run = command,
-  configure = configureSandbox, ensureBuilder = ensureKitBuilder, syncName = ensureNamingHook, syncPolicy = ensureWorkflowPolicy, startCluster=configureKubernetes, log = () => {}, recreateMissing = true, expectedSandboxId }) {
+  configure = configureSandbox, ensureBuilder = ensureKitBuilder, syncName = ensureNamingHook, syncPolicy = ensureWorkflowPolicy, prepareKubernetesHost=ensureKubernetesPrerequisites, startCluster=configureKubernetes, log = () => {}, recreateMissing = true, expectedSandboxId }) {
   validateProject(project);
   if (!assetRoot) throw Error('Plugin assets are required');
   const name = sandboxName(project.id), folder = join(stateRoot, name), path = join(folder, 'state.json');
@@ -97,6 +98,7 @@ export async function prepareProject({ project, assetRoot, stateRoot = stateDire
     }
     // No custom Orca process, pairing, desktop DB write, listener or port mapping.
     await run('sbx', ['run', '--detach', '--name', name]);
+    await prepareKubernetesHost({name,assetRoot,run});
     if (state.phase === 'ready') {
       await syncName({ name, project: { ...project, name: state.displayName }, assetRoot, run });
       await syncPolicy({ name, assetRoot, run });

@@ -20,6 +20,8 @@ development tools and language servers
 are available. Docker Engine runs project/test containers; Docker Sandboxes
 manages this VM and its SSH transport.
 
+The plugin automatically prepares /dev/kmsg for privileged Kubernetes test containers, independently of managed KIND. Testcontainers.K3s may create disposable clusters for integration tests using the sandbox's internal Docker daemon; no manual mknod or custom kmsg bind mount is needed. Keep those clusters separate from the project-owned KIND cluster. A Ready node alone does not prove pod execution, networking, storage or database recovery: verify the behavior required by the test and inspect actual failures. These prerequisites do not add missing kernel features or establish full Cilium/Istio compatibility.
+
 When /etc/teck-orca/kubernetes.json exists, one persistent KIND cluster starts for this project. Default startup has no Argo CD, Kargo, Git service or registry. Use the official Docker build -> kind load docker-image -> kubectl apply workflow. teck-kube deploy wraps that sequence for deployment/local/builds.json; it requires the current Orca worktree terminal and records image/source identities, rendered manifests and readiness. Use teck-kube addon cnpg|rollouts|gateway only when required. Each worktree gets a namespace and its own databases/dependencies.
 
 Use teck-kube kubectl for direct commands with the dedicated kubeconfig; do not change the default context. Run real connectivity/migration/test Jobs and inspect failures, rather than treating apply success as test success. teck-kube cleanup deletes only the recorded worktree namespace with UID checks and keeps the shared cluster/operators.

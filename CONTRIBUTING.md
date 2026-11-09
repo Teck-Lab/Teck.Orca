@@ -25,6 +25,32 @@ GitHub-to-PR delivery.
 
 Edit the native provider in `native-ssh/src/`, the retained recovery lifecycle in `scripts/lifecycle.mjs` and shared source assets in `runtime`. Run `npm run build`, `npm test` and `npm run check`. Recipe commands and the doctor mirror are generated and should not be edited manually. No dependency installation is required for these checks.
 
+Panel sources and real Orca SDK tests live in `ui/`; build copies them into the
+installable `plugin/` package. `npm run test:plugin` uses Orca 1.4.248+ to test and
+render the connected, fresh, unavailable and stopped states with an isolated
+runtime and empty ownership directory. It never approves or enables the plugin.
+Its render scenarios include the Agents and Updates tabs, a running maintenance
+job and low Docker disk space. `npm run smoke:panel-update` creates a uniquely
+named disposable workload, tests an actual versioned OMP npm installation,
+preservation of config/conversations/project files, repeat updates, rollback and
+the open-process refusal, then removes only that workload. Never aim maintenance
+smokes at a user's project sandbox.
+`ORCA_CLI_COMMAND` can select an extracted version-matched CLI for this check.
+Orca-generated `.orca/` SDK files are excluded from source control. Build preserves
+them under `.artifacts/plugin-sdk/` outside the installable folder; package checks
+reject extra files. This avoids a 1.4.248 discrepancy between dev-folder and worker
+integrity hashing. Build again after generating SDK typings or screenshots inside
+the plugin folder. Keep code integrity checks on the worker dependency closure; do not
+scan large SDK/browser archives during plugin startup. Run version updates from
+official checksum-verified distribution assets. Refresh official skills with
+`npm run bundle:skills`; this includes the CLI, orchestration and VM guides.
+
+`runtime/workflow-assets.mjs` defines the managed update set. Build mirrors it to
+`native-ssh/workflow-assets.mjs`; normal recipe reuse and panel maintenance use
+the same bytes and digest. Do not add model settings, credentials or session
+files to that set. Maintain process/ownership checks and staging/rollback when
+changing `runtime/sandbox-update*.mjs`.
+
 Current provisioning lives in `native-ssh/src/provider.mjs` and is emitted by the main plugin. Root build/check/setup include its immutable runtime, and root npm test includes its provider suite. The independent preview package was removed; install only `plugin/`.
 
 Older bundled-daemon project provisioning lives in `runtime/project-sandbox.mjs`; project ownership,
@@ -40,4 +66,4 @@ worktree destroy callback to a persistent project sandbox.
 
 Keep recipe stdout restricted to the final JSON result. Route provider logs to stderr without pairing credentials. Preserve feature ownership verification and fail safely when worktree inventories cannot be read. Test the universal Node launcher through the Windows host shell and preserve UTF-8 stdin and exit codes. Bundle only distribution files, never an initialized Orca runtime profile.
 
-Run setup and reinstall the generated `plugin/` folder, or refresh its Dev entry, after runtime changes. Point Orca to `plugin/`, never the repository root: Orca hashes the entire plugin tree with a 50 MiB limit, and the runtime binaries exceed that limit. Build and check validate that the package contains only its manifest, license and declared recipes; keep generated package files in source control. Record separately any live sandbox and Orca GUI tests. Do not add service tokens, private keys, host agent-home state, or a previously initialized Orca runtime to an image.
+Run setup and reinstall the generated `plugin/` folder, or refresh its Dev entry, after runtime changes. Point Orca to `plugin/`, never the repository root: Orca hashes the entire plugin tree with a 50 MiB limit, and the runtime binaries exceed that limit. Build and check validate that the package contains only its manifest, license, worker entry, declared recipes and panel sources/tests; keep generated package files in source control. Record separately any live sandbox and Orca GUI tests. Do not add service tokens, private keys, host agent-home state, or a previously initialized Orca runtime to an image.

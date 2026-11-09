@@ -21,7 +21,7 @@ function fixture(t) {
     }
     return '';
   };
-  const options = { project, stateRoot, assetRoot: stateRoot, run, configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {}, syncPolicy: async () => {} };
+  const options = { project, stateRoot, assetRoot: stateRoot, run, configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {}, syncPolicy: async () => {}, prepareOffice: async () => calls.push({ program: 'prepare-office', args: [] }), prepareKubernetesHost: async () => calls.push({ program: 'prepare-kubernetes-host', args: [] }) };
   return { project, name, rows, calls, options, stateRoot, run };
 }
 
@@ -50,6 +50,25 @@ test('a ready sandbox is reused without overwriting OMP settings or cloning agai
   await prepareProject(f.options);
   assert.ok(f.calls.some(c => c.program === 'ssh' && c.args.includes(`${f.name}.sbx`)));
   assert.ok(!f.calls.some(c => c.program === 'configure' || c.args.includes('clone') || c.args[0] === 'create'));
+});
+
+test('shared Kubernetes prerequisites run on creation and reuse even when managed KIND is disabled', async t => {
+  const f = fixture(t);
+  await prepareProject(f.options);
+  assert.ok(f.calls.findIndex(c => c.program === 'prepare-kubernetes-host') > f.calls.findIndex(c => c.args[0] === 'run'));
+  assert.ok(f.calls.findIndex(c => c.program === 'prepare-kubernetes-host') < f.calls.findIndex(c => c.program === 'ssh' && c.args[0] === '-T'));
+  f.calls.length = 0;
+  await prepareProject(f.options);
+  assert.equal(f.calls.filter(c => c.program === 'prepare-kubernetes-host').length, 1);
+  assert.ok(!f.calls.some(c => c.args[0] === 'create' || c.program === 'configure'));
+});
+
+test('failed shared device preparation cannot report a new sandbox ready', async t => {
+  const f = fixture(t);
+  await assert.rejects(prepareProject({ ...f.options, prepareKubernetesHost: async () => { throw Error('Invalid kmsg device'); } }), /Invalid kmsg device/);
+  const state = JSON.parse(readFileSync(join(f.stateRoot, f.name, 'state.json')));
+  assert.notEqual(state.phase, 'ready');
+  assert.ok(!f.calls.some(c => c.program === 'ssh' && c.args[0] === '-T'));
 });
 
 test('enabled project starts guest Kubernetes without blocking SSH on bootstrap failure',async t=>{

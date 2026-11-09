@@ -25,10 +25,11 @@ export function runtimeFiles(repositorySource = repository) {
   projects.forEach(validateProject);
   if (new Set(projects.map(project => project.id)).size !== projects.length) throw Error('Duplicate project ID');
   const files = { 'projects.json': json(projects) };
+  files['workflow-assets.mjs'] = readFileSync(join(repositorySource, 'runtime/workflow-assets.mjs'));
   function copyTree(source, target) {
     for (const relative of walk(source)) files[target + '/' + relative] = readFileSync(join(source, relative));
   }
-  for (const name of ['provider.mjs', 'configuration.mjs', 'system.mjs', 'recipe.mjs','kubernetes.mjs']) files[`src/${name}`] = readFileSync(join(root, 'src', name));
+  for (const name of ['provider.mjs', 'configuration.mjs', 'system.mjs', 'recipe.mjs','kubernetes.mjs','kubernetes-prerequisites.mjs']) files[`src/${name}`] = readFileSync(join(root, 'src', name));
   copyTree(join(repositorySource,'runtime/kubernetes'),'assets/kubernetes');
   copyTree(join(repositorySource, 'runtime/omp'), 'assets/omp');
   for (const kit of ['workload', 'omniroute', 'mcphub']) copyTree(join(repositorySource, 'runtime/kits', kit), `assets/kits/${kit}`);

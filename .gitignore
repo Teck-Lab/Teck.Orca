@@ -1,5 +1,8 @@
 node_modules/
 .artifacts/
+.orca/
 .env
 .env.*
 !.env.example
+sandbox/testing-smoke/bin/
+sandbox/testing-smoke/obj/
