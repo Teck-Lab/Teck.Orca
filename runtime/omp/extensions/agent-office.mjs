@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
 import { isOfficeTool, officeSignalFromResult } from './lib/office-tools.mjs';
 import { createOfficeUsage, ompMessageTokens } from './lib/office-usage.mjs';
+import { cleanPlan } from './lib/office-plan.mjs';
 const registry = new Map();
 const key = value => createHash('sha256').update(value).digest('hex').slice(0, 32);
 const categories = { read: 'read', edit: 'edit', write: 'edit', bash: 'bash', exec: 'bash', grep: 'search', find: 'search', glob: 'search', task: 'agent', eval: 'agent', wait: 'agent', orca: 'agent', orca_dispatch: 'agent', todo: 'todo', web_search: 'web', fetch: 'web' };
@@ -29,10 +30,25 @@ export function readOrcaCoordination(ctx) {
   return result;
 }
 
+// Rehydrate only canonical native state on this branch, never prompt text,
+// arbitrary tool results, assignment descriptions or a different session.
+export function readOfficePlan(ctx, liveGoal) {
+  let goal = null, phases = [];
+  for (const e of ctx.sessionManager.getBranch?.() ?? []) {
+    if (e.type === 'mode_change') goal = e.data?.goal ?? null;
+    if (e.type === 'custom' && e.customType === 'user_todo_edit' && Array.isArray(e.data?.phases)) phases = e.data.phases;
+    const m = e.type === 'message' ? e.message : null;
+    if (m?.role !== 'toolResult' || m.isError) continue;
+    if (m.toolName === 'todo' && m.details?.op !== 'view' && Array.isArray(m.details?.phases)) phases = m.details.phases;
+    if (m.toolName === 'goal' && m.details?.goal) goal = m.details.goal;
+  }
+  return cleanPlan({goal: liveGoal === undefined ? goal : liveGoal, phases}) ?? {goal:null,phases:[]};
+}
+
 export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSync('/etc/teck-orca/office.json', 'utf8')), request = fetch,
   schedule = setTimeout, cancel = clearTimeout, now = Date.now } = {}) {
   const queue = []; let timer, inFlight, stopped = false, retry = 500;
-  let current, currentStatus;
+  let current, currentStatus, currentPlan;
   function later(ms = 20) {
     if (timer || stopped) return;
     timer = schedule(() => { timer = null; void flush(); }, ms); timer.unref?.();
@@ -41,11 +57,12 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
     if (stopped) return;
     if (queue.length >= 200) queue.shift();
     queue.push({ ...event, eventId: randomUUID(), ts: new Date(now()).toISOString(), agent: 'omp' });
-    if (['usage','status','shout','celebrate','flip'].includes(event.kind)) {
+    if (event.plan !== undefined) currentPlan = { ...event, kind: 'plan' };
+    if (['plan','usage','status','shout','celebrate','flip'].includes(event.kind)) {
       if (event.kind === 'status') currentStatus = event;
       if (current?.workerId === event.workerId && event.tokenTotal !== undefined) current = { ...current, tokenTotal: event.tokenTotal };
     } else if (!['session_end','subagent_end'].includes(event.kind)) current = event;
-    else if (current?.workerId === event.workerId) { current = undefined; currentStatus = undefined; }
+    else if (current?.workerId === event.workerId) { current = undefined; currentStatus = undefined; currentPlan = undefined; }
     later();
   }
   async function flush() {
@@ -77,6 +94,7 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
           const previous = current;
           publish({ ...previous, kind: previous.parentId ? 'subagent_start' : 'session_start' });
           publish(previous);
+          if (currentPlan?.workerId === previous.workerId) publish(currentPlan);
           if (currentStatus?.workerId === previous.workerId) publish({ ...previous, kind: 'status', summary: currentStatus.summary, tool: currentStatus.tool });
         }
       } catch { retry = Math.min(retry * 2, 10_000); }
@@ -93,23 +111,29 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
 export default function activate(pi, dependencies = {}) {
   const reporter = dependencies.reporter ?? createOfficeReporter(dependencies);
   const usage = createOfficeUsage();
-  let identity, session, startupGeneration = 0; const tools = new Map();
+  let identity, session, startupGeneration = 0, planKey, liveGoal; const tools = new Map();
   function ensure(ctx) {
     const nextSession = ctx.sessionManager.getSessionId();
     const agent = ctx.agent ?? { kind: 'main', id: 'Main', name: 'main' };
     const helper = agent.kind === 'sub';
+    if (!helper && (ctx.sessionManager.getBranch?.() ?? []).filter(e=>e.type==='custom'&&e.customType==='teck-orca-contract').at(-1)?.data?.presentationReady === false) return false;
     const parent = helper ? registry.get(agent.parentId) : undefined;
     const orchestration = parent ? parent.orchestration : helper ? null : readOrcaCoordination(ctx);
     const started = !identity || nextSession !== session;
     if (started && identity) reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
+    if (started) { planKey = undefined; liveGoal = undefined; }
     session = nextSession;
     identity = { workerId: key(`${session}:${agent.id}`), ...(parent ? { parentId: parent.workerId } : {}),
       role: safe(helper ? agent.name : orchestration?.role ?? agent.name), model: safe(ctx.model?.id, 64),
       orchestration, placement: orchestration?.role === 'coordinator' ? 'office' : 'cloud', tokenTotal: usage.total(ctx) };
     registry.set(agent.id, identity);
-    if (started) { tools.clear(); reporter.publish({ ...identity, kind: parent ? 'subagent_start' : 'session_start' }); }
+    const plan = readOfficePlan(ctx, liveGoal), nextKey = JSON.stringify(plan);
+    if (started) { tools.clear(); reporter.publish({ ...identity, kind: parent ? 'subagent_start' : 'session_start', plan }); }
+    else if (nextKey !== planKey) reporter.publish({ ...identity, kind: 'plan', plan });
+    planKey = nextKey;
+    return true;
   }
-  function emit(kind, ctx, extra = {}) { ensure(ctx); reporter.publish({ ...identity, kind, ...extra }); }
+  function emit(kind, ctx, extra = {}) { if (ensure(ctx)) reporter.publish({ ...identity, kind, ...extra }); }
   const on = (name, handler) => pi.on(name, (event, ctx) => {
     try { handler(event, ctx); } catch { /* Best-effort observer; never affect a model turn. */ }
   });
@@ -117,7 +141,14 @@ export default function activate(pi, dependencies = {}) {
     // Ambient observers load before the explicitly loaded role guard. Wait for
     // its lifecycle handler to append the contract, even if no prompt follows.
     const generation = ++startupGeneration;
-    const announce = () => { try { if (generation === startupGeneration) ensure(ctx); } catch { /* Observer only. */ } };
+    liveGoal = undefined; planKey = undefined;
+    const announce = () => { try {
+      if (generation !== startupGeneration) return;
+      const ready = ensure(ctx);
+      // Also observe human /todo edits while idle; read-only branch metadata,
+      // no agent input, polling Orca or fabricated activity events.
+      if (typeof ctx.setTimeout === 'function') ctx.setTimeout(announce, ready ? 5000 : 50);
+    } catch { /* Observer only. */ } };
     if (typeof ctx.setTimeout === 'function') ctx.setTimeout(announce, 0);
     else announce();
   });
@@ -143,7 +174,15 @@ export default function activate(pi, dependencies = {}) {
   on('tool_approval_requested', (_e, ctx) => emit('waiting', ctx, { summary: 'Awaiting approval' }));
   on('tool_approval_resolved', (_e, ctx) => emit(tools.size ? 'thinking' : 'idle', ctx));
   on('agent_end', (_e, ctx) => emit('waiting', ctx));
+  on('goal_updated', (e, ctx) => {
+    if (!ensure(ctx)) return;
+    liveGoal = e.goal ?? null;
+    ensure(ctx);
+  });
   on('message_end', (e, ctx) => {
+    // Tool results have been persisted by this point, including successful
+    // todo changes. Failed calls/view reads cannot replace the canonical list.
+    if (e.message?.role === 'toolResult' && ['todo','goal'].includes(e.message.toolName)) ensure(ctx);
     if (ompMessageTokens(e.message) !== undefined) {
       const previous = usage.total(ctx), total = usage.observe(e.message, ctx);
       if (total !== previous) emit('usage', ctx, { tokenTotal: total });
@@ -154,7 +193,8 @@ export default function activate(pi, dependencies = {}) {
   pi.on('session_shutdown', async (_e, ctx) => {
     ++startupGeneration;
     try {
-      ensure(ctx); reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
+      if (!ensure(ctx)) { await reporter.close(); return; }
+      reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
       if (registry.get(ctx.agent?.id)?.workerId === identity.workerId) registry.delete(ctx.agent.id);
       // Shutdown is the only awaited handler: preserve the final event before process exit.
       await reporter.close();

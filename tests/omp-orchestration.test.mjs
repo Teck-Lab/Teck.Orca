@@ -731,6 +731,26 @@ test('a repeated inventory cursor cannot loop or preserve stale editing authorit
   assert.equal(s.branch.at(-1).data.role, 'unbound');
 });
 
+test('startup binds an exact Dispatch before declaring the presentation role ready',async()=>{
+  const s=session('doer');s.setAssignment({role:'executor',objective:'Bound before display',acceptance:['Verified']});
+  const pending=s.handlers.get('session_start')({},s.ctx);
+  assert.equal(s.branch.at(-1).data.presentationReady,false,'do not display the coordinator fallback during ownership lookup');
+  await pending;
+  const contract=s.branch.at(-1).data;assert.equal(contract.presentationReady,true);assert.equal(contract.role,'executor');assert.equal(contract.authority.dispatchId,'ctx_456');
+  assert.equal(s.sent.length,0,'startup role resolution does not send input');
+  assert.equal(s.guard('edit').block,true,'presentation does not skip the native goal/delegation gates');
+});
+
+test('a Dispatch attached during initial pane startup never publishes the coordinator fallback',async()=>{
+  const s=session('doer');
+  await s.handlers.get('session_start')({},s.ctx);
+  assert.equal(s.branch.at(-1).data.presentationReady,false,'a new pane waits through assignment recovery before becoming an office coordinator');
+  s.setAssignment({role:'executor',objective:'Attach after pane startup',acceptance:['Verified']});
+  await s.timers[0]();
+  assert.equal(s.branch.at(-1).data.presentationReady,true);assert.equal(s.branch.at(-1).data.role,'executor');
+  assert.equal(s.branch.at(-1).data.authority.dispatchId,'ctx_456');
+});
+
 test('startup recovers the exact idle worker assignment through OMP queue once, without another Orca start', async () => {
   const s = session('doer');
   const input = { role: 'executor', objective: 'Recover task', acceptance: ['Verified'], constraints: 'Scope' };

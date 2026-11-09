@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import activate, { createOfficeReporter, readOrcaCoordination } from '../runtime/omp/extensions/agent-office.mjs';
+import activate, { createOfficeReporter, readOrcaCoordination, readOfficePlan } from '../runtime/omp/extensions/agent-office.mjs';
 const context = (id, agent = { kind: 'main', id: 'Main', name: 'main' }) => ({ sessionManager: { getSessionId: () => id }, agent, model: { id: 'teck-executor' } });
 function adapter(ctx, registered = []) {
   const handlers = new Map(), events = [];
@@ -8,6 +8,58 @@ function adapter(ctx, registered = []) {
   activate({ on: (name, handler) => handlers.set(name, handler),getAllTools:()=>registered.map(name=>({name})) }, { reporter });
   return { events, run: (name, data = {}, c = ctx) => handlers.get(name)?.(data, c), handlers };
 }
+
+test('whiteboard recovers canonical branch goals/todos, ignores failed/view calls and redacts bounded text',()=>{
+  const branch=[{type:'mode_change',mode:'goal',data:{goal:{id:'g-one',objective:'Ship preview',status:'active'}}},
+    {type:'message',message:{role:'toolResult',toolName:'todo',details:{op:'init',phases:[{name:'Delivery',tasks:[{content:'Verify restore',status:'blocked',blocker:'password=unsafe'}]}]}}},
+    {type:'message',message:{role:'toolResult',toolName:'todo',isError:true,details:{op:'init',phases:[]}}},
+    {type:'message',message:{role:'toolResult',toolName:'todo',details:{op:'view',phases:[]}}},
+    {type:'message',message:{role:'user',content:'PRIVATE PROMPT'}},
+    {type:'message',message:{role:'toolResult',toolName:'bash',details:{phases:[]},content:'PRIVATE OUTPUT'}}];
+  const ctx=context('plan-restore');ctx.sessionManager.getBranch=()=>branch;
+  let plan=readOfficePlan(ctx);assert.equal(plan.goal.objective,'Ship preview');assert.equal(plan.phases[0].tasks[0].status,'blocked');
+  assert.ok(!JSON.stringify(plan).includes('unsafe'));assert.ok(!JSON.stringify(plan).includes('PRIVATE'));
+  branch.push({type:'custom',customType:'user_todo_edit',data:{phases:[]}});
+  assert.deepEqual(readOfficePlan(ctx).phases,[],'human todo edits replace the previous canonical list');
+  assert.equal(readOfficePlan(ctx,{id:'g-one',objective:'Ship preview',status:'complete'}).goal.status,'complete');
+  branch.push({type:'mode_change',mode:'none'});assert.equal(readOfficePlan(ctx).goal,null);
+});
+
+test('live plans update without model turns, clear on session switches and observe idle todo edits',()=>{
+  let branch=[];const timers=[],ctx=context('plan-live');ctx.sessionManager.getBranch=()=>branch;ctx.setTimeout=fn=>timers.push(fn);
+  const a=adapter(ctx);a.run('session_start');timers.shift()();
+  assert.deepEqual(a.events[0].plan,{goal:null,phases:[]});
+  a.run('goal_updated',{goal:{id:'g-live',objective:'Review feature',status:'active'}});
+  assert.equal(a.events.at(-1).kind,'plan');assert.equal(a.events.at(-1).plan.goal.status,'active');
+  const before=a.events.length;a.run('goal_updated',{goal:{id:'g-live',objective:'Review feature',status:'active',tokensUsed:100}});
+  assert.equal(a.events.length,before,'accounting-only changes are not a new plan');
+  branch.push({type:'custom',customType:'user_todo_edit',data:{phases:[{name:'Verify',tasks:[{content:'Check tests',status:'in_progress'}]}]}});
+  timers.shift()();assert.equal(a.events.at(-1).plan.phases[0].tasks[0].content,'Check tests');
+  const switched=context('another-plan');switched.setTimeout=fn=>timers.push(fn);switched.sessionManager.getBranch=()=>[];
+  a.run('session_switch',{},switched);while(timers.length&&a.events.at(-1)?.workerId===a.events[0].workerId)timers.shift()();
+  assert.deepEqual(a.events.at(-1).plan,{goal:null,phases:[]});assert.notEqual(a.events.at(-1).workerId,a.events[0].workerId);
+  assert.ok(!a.events.some(e=>['thinking','prompt','tool_start'].includes(e.kind)),'plan snapshots never fabricate execution');
+});
+
+test('an unresolved Dispatch is never announced as an office coordinator',()=>{
+  const branch=[{type:'custom',customType:'teck-orca-contract',data:{version:1,role:'coordinator',presentationReady:false}}];
+  const timers=[],ctx=context('pending-dispatch');ctx.sessionManager.getBranch=()=>branch;ctx.setTimeout=fn=>timers.push(fn);
+  const a=adapter(ctx);a.run('session_start');timers.shift()();a.run('agent_start');assert.equal(a.events.length,0);
+  branch.push({type:'custom',customType:'teck-orca-contract',data:{version:1,presentationReady:true,role:'executor',authority:{runId:'run-bound',taskId:'task-bound',dispatchId:'dispatch-bound'}}});
+  timers.shift()();assert.equal(a.events.length,1);assert.equal(a.events[0].kind,'session_start');assert.equal(a.events[0].placement,'cloud');
+  assert.equal(a.events[0].orchestration.dispatchId,'dispatch-bound');
+});
+
+test('a restarted office receives the latest native plan without changing cached activity',async()=>{
+  const packets=[];let missing=false;
+  const r=createOfficeReporter({readConfig:()=>({version:1,sourceId:'347bd1b8-7ae4-46b8-bdd0-b6a193d165d6',token:'a'.repeat(64),url:'http://127.0.0.1:19474/api/ingest'}),schedule:()=>({unref(){}}),cancel(){},request:async(_url,opts)=>{packets.push(JSON.parse(opts.body));return new Response(JSON.stringify({missing:missing?['one']:[]}),{status:202});}});
+  r.publish({workerId:'one',kind:'session_start',plan:{goal:null,phases:[]}});
+  r.publish({workerId:'one',kind:'waiting'});await r.flush();
+  const plan={goal:{id:'g-last',objective:'Retained plan',status:'paused'},phases:[]};r.publish({workerId:'one',kind:'plan',plan});await r.flush();
+  missing=true;await r.flush();missing=false;await r.flush();
+  const restored=packets.at(-1).events;assert.deepEqual(restored.map(e=>e.kind),['session_start','waiting','plan']);assert.deepEqual(restored.at(-1).plan,plan);
+  await r.close();
+});
 test('observer sends only lifecycle metadata and links native helper identities', () => {
   const main = adapter(context('main-session'));
   main.run('session_start');
@@ -143,6 +195,8 @@ test('deferred startup keeps dispatched workers in cloud and cannot revive a swi
     authority: { runId: 'run-1', taskId: 'task-1', dispatchId: 'dispatch-1' } } });
   timers.shift()();
   assert.equal(a.events[0].placement, 'cloud');
+  // OMP clears lifecycle-scoped refresh timers when switching sessions.
+  timers.length = 0;
   assert.equal(a.events[0].orchestration.role, 'executor');
   a.run('session_switch', {}, ctx);
   const next = context('next-session'); next.setTimeout = ctx.setTimeout;

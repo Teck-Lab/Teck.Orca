@@ -24,6 +24,8 @@ const {transformSync,buildSync}=createRequire(join(source,'package.json'))('esbu
 for(const file of ['cli.js','term-worker.mjs'])fs.writeFileSync(join(destination,file),transformSync(fs.readFileSync(join(destination,file),'utf8'),{
  minify:true,keepNames:true,format:'esm',target:'node18',legalComments:'inline'}).code);
 const mcpRoot=join(repo,'runtime/omp/extensions/lib');fs.mkdirSync(mcpRoot,{recursive:true});
+buildSync({entryPoints:[join(source,'src/shared/plan.ts')],outfile:join(mcpRoot,'office-plan.mjs'),bundle:true,platform:'neutral',format:'esm',target:'es2022',minify:true,
+ banner:{js:'// Bundled Agent Office plan metadata sanitizer (MIT); see agent-office.LICENSE.'},logLevel:'warning'});
 buildSync({stdin:{contents:`export {createMcpServer} from './src/mcp/server.ts'; export const OFFICE_VERSION=${JSON.stringify(JSON.parse(fs.readFileSync(join(source,'package.json'),'utf8')).version)};`,resolveDir:source,loader:'ts'},
  outfile:join(mcpRoot,'office-mcp-server.mjs'),bundle:true,platform:'node',format:'esm',target:'node18',minify:true,keepNames:true,legalComments:'inline',
  banner:{js:'// Bundled Agent Office MCP implementation (MIT); see agent-office.LICENSE.'},logLevel:'warning'});

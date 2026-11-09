@@ -17,7 +17,7 @@ process.stdin.on('end',()=>{
  const regular=p=>{if(fs.existsSync(p)&&fs.lstatSync(p).isSymbolicLink())throw Error('Office path is a symlink');};
  const put=(p,data,mode,uid=1000,gid=1000)=>{regular(p);regular(path.dirname(p));fs.mkdirSync(path.dirname(p),{recursive:true});if(fs.existsSync(p)&&fs.readFileSync(p,'utf8')===data)return;const t=p+'.office-'+process.pid;fs.writeFileSync(t,data,{mode,flag:'wx'});fs.chownSync(t,uid,gid);fs.renameSync(t,p)};
  put('/etc/teck-orca/office.json',JSON.stringify(p.config)+'\n',0o640,0,1000);
- const allowed=new Set(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','agent-office.LICENSE']);
+ const allowed=new Set(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE']);
  for(const [name,encoded]of Object.entries(p.mcpAssets||{})){if(!allowed.has(name))throw Error('Unknown office asset');put('/home/agent/.omp/agent/extensions/lib/'+name,Buffer.from(encoded,'base64').toString(),0o600)}
  const mcpPath='/home/agent/.omp/agent/mcp.json';regular(mcpPath);
  const current=fs.existsSync(mcpPath)?JSON.parse(fs.readFileSync(mcpPath,'utf8')):{};
@@ -25,6 +25,9 @@ process.stdin.on('end',()=>{
  if(next!==current)put(mcpPath,JSON.stringify(next,null,2)+'\n',0o600);
  put('/home/agent/.omp/agent/extensions/agent-office.mjs',Buffer.from(p.extension,'base64').toString(),0o600);
  put('/home/agent/.omp/agent/extensions/agent-office.ts',Buffer.from(p.entry,'base64').toString(),0o600);
+ // The observer and role guard share a presentation-readiness contract. Stage the
+ // matching guard atomically for future loads; never signal/restart OMP.
+ if(p.roleGuard)put('/home/agent/.omp/agent/extensions/orca-orchestration.mjs',Buffer.from(p.roleGuard,'base64').toString(),0o600);
  if(!fs.existsSync('/etc/teck-orca/pixtuoid-removed')){
    for(const id of fs.readdirSync('/proc').filter(n=>/^\d+$/.test(n)))try{const args=fs.readFileSync('/proc/'+id+'/cmdline','utf8').split('\0');if(args[0]==='/opt/teck-office/ttyd'||args[0]==='/opt/teck-office/pixtuoid')process.kill(Number(id),'SIGTERM')}catch{}
    for(const p of ['/home/agent/.omp/agent/extensions/pixtuoid.ts','/home/agent/.omp/agent/extensions/pixtuoid.ts.lock','/usr/local/bin/pixtuoid','/usr/local/bin/pixtuoid-hook'])if(fs.existsSync(p))fs.unlinkSync(p);

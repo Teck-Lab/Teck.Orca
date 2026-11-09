@@ -99,7 +99,8 @@ export default function activate(pi, dependencies = {}) {
     if (!goal && assignmentGoal && ['complete', 'dropped'].includes(assignmentGoal.status)) goal = { ...assignmentGoal };
     initialized = true;
   }
-  const save = () => pi.appendEntry('teck-orca-contract', { version: 1, launchRole, role, assignment: currentAssignment, authority, assignmentGoal, pendingReport, lastReport, delegation, coordinatorRunId, planningScope: planningScope?.state() });
+  let presentationReady = true;
+  const save = () => pi.appendEntry('teck-orca-contract', { version: 1, presentationReady, launchRole, role, assignment: currentAssignment, authority, assignmentGoal, pendingReport, lastReport, delegation, coordinatorRunId, planningScope: planningScope?.state() });
   const matchingGoal = () => authority && currentAssignment && goal && assignmentGoal &&
     assignmentGoal.dispatchId === authority.dispatchId && assignmentGoal.id === goal.id &&
     assignmentGoal.objective === currentAssignment.objective && goal.objective === currentAssignment.objective;
@@ -206,13 +207,29 @@ export default function activate(pi, dependencies = {}) {
         ...pi.getAllTools().map(t=>t.name).filter(isOfficeTool)])]);
       return;
     }
-    restore(ctx); save(); await tools(ctx);ownFamily(ctx);
+    restore(ctx); presentationReady = false; save();
+    // Resolve the exact Dispatch before observers publish a provisional role.
+    // This uses the same public ownership check as before_agent_start; no
+    // prompt/model alias can mint worker authority or an office seat.
+    try {
+      const bound = await bindWorker(ctx);
+      // A newly spawned pane can start before Orca attaches its Dispatch.
+      // Do not publish the coordinator fallback during the existing recovery
+      // window. Restored goals and already verified workers need no delay.
+      presentationReady = bound || !!goal || !environment.ORCA_PANE_KEY || !environment.ORCA_WORKTREE_ID || !ctx.setTimeout;
+    }
+    catch { presentationReady = false; /* No provisional office seat on a failed lookup. */ }
+    save();
+    await tools(ctx);ownFamily(ctx);
     // Orca may accept terminal input before OMP finishes starting. Recover only
     // this pane's exact live assignment via public records, then deliver through
     // OMP's own queue after startup. Never replay a task already started/settled.
     if (ctx.setTimeout) ctx.setTimeout(async () => {
-      if (goal || ctx.hasPendingMessages?.() || !ctx.isIdle?.()) return;
-      if (await bindWorker(ctx)) {
+      const recoverInput = !goal && !ctx.hasPendingMessages?.() && ctx.isIdle?.();
+      let bound;
+      try { bound = await bindWorker(ctx); presentationReady = true; save(); }
+      catch { presentationReady = false; save(); return; }
+      if (bound && recoverInput) {
         pi.sendUserMessage(`${assignment(currentAssignment)}\nLive Orca task ${authority.taskId}, Dispatch ${authority.dispatchId}, handle ${authority.handle}.\n` +
           'The extension verified this pane owns the active Dispatch. Use the structured orca report/check/ask actions; lifecycle IDs are supplied from that verified binding.');
       }
@@ -230,8 +247,8 @@ export default function activate(pi, dependencies = {}) {
     if (!initialized) restore(ctx);
     // Prompt text cannot mint authority, change role or narrow the assignment.
     let bound = false;
-    try { bound = await bindWorker(ctx); }
-    catch { /* Unreachable authority must not preserve a previous editing grant. */ }
+    try { bound = await bindWorker(ctx); presentationReady = true; save(); }
+    catch { presentationReady = false; /* Unreachable authority must not preserve a previous editing grant. */ }
     if (!bound && authority) {
       role = 'unbound'; currentAssignment = undefined; authority = undefined; save();
     }
