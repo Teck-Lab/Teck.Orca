@@ -98,7 +98,7 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
           if (currentStatus?.workerId === previous.workerId) publish({ ...previous, kind: 'status', summary: currentStatus.summary, tool: currentStatus.tool });
         }
       } catch { retry = Math.min(retry * 2, 10_000); }
-    }).finally(() => { inFlight = null; later(queue.length ? retry : 10_000); });
+    }).finally(() => { inFlight = null; if (queue.length || current) later(queue.length ? retry : 10_000); });
     return inFlight;
   }
   return { publish, flush, get pending() { return queue.length; }, async close() {
@@ -111,22 +111,24 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
 export default function activate(pi, dependencies = {}) {
   const reporter = dependencies.reporter ?? createOfficeReporter(dependencies);
   const usage = createOfficeUsage();
-  let identity, session, startupGeneration = 0, planKey, liveGoal; const tools = new Map();
+  let identity, session, startupGeneration = 0, planKey, liveGoal, retired = false, visible = false; const tools = new Map();
   function ensure(ctx) {
+    if (retired) return false;
     const nextSession = ctx.sessionManager.getSessionId();
     const agent = ctx.agent ?? { kind: 'main', id: 'Main', name: 'main' };
     const helper = agent.kind === 'sub';
     if (!helper && (ctx.sessionManager.getBranch?.() ?? []).filter(e=>e.type==='custom'&&e.customType==='teck-orca-contract').at(-1)?.data?.presentationReady === false) return false;
     const parent = helper ? registry.get(agent.parentId) : undefined;
     const orchestration = parent ? parent.orchestration : helper ? null : readOrcaCoordination(ctx);
-    const started = !identity || nextSession !== session;
-    if (started && identity) reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
+    const started = !identity || !visible || nextSession !== session;
+    if (started && identity && visible) reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
     if (started) { planKey = undefined; liveGoal = undefined; }
     session = nextSession;
     identity = { workerId: key(`${session}:${agent.id}`), ...(parent ? { parentId: parent.workerId } : {}),
       role: safe(helper ? agent.name : orchestration?.role ?? agent.name), model: safe(ctx.model?.id, 64),
       orchestration, placement: orchestration?.role === 'coordinator' ? 'office' : 'cloud', tokenTotal: usage.total(ctx) };
     registry.set(agent.id, identity);
+    visible = true;
     const plan = readOfficePlan(ctx, liveGoal), nextKey = JSON.stringify(plan);
     if (started) { tools.clear(); reporter.publish({ ...identity, kind: parent ? 'subagent_start' : 'session_start', plan }); }
     else if (nextKey !== planKey) reporter.publish({ ...identity, kind: 'plan', plan });
@@ -137,13 +139,13 @@ export default function activate(pi, dependencies = {}) {
   const on = (name, handler) => pi.on(name, (event, ctx) => {
     try { handler(event, ctx); } catch { /* Best-effort observer; never affect a model turn. */ }
   });
-  for (const name of ['session_start','session_switch','session_branch','session_tree']) on(name, (_e, ctx) => {
+  function refresh(ctx) {
     // Ambient observers load before the explicitly loaded role guard. Wait for
     // its lifecycle handler to append the contract, even if no prompt follows.
     const generation = ++startupGeneration;
     liveGoal = undefined; planKey = undefined;
     const announce = () => { try {
-      if (generation !== startupGeneration) return;
+      if (generation !== startupGeneration || retired) return;
       const ready = ensure(ctx);
       // Also observe human /todo edits while idle; read-only branch metadata,
       // no agent input, polling Orca or fabricated activity events.
@@ -151,9 +153,14 @@ export default function activate(pi, dependencies = {}) {
     } catch { /* Observer only. */ } };
     if (typeof ctx.setTimeout === 'function') ctx.setTimeout(announce, 0);
     else announce();
+  }
+  for (const name of ['session_start','session_switch','session_branch','session_tree']) on(name, (_e, ctx) => {
+    retired = false;
+    refresh(ctx);
   });
-  on('before_agent_start', (_e, ctx) => emit('prompt', ctx));
-  on('agent_start', (_e, ctx) => emit('thinking', ctx));
+  const wake = ctx => { if (retired) { retired = false; refresh(ctx); } };
+  on('before_agent_start', (_e, ctx) => { wake(ctx); emit('prompt', ctx); });
+  on('agent_start', (_e, ctx) => { wake(ctx); emit('thinking', ctx); });
   on('tool_execution_start', (e, ctx) => {
     ensure(ctx);
     let name=e.toolName;
@@ -173,7 +180,16 @@ export default function activate(pi, dependencies = {}) {
   });
   on('tool_approval_requested', (_e, ctx) => emit('waiting', ctx, { summary: 'Awaiting approval' }));
   on('tool_approval_resolved', (_e, ctx) => emit(tools.size ? 'thinking' : 'idle', ctx));
-  on('agent_end', (_e, ctx) => emit('waiting', ctx));
+  on('agent_end', (e, ctx) => {
+    if (ctx.agent?.kind === 'sub' && !e.willContinue && !e.awaitingAsyncWork) {
+      if (ensure(ctx)) reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
+      // Retire the seat, not the native helper. Only a real new turn revives
+      // it; timer refreshes, late usage and plan events cannot resurrect it.
+      retired = true; visible = false; ++startupGeneration;
+      return;
+    }
+    emit('waiting', ctx, e.awaitingAsyncWork ? {summary:'Awaiting helper work'} : e.willContinue ? {summary:'Awaiting continuation'} : {});
+  });
   on('goal_updated', (e, ctx) => {
     if (!ensure(ctx)) return;
     liveGoal = e.goal ?? null;
@@ -189,11 +205,14 @@ export default function activate(pi, dependencies = {}) {
     }
     if (e.message?.role === 'assistant' && ['error','aborted'].includes(e.message.stopReason)) emit('error', ctx, { summary: 'Turn interrupted or failed' });
   });
-  // A helper can finish one turn and remain available. Only actual shutdown removes its seat.
+  // Native helpers can remain reusable after their Office seat has retired.
   pi.on('session_shutdown', async (_e, ctx) => {
     ++startupGeneration;
     try {
-      if (!ensure(ctx)) { await reporter.close(); return; }
+      if (!ensure(ctx)) {
+        if (registry.get(ctx.agent?.id)?.workerId === identity?.workerId) registry.delete(ctx.agent.id);
+        await reporter.close(); return;
+      }
       reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
       if (registry.get(ctx.agent?.id)?.workerId === identity.workerId) registry.delete(ctx.agent.id);
       // Shutdown is the only awaited handler: preserve the final event before process exit.

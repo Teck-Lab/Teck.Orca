@@ -71,7 +71,7 @@ test('observer sends only lifecycle metadata and links native helper identities'
   assert.equal(helper.events[0].parentId, main.events[0].workerId);
   assert.equal(helper.events[0].kind, 'subagent_start');
   helper.run('agent_end');
-  assert.equal(helper.events.at(-1).kind, 'waiting');
+  assert.equal(helper.events.at(-1).kind, 'subagent_end');
   helper.run('session_shutdown');
   assert.equal(helper.events.at(-1).kind, 'subagent_end');
   assert.ok(!JSON.stringify(main.events).includes('PRIVATE'));
@@ -92,6 +92,32 @@ test('mounted tool calls and helper messages are labelled as metadata rather tha
   a.run('tool_execution_start',{toolCallId:'unknown',toolName:'write',args:{path:'xd://unregistered',content:'PRIVATE PAYLOAD'}});
   assert.equal(a.events.at(-1).tool,'write');
   assert.ok(!JSON.stringify(a.events).includes('PRIVATE'));
+});
+
+test('finished helpers retire without being destroyed, ignore late callbacks and return once when reused',()=>{
+  const parent=context('helper-retirement-parent',{kind:'main',id:'retire-parent',name:'main'}),main=adapter(parent);main.run('session_start');
+  const timers=[],ctx=context('helper-retirement-child',{kind:'sub',id:'retire-child',parentId:'retire-parent',name:'scout'});ctx.setTimeout=fn=>timers.push(fn);
+  const a=adapter(ctx);a.run('session_start');timers.shift()();const id=a.events[0].workerId;
+  a.run('agent_end',{willContinue:false});assert.equal(a.events.at(-1).kind,'subagent_end');
+  const n=a.events.length;for(const timer of timers.splice(0))timer();
+  a.run('goal_updated',{goal:null});a.run('tool_execution_end',{toolCallId:'late',toolName:'read'});
+  a.run('message_end',{message:{role:'assistant',timestamp:123,usage:{totalTokens:12}}});
+  assert.equal(a.events.length,n,'idle refresh and late accounting cannot resurrect a finished helper');
+  a.run('before_agent_start',{reason:'revive'});a.run('agent_start');
+  const starts=a.events.filter(e=>e.kind==='subagent_start');assert.equal(starts.length,2);assert.equal(starts[1].workerId,id);assert.equal(starts[1].parentId,main.events[0].workerId);
+  a.run('agent_end',{awaitingAsyncWork:true,willContinue:true});assert.equal(a.events.at(-1).kind,'waiting');assert.equal(a.events.at(-1).summary,'Awaiting helper work');
+  a.run('agent_end',{willContinue:true});assert.equal(a.events.at(-1).summary,'Awaiting continuation');
+  main.run('agent_end',{});assert.equal(main.events.at(-1).kind,'waiting','a coordinator waiting on its workers remains in the office');
+});
+
+test('a retired helper stops presence heartbeats and resumes them on a new start',async()=>{
+  const timers=new Map(),packets=[];let seq=0;
+  const r=createOfficeReporter({readConfig:()=>({version:1,sourceId:'347bd1b8-7ae4-46b8-bdd0-b6a193d165d6',token:'a'.repeat(64),url:'http://127.0.0.1:19474/api/ingest'}),schedule:fn=>{const t={id:++seq,fn,unref(){}};timers.set(t.id,t);return t},cancel:t=>timers.delete(t.id),request:async(_u,o)=>{packets.push(JSON.parse(o.body));return new Response('{}',{status:202})}});
+  async function next(){const t=timers.values().next().value;assert.ok(t);timers.delete(t.id);t.fn();await r.flush();}
+  r.publish({workerId:'helper',parentId:'parent',kind:'subagent_start'});await next();
+  r.publish({workerId:'helper',parentId:'parent',kind:'subagent_end'});await next();
+  assert.deepEqual(packets.at(-1).heartbeat,[]);assert.equal(timers.size,0);
+  r.publish({workerId:'helper',parentId:'parent',kind:'subagent_start'});await next();assert.deepEqual(packets.at(-1).heartbeat,['helper']);await r.close();
 });
 test('session switches retire the previous seat and approval reporting never gates execution', () => {
   const a = adapter(context('one'));
