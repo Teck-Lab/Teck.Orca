@@ -140,6 +140,7 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
           const roleGuard=fs.readFileSync(new URL('./omp/extensions/orca-orchestration.mjs',import.meta.url)).toString('base64');
           const forwarder=fs.readFileSync(new URL('./office-forward.mjs',import.meta.url)).toString('base64');
           const entry=fs.readFileSync(new URL('./omp/extensions/agent-office.ts',import.meta.url)).toString('base64');
+          const officeSkill=fs.readFileSync(new URL('./omp/skills/agent-office/SKILL.md',import.meta.url)).toString('base64');
           const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE'].map(name=>
             [name,fs.readFileSync(new URL('./omp/extensions/lib/'+name,import.meta.url)).toString('base64')]));
           const current=JSON.parse(await run('sbx',['ls','--json']));
@@ -148,7 +149,7 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
           // Scope access to this sandbox, exact port and Office endpoints.
           await run('sbx',['policy','allow','network','--sandbox',p.name,`localhost:${server.port}`,'--method','GET','--path','/healthz']);
           await run('sbx',['policy','allow','network','--sandbox',p.name,`localhost:${server.port}`,'--method','POST','--path','/api/ingest']);
-          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,roleGuard,forwarder,entry,mcpAssets}));
+          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,roleGuard,forwarder,entry,officeSkill,mcpAssets}));
           if(disposed)return;
           const child=spawnTunnel(p.name,server.port,guestPort); const item={child,guestPort};tunnels.set(p.id,item);
           let diagnostics='', exitReason='still running';child.stderr?.on('data',b=>{diagnostics=(diagnostics+b).slice(-2048)});
