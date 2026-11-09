@@ -2,6 +2,10 @@
   "source": "Teck.Paseo import with Orca lifecycle skills",
   "files": [
     {
+      "name": "agent-office/SKILL.md",
+      "sha256": "29e12c52cb53ea5bad44de191697e694770824394f0f23ba2620fca5a617dd39"
+    },
+    {
       "name": "building-admin-dashboard-customizations/references/data-loading.md",
       "sha256": "8f394a141dc73c95eb83cd76169382006cce704e6d04130424b4f54a2cf6ef08"
     },

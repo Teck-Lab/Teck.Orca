@@ -11,7 +11,7 @@ export function ompProcesses() {
   }).length;
 }
 export function validManagedPath(path) {
-  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:orca-policy|github-plan-scope|mcphub-client|mcphub-search|mcphub-firecrawl)\.mjs)|skills\/(?:orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
+  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:(?:orca-policy|github-plan-scope|mcphub-client|mcphub-search|mcphub-firecrawl|office-tools|office-usage|office-mcp|office-mcp-server)\.mjs|agent-office\.LICENSE))|skills\/(?:agent-office|orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
 }
 export function validatePayload(data) {
   if (data?.version !== 1 || !/^\d+\.\d+\.\d+$/.test(data.omp) || !/^[a-f0-9]{64}$/.test(data.digest) || !Array.isArray(data.files) || !data.files.length || data.files.length > 1000) throw Error('Invalid update payload');

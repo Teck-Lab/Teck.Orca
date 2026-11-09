@@ -3,13 +3,14 @@ import { promisify } from 'node:util';
 import { createHash, randomUUID } from 'node:crypto';
 import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { assignment, coordinationAction, coordinationActions, messageTypes, permittedTool, resolveRole, workerRoles, isPlanningWrite, isPlanningTool, implementationTool, dispatchPlacement, verifyExecutorReuse, dispatchLabels, canRenameWorkerTab } from './lib/orca-policy.mjs';
+import { assignment, coordinationAction, coordinationActions, messageTypes, permittedTool, resolveRole, workerRoles, isPlanningWrite, isPlanningTool, implementationTool, dispatchPlacement, verifyExecutorReuse, dispatchLabels, canRenameWorkerTab, isOfficeTool } from './lib/orca-policy.mjs';
 import { createPlanningScope } from './lib/github-plan-scope.mjs';
 
 const execute = promisify(execFile);
 // OMP rebinds the extension per native agent in the same process. Only actual
 // child turns can record delegation; copied prompts/tool receipts cannot.
 const nativeFamilies = new Map();
+const officeInstructions = 'When the Agent Office MCP tools are available, read skill://agent-office once before using them. Update your own status at meaningful phase/wait changes, check peers before shared edits, announce real milestones and celebrate verified wins. A rare table flip is optional. Office tools never replace Orca messages, evidence or acceptance, and office failure/cooldown never delays work.';
 const instructions = `Teck Orca role contract:
 The coordinator only plans and manages GitHub metadata, Orca Tasks/Dispatches and messages.
 Never inspect source, implement, integrate code, run tests or publish code as coordinator.
@@ -76,6 +77,7 @@ export default function activate(pi, dependencies = {}) {
   const requireParent = ctx => { if (isNative(ctx)) throw Error('Orca lifecycle tools belong to the owning session; return native helper results to the parent.'); };
   const z = pi.zod;
   const environment = dependencies.environment ?? process.env;
+  const officeContext = () => pi.getAllTools().some(t => isOfficeTool(t.name)) ? [officeInstructions] : [];
   const reply = data => ({ content: [{ type: 'text', text: JSON.stringify(data) }], details: data,
     ...(data?.ok === false ? { isError: true } : {}) });
   const entries = ctx => ctx.sessionManager.getBranch?.() ?? ctx.sessionManager.getEntries?.() ?? [];
@@ -186,6 +188,7 @@ export default function activate(pi, dependencies = {}) {
       ...(permittedTool(role,'git_inspect',{})?['git_inspect']:[]),
       ...(role === 'coordinator' ? ['orca_dispatch'] : [])])];
     for (const name of ['task', 'wait', 'write', ...(role==='executor'?['eval']:[])]) if (available.includes(name)) names.push(name);
+    for (const name of available.filter(isOfficeTool)) names.push(name);
     if(['planner','researcher','reviewer','publisher'].includes(role)&&available.includes('lsp'))names.push('lsp');
     // Argument-sensitive tools stay visible; tool_call is the authoritative boundary.
     for (const name of available) if (/github/.test(name) && (isPlanningTool(name) || ['pull_request_read', 'manage_project', 'manage_issues', 'manage_milestones', 'manage_labels', 'manage_status_updates']
@@ -198,8 +201,9 @@ export default function activate(pi, dependencies = {}) {
       // OMP rebinds this factory per helper. Preserve its agent preset and own
       // lifecycle instead of claiming the parent's pane/Dispatch/goal.
       const scope=nativeScope(ctx);
-      await pi.setActiveTools(pi.getActiveTools().filter(name => !parentTools.includes(name)&&
-        (!scope||name==='yield'||permittedTool(scope,name,{})||name==='lsp'&&['researcher','reviewer','publisher'].includes(scope))));
+      await pi.setActiveTools([...new Set([...pi.getActiveTools().filter(name => !parentTools.includes(name)&&
+        (!scope||name==='yield'||permittedTool(scope,name,{})||name==='lsp'&&['researcher','reviewer','publisher'].includes(scope))),
+        ...pi.getAllTools().map(t=>t.name).filter(isOfficeTool)])]);
       return;
     }
     restore(ctx); save(); await tools(ctx);ownFamily(ctx);
@@ -221,7 +225,7 @@ export default function activate(pi, dependencies = {}) {
     xdevCalls.clear();
   });
   pi.on('before_agent_start', async (event, ctx) => {
-    if (isNative(ctx)) { const scope=nativeScope(ctx,true);return { systemPrompt: [...event.systemPrompt,
+    if (isNative(ctx)) { const scope=nativeScope(ctx,true);return { systemPrompt: [...event.systemPrompt, ...officeContext(),
       `You are a native OMP helper${scope?` within the ${scope} boundary`:''}. Follow your parent assignment, agent preset and permissions. Native delegation is allowed as needed. Return evidence/results to the parent; it owns its Orca Task/Dispatch, native goal and final settlement. Do not claim or settle the parent session's lifecycle. This helper does not need another implementation-worker before using its own permitted tools.`] }; }
     if (!initialized) restore(ctx);
     // Prompt text cannot mint authority, change role or narrow the assignment.
@@ -233,7 +237,7 @@ export default function activate(pi, dependencies = {}) {
     }
     await tools(ctx);
     ownFamily(ctx);
-    return { systemPrompt: [...event.systemPrompt, instructions,
+    return { systemPrompt: [...event.systemPrompt, instructions, ...officeContext(),
       `Current fixed role: ${role}. ${currentAssignment ? `Assigned native goal: ${JSON.stringify(currentAssignment.objective)}. Acceptance: ${JSON.stringify(currentAssignment.acceptance)}.` :
         'Before substantial delivery work create the authorized native goal. Do not invent or select a different GitHub milestone.'}`,
       ...(authority?[`Verified Orca Run ${authority.runId}, Task ${authority.taskId}, Dispatch ${authority.dispatchId}, handle ${authority.handle}. Structured orca report/check/ask calls supply their own lifecycle IDs; omit those fields instead of guessing.`]:[])] };
@@ -297,6 +301,9 @@ export default function activate(pi, dependencies = {}) {
         name=route[1];
       }catch{return{block:true,reason:'The registered Orca endpoint requires one JSON argument object.'};}
     }
+    // Presence and presentation remain usable before goal creation, after
+    // completion and while waiting; they never authorize implementation.
+    if (isOfficeTool(name)) return;
     if (isNative(ctx)) {
       if (parentTools.includes(name)) return { block: true, reason: 'Return native helper results to the parent; its Orca lifecycle belongs to the owning session.' };
       const scope=nativeScope(ctx);

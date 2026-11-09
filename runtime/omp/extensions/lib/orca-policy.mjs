@@ -3,6 +3,8 @@
 import { realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, relative, isAbsolute } from 'node:path';
+import { isOfficeTool } from './office-tools.mjs';
+export { isOfficeTool } from './office-tools.mjs';
 export const workerRoles = { executor: 'task', planner: 'slow', researcher: 'slow', reviewer: 'advisor', publisher: 'task' };
 const same = (a, b) => a && b && a.provider === b.provider && a.id === b.id;
 export function resolveRole(model, models, assignedRole) {
@@ -55,6 +57,9 @@ export function mcpName(name) {
 export const isPlanningWrite = name => planningWrites.has(mcpName(name));
 export const isPlanningTool = name => planning.has(mcpName(name));
 export function permittedTool(role, name, input = {}) {
+  // These five visual/presence tools do not grant repository, shell or Orca
+  // lifecycle authority, including in a read-only helper or a waiting session.
+  if (isOfficeTool(name)) return true;
   // Knowledge capture is separate from repository editing/publication authority.
   if (['recall', 'retain', 'reflect', 'learn'].includes(name)) return true;
   // Native OMP delegation is available to every role. The parent remains

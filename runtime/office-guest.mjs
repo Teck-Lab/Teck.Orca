@@ -1,5 +1,15 @@
+export function withOfficeMcp(config) {
+  if (!config || typeof config !== 'object' || Array.isArray(config) ||
+      config.mcpServers !== undefined && (!config.mcpServers || typeof config.mcpServers !== 'object' || Array.isArray(config.mcpServers)))
+    throw Error('Invalid OMP MCP configuration; retained without replacement');
+  const servers = config.mcpServers ?? {};
+  if (Object.keys(servers).some(name => /^(?:agentoffice|agent-office|agent_office)$/i.test(name))) return config;
+  return { ...config, mcpServers: { ...servers, agentoffice: { type: 'stdio', command: 'node',
+    args: ['/home/agent/.omp/agent/extensions/lib/office-mcp.mjs'], timeout: 5000 } } };
+}
+
 // Input travels on stdin: observer credentials never appear in command arguments or logs.
-export const configureOfficeGuest = String.raw`
+export const configureOfficeGuest = 'const withOfficeMcp=' + withOfficeMcp.toString() + ';\n' + String.raw`
 const fs=require('node:fs'),path=require('node:path');let text='';
 process.stdin.on('data',b=>{text+=b;if(text.length>262144)process.exit(1)});
 process.stdin.on('end',()=>{
@@ -7,6 +17,12 @@ process.stdin.on('end',()=>{
  const regular=p=>{if(fs.existsSync(p)&&fs.lstatSync(p).isSymbolicLink())throw Error('Office path is a symlink');};
  const put=(p,data,mode,uid=1000,gid=1000)=>{regular(p);regular(path.dirname(p));fs.mkdirSync(path.dirname(p),{recursive:true});if(fs.existsSync(p)&&fs.readFileSync(p,'utf8')===data)return;const t=p+'.office-'+process.pid;fs.writeFileSync(t,data,{mode,flag:'wx'});fs.chownSync(t,uid,gid);fs.renameSync(t,p)};
  put('/etc/teck-orca/office.json',JSON.stringify(p.config)+'\n',0o640,0,1000);
+ const allowed=new Set(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','agent-office.LICENSE']);
+ for(const [name,encoded]of Object.entries(p.mcpAssets||{})){if(!allowed.has(name))throw Error('Unknown office asset');put('/home/agent/.omp/agent/extensions/lib/'+name,Buffer.from(encoded,'base64').toString(),0o600)}
+ const mcpPath='/home/agent/.omp/agent/mcp.json';regular(mcpPath);
+ const current=fs.existsSync(mcpPath)?JSON.parse(fs.readFileSync(mcpPath,'utf8')):{};
+ const next=withOfficeMcp(current);
+ if(next!==current)put(mcpPath,JSON.stringify(next,null,2)+'\n',0o600);
  put('/home/agent/.omp/agent/extensions/agent-office.mjs',Buffer.from(p.extension,'base64').toString(),0o600);
  put('/home/agent/.omp/agent/extensions/agent-office.ts',Buffer.from(p.entry,'base64').toString(),0o600);
  if(!fs.existsSync('/etc/teck-orca/pixtuoid-removed')){

@@ -16,9 +16,13 @@ test('maintenance payload verifies every file and rejects attempts to overwrite 
     assert.equal(validManagedPath(path), true);
     assert.ok(payload.files.some(file => file.path === path), 'maintenance must include the research extension and all of its dependencies');
   }
-  for(const path of ['WATCHDOG.yml','agents/implementation-worker.md','agents/correctness-reviewer.md','agents/security-auditor.md']){
+  for(const path of ['WATCHDOG.yml','agents/implementation-worker.md','agents/correctness-reviewer.md','agents/security-auditor.md','skills/agent-office/SKILL.md']){
     assert.equal(validManagedPath(path),true);
     assert.ok(payload.files.some(file=>file.path===path),'managed updates must carry the native worker/review presets and their advisor policy together');
+  }
+  for(const name of ['office-tools.mjs','office-usage.mjs','office-mcp.mjs','office-mcp-server.mjs','agent-office.LICENSE']){
+    const path='extensions/lib/'+name;assert.equal(validManagedPath(path),true);
+    assert.ok(payload.files.some(file=>file.path===path),'the observer/MCP dependencies must ship with the workflow');
   }
   assert.equal(validManagedPath('agents/user-custom-agent.md'),false);
   const broken = structuredClone(payload); broken.files[0].data = Buffer.from('tampered').toString('base64');

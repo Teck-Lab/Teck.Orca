@@ -7,6 +7,16 @@ import { createPlanningScope } from '../runtime/omp/extensions/lib/github-plan-s
 const roles = { default: 'gateway/lead', plan: 'gateway/lead', task: 'gateway/doer', slow: 'gateway/research', advisor: 'gateway/review' };
 const models = { resolve: role => { const [provider, id] = (roles[role.replace('@', '')] ?? '').split('/'); return id ? { provider, id } : undefined; } };
 let sessionSequence=0;
+const officeTools=['office_status','office_peers','office_shout','office_celebrate','office_flip'];
+
+test('all roles permit exactly the five Office presentation tools across supported MCP aliases',()=>{
+  for(const role of ['coordinator','executor','planner','researcher','reviewer','publisher','unbound']){
+    for(const tool of officeTools)for(const prefix of ['', 'agentoffice-', 'agentoffice/', 'agentoffice__', 'agentoffice_', 'agent-office-', 'agent_office/', 'mcp__agentoffice__'])
+      assert.equal(permittedTool(role,prefix+tool,{}),true,role+': '+prefix+tool);
+    for(const tool of ['office_shell','office_status_extra','office_status/exec','unrelated-office_status','agentoffice-exec','agentoffice-office_status/exec','github-office_flip'])
+      assert.equal(permittedTool(role,tool,{}),false,role+': '+tool);
+  }
+});
 test('roles follow existing OMP configuration, with ambiguous or unknown models restricted to coordination', () => {
   assert.equal(resolveRole({ provider: 'gateway', id: 'lead' }, models), 'coordinator');
   assert.equal(resolveRole({ provider: 'gateway', id: 'doer' }, models), 'executor');
@@ -161,7 +171,8 @@ function session(model = 'lead', branch = [], sendResult) {
   const schema = new Proxy(() => schema, { get: () => schema });
   const pi = { zod: schema, on: (name, fn) => handlers.set(name, fn), registerTool: tool => tools.set(tool.name, tool),
     getAllTools: () => ['bash', 'read', 'edit', 'eval', 'task', 'goal', 'todo', 'github__push_files', 'github__issue_write',
-      'github/github-get_file_contents','github-projects/manage_project','web_search','lsp','debug','ast_edit'].map(name => ({ name })),
+      'github/github-get_file_contents','github-projects/manage_project','web_search','lsp','debug','ast_edit',
+      ...officeTools.map(n=>'agentoffice-'+n),'agentoffice-office_exec'].map(name => ({ name })),
     getActiveTools: () => [...activeTools],
     setActiveTools: async names => { activeTools = [...names]; calls.push({ active: names }); },
     sendUserMessage: text => { sent.push(text); pending = true; },
@@ -214,6 +225,37 @@ function createdGoal(s, objective) {
   s.handlers.get('tool_result')({ toolName: 'goal', isError: false, details: { op: 'create', goal } });
   return goal;
 }
+
+test('Office tools are visible and callable before goals and while waiting, without widening execution rights',async()=>{
+  for(const role of ['coordinator','executor','planner','researcher','reviewer','publisher','unbound']){
+    const s=session('lead',[{type:'custom',customType:'teck-orca-contract',data:{version:1,role,launchRole:role}}]);
+    await s.handlers.get('session_start')({},s.ctx);
+    for(const tool of officeTools){
+      assert.ok(s.pi.getActiveTools().includes('agentoffice-'+tool),role+': advertised Office tool');
+      assert.equal(s.guard('agentoffice-'+tool,{text:'Waiting for workers'}),undefined);
+      assert.equal(s.guard('write',{path:'xd://agentoffice-'+tool,content:JSON.stringify({text:'Waiting for workers'})}),undefined);
+    }
+    assert.equal(s.pi.getActiveTools().includes('agentoffice-office_exec'),false);
+    assert.equal(s.guard('agentoffice-office_exec',{}).block,true);
+    assert.equal(s.guard('write',{path:'xd://agentoffice-office_exec',content:'{}'}).block,true);
+    s.handlers.get('goal_updated')({goal:{id:'goal',status:'complete',objective:'Done'}});
+    assert.equal(s.guard('agentoffice-office_status',{text:'Waiting for verification'}),undefined);
+    assert.equal(s.guard('edit',{path:'/project/source'}).block,true);
+  }
+});
+
+test('native reviewers and advisors retain Office tools without acquiring edits or parent lifecycle rights',async()=>{
+  const parent=session('review');const input={role:'reviewer',objective:'Review snapshot',acceptance:['Verdict'],constraints:'Read only'};
+  await parent.handlers.get('session_start')({},parent.ctx);parent.setAssignment(input);
+  await parent.handlers.get('before_agent_start')({systemPrompt:[],prompt:'Review'},parent.ctx);createdGoal(parent,input.objective);
+  const child=await startImplementation(parent,'correctness-reviewer');
+  for(const tool of officeTools){assert.ok(child.pi.getActiveTools().includes('agentoffice-'+tool));assert.equal(child.guard('agentoffice-'+tool,{}),undefined);}
+  const advisor={...child.ctx,agent:{kind:'sub',id:'advisor',name:'advisor',parentId:child.ctx.agent.id}};
+  assert.equal(child.handlers.get('tool_call')({toolName:'agentoffice-office_status',input:{text:'Checking evidence'}},advisor),undefined);
+  for(const tool of ['edit','bash','eval','orca_dispatch'])assert.equal(child.guard(tool,{}).block,true);
+  const prompt=await child.handlers.get('before_agent_start')({systemPrompt:[],prompt:'Review'},child.ctx);
+  assert.match(prompt.systemPrompt.join('\n'),/skill:\/\/agent-office/);
+});
 test('loaded extension requires an active native goal, dispatches configured role, and cannot promote coordinator through a prompt', async () => {
   const s = session();
   await s.handlers.get('session_start')({}, s.ctx);

@@ -125,3 +125,41 @@ test('unbound/malformed worker claims do not become a verified office role',()=>
     assert.equal(readOrcaCoordination(ctx),null);
   }
 });
+
+test('native Office MCP results animate their exact owner without forwarding arbitrary arguments or output',()=>{
+  const a=adapter(context('office-owner'),['agentoffice-office_status','agentoffice-office_flip']);
+  a.run('tool_execution_start',{toolCallId:'status',toolName:'write',args:{path:'xd://agentoffice-office_status',content:'PRIVATE REQUEST'}});
+  a.run('tool_execution_end',{toolCallId:'status',toolName:'write',result:{details:{xdev:{tool:'agentoffice-office_status',inner:{structuredContent:{officeSignal:{v:1,kind:'status',text:'Testing cache',mood:'🧪',extra:'PRIVATE'}}}}}}});
+  const status=a.events.find(e=>e.kind==='status');
+  assert.equal(status.workerId,a.events[0].workerId);assert.equal(status.summary,'Testing cache');assert.equal(status.tool,'🧪');
+  a.run('tool_execution_start',{toolCallId:'flip',toolName:'agentoffice-office_flip',args:{reason:'PRIVATE REQUEST'}});
+  a.run('tool_execution_end',{toolCallId:'flip',toolName:'agentoffice-office_flip',isError:true,result:{content:[{type:'text',text:'PRIVATE OUTPUT'}],details:{structuredContent:{officeSignal:{v:1,kind:'flip',text:'Not delivered'}}}}});
+  assert.ok(!a.events.some(e=>e.kind==='flip'));assert.ok(!JSON.stringify(a.events).includes('PRIVATE'));
+});
+
+test('assistant usage is cumulative per owner and replay cannot replace its waiting pose',async()=>{
+  const ctx=context('usage-owner'),a=adapter(ctx);
+  a.run('session_start');a.run('agent_end');
+  const message={role:'assistant',provider:'gateway',model:'model',timestamp:10,responseId:'shared-gateway-id',usage:{totalTokens:125}};
+  a.run('message_end',{message});a.run('message_end',{message});
+  assert.deepEqual(a.events.filter(e=>e.kind==='usage').map(e=>e.tokenTotal),[125]);
+  const packets=[];const r=createOfficeReporter({readConfig:()=>({version:1,sourceId:'347bd1b8-7ae4-46b8-bdd0-b6a193d165d6',token:'a'.repeat(64),url:'http://127.0.0.1:19474/api/ingest'}),
+    schedule:()=>({unref(){}}),cancel(){},request:async(_url,options)=>{packets.push(JSON.parse(options.body));return new Response(JSON.stringify({missing:packets.length===1?['owner']:[]}),{status:202})}});
+  r.publish({workerId:'owner',kind:'waiting',tokenTotal:10,orchestration:{role:'coordinator',runId:'old-run'}});
+  r.publish({workerId:'owner',kind:'status',summary:'Waiting for workers',tool:'⏳',tokenTotal:10,orchestration:{role:'coordinator',runId:'old-run'}});
+  r.publish({workerId:'owner',kind:'waiting',tokenTotal:10,orchestration:{role:'coordinator',runId:'new-run'}});
+  r.publish({workerId:'owner',kind:'usage',tokenTotal:125});
+  await r.flush();await r.flush();
+  assert.deepEqual(packets[1].events.map(e=>e.kind),['session_start','waiting','status']);
+  assert.ok(packets[1].events.every(e=>e.tokenTotal===125&&e.orchestration.runId==='new-run'));
+  await r.close();
+});
+
+test('burst observer batches fit the HTTP byte limit without dropping unsent events on acknowledgement',async()=>{
+  const packets=[];const r=createOfficeReporter({readConfig:()=>({version:1,sourceId:'347bd1b8-7ae4-46b8-bdd0-b6a193d165d6',token:'a'.repeat(64),url:'http://127.0.0.1:19474/api/ingest'}),
+    schedule:()=>({unref(){}}),cancel(){},request:async(_url,options)=>{assert.ok(Buffer.byteLength(options.body)<64*1024);packets.push(JSON.parse(options.body));return new Response('{}',{status:202})}});
+  for(let i=0;i<100;i++)r.publish({workerId:'owner',kind:'tool_start',summary:'tool '+i,role:'r'.repeat(48),model:'m'.repeat(64),orchestration:{role:'executor',runId:'r'.repeat(120),taskId:'t'.repeat(120),dispatchId:'d'.repeat(120),issue:'https://github.com/owner/repository/issues/123'}});
+  while(r.pending)await r.flush();
+  assert.equal(packets.reduce((n,p)=>n+p.events.length,0),100);assert.ok(packets.length>1);
+  await r.close();
+});

@@ -25,7 +25,7 @@ test('only exactly owned running sandboxes get a tunnel; duplicate refreshes coa
   let starts=0,configured=0,tunnelCount=0,closed=0,configuredPort;
   const m=createOfficeManager({root,run:async()=>JSON.stringify([{...project,status:'running'}]),
     service:async()=>{starts++;return{port:4747,url:'http://127.0.0.1:4747',home:join(root,'server'),secret:'a'.repeat(64)}},
-    input:async(_program,args,stdin)=>{configured++;const data=JSON.parse(stdin);assert.equal(data.config.sourceId,project.id);assert.ok(!args.join(' ').includes(data.config.token));configuredPort=Number(new URL(data.config.url).port);assert.ok(configuredPort>=20000&&configuredPort<60000);assert.ok(Buffer.from(data.entry,'base64').toString().includes('./agent-office.mjs'));},
+    input:async(_program,args,stdin)=>{configured++;const data=JSON.parse(stdin);assert.equal(data.config.sourceId,project.id);assert.ok(!args.join(' ').includes(data.config.token));configuredPort=Number(new URL(data.config.url).port);assert.ok(configuredPort>=20000&&configuredPort<60000);assert.ok(Buffer.from(data.entry,'base64').toString().includes('./agent-office.mjs'));assert.ok(data.mcpAssets['office-usage.mjs']);assert.ok(data.mcpAssets['office-mcp-server.mjs']);assert.ok(Buffer.byteLength(stdin)<262144);},
     spawnTunnel:(_name,_port,guestPort)=>{assert.equal(guestPort,configuredPort);tunnelCount++;const child=new EventEmitter();child.stderr={resume(){}};child.kill=()=>{closed++};return child;},
     checkTunnel:async(_project,_record,guestPort)=>{assert.equal(guestPort,configuredPort)},open:async()=>{} });
   await Promise.all([m.sync([project],{autoOpen:false}),m.sync([project],{autoOpen:false})]);

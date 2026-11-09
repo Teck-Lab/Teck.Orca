@@ -20,9 +20,14 @@ for(const file of ['cli.js','term-worker.mjs','web'])fs.cpSync(join(source,'dist
 // The source fork's build already requires esbuild. Minify its node bundles
 // without renaming functions/classes so individual App-backed uploads stay
 // below the gateway's body limit; runtime imports remain unchanged.
-const {transformSync}=createRequire(join(source,'package.json'))('esbuild');
+const {transformSync,buildSync}=createRequire(join(source,'package.json'))('esbuild');
 for(const file of ['cli.js','term-worker.mjs'])fs.writeFileSync(join(destination,file),transformSync(fs.readFileSync(join(destination,file),'utf8'),{
  minify:true,keepNames:true,format:'esm',target:'node18',legalComments:'inline'}).code);
+const mcpRoot=join(repo,'runtime/omp/extensions/lib');fs.mkdirSync(mcpRoot,{recursive:true});
+buildSync({stdin:{contents:`export {createMcpServer} from './src/mcp/server.ts'; export const OFFICE_VERSION=${JSON.stringify(JSON.parse(fs.readFileSync(join(source,'package.json'),'utf8')).version)};`,resolveDir:source,loader:'ts'},
+ outfile:join(mcpRoot,'office-mcp-server.mjs'),bundle:true,platform:'node',format:'esm',target:'node18',minify:true,keepNames:true,legalComments:'inline',
+ banner:{js:'// Bundled Agent Office MCP implementation (MIT); see agent-office.LICENSE.'},logLevel:'warning'});
+fs.copyFileSync(join(source,'LICENSE'),join(mcpRoot,'agent-office.LICENSE'));
 fs.copyFileSync(join(source,'LICENSE'),join(destination,'LICENSE'));
 fs.copyFileSync(join(source,'package.json'),join(destination,'package.json'));
 const files={};function walk(root,prefix=''){for(const name of fs.readdirSync(root).sort()){const p=join(root,name),relative=prefix+name;if(fs.lstatSync(p).isSymbolicLink())throw Error('Bundle symlink refused');
