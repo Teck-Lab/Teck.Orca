@@ -13,10 +13,10 @@ import { configureOfficeGuest } from '../runtime/office-guest.mjs';
 const project = { projectId: 'p', id: '347bd1b8-7ae4-46b8-bdd0-b6a193d165d6', name: 'teck-orca-ssh-bc02e0548944', title: 'Teck.Monorepo', state: 'running' };
 test('transport exposes only validated guest and host loopback ports', () => {
   const args = officeTunnelArgs(project.name,4747);
-  assert.ok(args.includes('127.0.0.1:19474:127.0.0.1:4747'));
-  assert.ok(args.includes('ExitOnForwardFailure=yes'));
+  assert.deepEqual(args.slice(-4),['node','/usr/local/lib/teck-orca/office-forward.mjs','19474','4747']);
+  assert.ok(!args.includes('-R'));
   assert.throws(()=>officeTunnelArgs('unowned',4747));
-  assert.ok(officeTunnelArgs(project.name,4747,28765).includes('127.0.0.1:28765:127.0.0.1:4747'));
+  assert.deepEqual(officeTunnelArgs(project.name,4747,28765).slice(-2),['28765','4747']);
   assert.throws(()=>officeTunnelArgs(project.name,4747,0));
   new Function(configureOfficeGuest);
 });
@@ -44,6 +44,23 @@ test('failed service startup backs off and logs one actionable message',async t=
 test('bundled distribution is from our fork and passes all asset hashes',()=>{
   const root=new URL('../runtime/agent-office/',import.meta.url);const bundle=verifyOfficeBundle(root.pathname.replace(/^\/([A-Za-z]:)/,'$1'));
   assert.equal(bundle.source,'https://github.com/Teck-Lab/agent-office');assert.ok(bundle.files['cli.js']);
+});
+
+test('a live SSH helper with a dead Office listener is replaced without restarting the sandbox',async t=>{
+  const root=fs.mkdtempSync(join(tmpdir(),'teck-office-health-')),secret='c'.repeat(64);
+  const http=createServer((req,res)=>{const challenge=new URL(req.url,'http://localhost').searchParams.get('challenge');res.setHeader('Content-Type','application/json');res.end(JSON.stringify({external:true,clients:1,proof:createHmac('sha256',secret).update('agentoffice:'+challenge).digest('hex')}));});
+  const port=await new Promise(resolve=>{http.listen(0,'127.0.0.1',()=>resolve(http.address().port))});
+  const home=join(root,'server');fs.mkdirSync(home);fs.writeFileSync(join(home,'office.json'),JSON.stringify({host:'127.0.0.1',port,url:`http://127.0.0.1:${port}`,secret}));
+  let spawned=0,killed=0,configured=0,failExisting=false;const policies=[];
+  const m=createOfficeManager({root,run:async(_program,args)=>{if(args[0]==='policy')policies.push(args);return JSON.stringify([{...project,status:'running'}])},
+    service:async()=>({home,port,url:`http://127.0.0.1:${port}`,secret,clients:1}),input:async()=>{configured++},open:async()=>{},
+    spawnTunnel:()=>{spawned++;const c=new EventEmitter();c.kill=()=>{killed++};return c},
+    checkTunnel:async(_p,_r,_port,options)=>{if(options?.retry===false&&failExisting){failExisting=false;throw Error('Listener lost')}}});
+  t.after(()=>{m.dispose();http.closeAllConnections();http.close();fs.rmSync(root,{recursive:true,force:true})});
+  await m.sync([project]);failExisting=true;await m.sync([project]);await m.sync([project]);
+  assert.equal(spawned,2);assert.equal(configured,2);assert.equal(killed,1);
+  assert.ok(policies.every(a=>a.includes('--sandbox')&&a.includes(project.name)&&a.includes(`localhost:${port}`)));
+  assert.deepEqual([...new Set(policies.map(a=>a.at(-1)))].sort(),['/api/ingest','/healthz']);
 });
 
 test('an explicit open works even when another viewer is connected; automatic refresh does not duplicate it',async t=>{

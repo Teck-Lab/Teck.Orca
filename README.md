@@ -77,7 +77,10 @@ selection highlights the native family and workers sharing its Run. Unbound
 sessions remain in the cloud area.
 Orca retains workspace, terminal and sandbox ownership. The office runs with agent
 control and transcript/cloud discovery disabled. Authenticated events travel through
-a loopback-only reverse SSH tunnel; no LAN listener or firewall change is required.
+a guest loopback relay through Docker's host-service proxy; no LAN listener or
+firewall change is required. The plugin scopes network access to that sandbox,
+the Office host port, GET /healthz and POST /api/ingest. Fresh connections are
+checked on refresh so an alive helper cannot conceal a broken listener.
 Existing OMP sessions must be reopened/resumed to load the observer. Pixtuoid is removed
 from new images and cleaned up in owned running sandboxes when the plugin connects.
 See [native runtime details](native-ssh/README.md).

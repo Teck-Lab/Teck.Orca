@@ -28,8 +28,8 @@ export function verifyOfficeBundle(root) {
 }
 export function officeTunnelArgs(name, port, guestPort = 19474) {
   if (!/^teck-orca-ssh-[a-f0-9]{12}$/.test(name) || [port,guestPort].some(p=>!Number.isInteger(p)||p<1024||p>65535)) throw Error('Invalid office transport');
-  return ['-N','-T','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=2',
-    '-R',`127.0.0.1:${guestPort}:127.0.0.1:${port}`,`${name}.sbx`];
+  return ['-T','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=2',
+    `${name}.sbx`,'node','/usr/local/lib/teck-orca/office-forward.mjs',String(guestPort),String(port)];
 }
 export async function commandWithInput(program, args, input) {
   return new Promise((resolve, reject) => {
@@ -92,7 +92,7 @@ function spawnOfficeTunnel(name,port,guestPort){
 }
 export function createOfficeManager({ root = join(homedir(),'.teck-orca','office'), run = statusCommand, input = commandWithInput,
   service = startLocalOffice, spawnTunnel = spawnOfficeTunnel,
-  checkTunnel = async (project, record, guestPort) => {
+  checkTunnel = async (project, record, guestPort, {retry=true}={}) => {
     const challenge = randomBytes(16).toString('hex');
     const expected = createHmac('sha256', record.secret).update('agentoffice:' + challenge).digest('hex');
     const script = `fetch('http://127.0.0.1:${guestPort}/healthz?challenge=${challenge}',{signal:AbortSignal.timeout(1200)}).then(r=>r.json()).then(d=>{if(d.proof!=='${expected}'||!d.external){console.log(JSON.stringify({proofMatches:d.proof==='${expected}',external:d.external===true}));process.exitCode=1}}).catch(e=>{console.log(JSON.stringify({code:e.cause?.code||e.name}));process.exitCode=1})`;
@@ -101,9 +101,9 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
     while(Date.now()<deadline) {
       const rows=JSON.parse(await run('sbx',['ls','--json']));
       if(!rows.some(r=>r.id===project.id&&r.name===project.name&&r.status==='running'))throw Error('Office sandbox is no longer running');
-      try { await run('sbx',['exec','-u','agent',project.name,'node','-e',script]); return; } catch(error) { lastProbe=String(error.stdout||error.code||'').replace(/[^A-Za-z0-9_:{}",.-]/g,'').slice(0,180);await delay(500); }
+      try { await run('sbx',['exec','-u','agent',project.name,'node','-e',script]); return; } catch(error) { lastProbe=String(error.stdout||error.code||'').replace(/[^A-Za-z0-9_:{}",.-]/g,'').slice(0,180);if(!retry)break;await delay(500); }
     }
-    throw Error('Office reverse SSH connection failed'+(lastProbe?': '+lastProbe:''));
+    throw Error('Office sandbox relay failed'+(lastProbe?': '+lastProbe:''));
   },
   open = openOfficeBrowser, now = Date.now, log = () => {} } = {}) {
   let pending, disposed = false, server, opened = false, backoff = 0, failure;
@@ -128,20 +128,29 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
         if(!live){for(const item of tunnels.values())item.child.kill();tunnels.clear();server=await service({root});opened=false;}
         else server={...server,...live};
         for(const p of verified){
-          if(tunnels.has(p.id))continue;
+          const previous=tunnels.get(p.id);
+          if(previous){
+            try {await checkTunnel(p,server,previous.guestPort,{retry:false});continue;}
+            catch {previous.child.kill();tunnels.delete(p.id);}
+          }
           // A new listener must not share a port with an old SSH session still being retired.
           const guestPort=randomInt(20000,60000);
           const config={version:1,sourceId:p.id,url:`http://127.0.0.1:${guestPort}/api/ingest`,token:sources[p.id].token};
           const extension=fs.readFileSync(new URL('./omp/extensions/agent-office.mjs',import.meta.url)).toString('base64');
           const roleGuard=fs.readFileSync(new URL('./omp/extensions/orca-orchestration.mjs',import.meta.url)).toString('base64');
+          const forwarder=fs.readFileSync(new URL('./office-forward.mjs',import.meta.url)).toString('base64');
           const entry=fs.readFileSync(new URL('./omp/extensions/agent-office.ts',import.meta.url)).toString('base64');
           const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE'].map(name=>
             [name,fs.readFileSync(new URL('./omp/extensions/lib/'+name,import.meta.url)).toString('base64')]));
           const current=JSON.parse(await run('sbx',['ls','--json']));
           if(!current.some(r=>r.id===p.id&&r.name===p.name&&r.status==='running'))continue;
-          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,roleGuard,entry,mcpAssets}));
+          // Docker translates this host-service address through its proxy.
+          // Scope access to this sandbox, exact port and Office endpoints.
+          await run('sbx',['policy','allow','network','--sandbox',p.name,`localhost:${server.port}`,'--method','GET','--path','/healthz']);
+          await run('sbx',['policy','allow','network','--sandbox',p.name,`localhost:${server.port}`,'--method','POST','--path','/api/ingest']);
+          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,roleGuard,forwarder,entry,mcpAssets}));
           if(disposed)return;
-          const child=spawnTunnel(p.name,server.port,guestPort); const item={child};tunnels.set(p.id,item);
+          const child=spawnTunnel(p.name,server.port,guestPort); const item={child,guestPort};tunnels.set(p.id,item);
           let diagnostics='', exitReason='still running';child.stderr?.on('data',b=>{diagnostics=(diagnostics+b).slice(-2048)});
           child.stderr?.resume();
           const lost=()=>{if(tunnels.get(p.id)===item){tunnels.delete(p.id);backoff=now()+5000;}};

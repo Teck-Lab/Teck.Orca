@@ -20,7 +20,8 @@ const program=candidates.find(p=>spawnSync(p,['-V'],{cwd:homedir(),env,windowsHi
 if(!program)throw Error('No usable OpenSSH client in the office helper');
 const ssh = spawn(program, args,
   { cwd:homedir(), env, windowsHide:true, stdio:['pipe','ignore','pipe'] });
-ssh.stdin.end();ssh.stderr.pipe(process.stderr);
+// EOF shuts down the guest relay; keep this exec's stdin open until stopped.
+ssh.stderr.pipe(process.stderr);
 let stopping=false;
 function stop(){if(!stopping){
   stopping=true;
