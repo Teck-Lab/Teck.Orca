@@ -1,6 +1,6 @@
 ---
 name: agent-office
-description: Use Agent Office's five MCP tools for meaningful status changes, peer awareness, milestone announcements, verified wins and an occasional table flip. Applies to coordinators, workers and native helpers when the tools are available.
+description: Use Agent Office MCP for meaningful status, peer awareness, announcements and visual meetings. Meeting participation is limited to main terminal sessions; native helpers keep the other office tools.
 ---
 
 # Agent Office
@@ -17,6 +17,27 @@ they grant no source-editing, shell, publication or Orca lifecycle authority.
 | office_shout | Reaching a significant milestone or diagnosing a consequential blocker | `{"text":"#906 verified; PR ready for review"}` |
 | office_celebrate | A meaningful fix passes its relevant tests, or a delivery passes acceptance | `{"reason":"Cache regression fixed; integration tests green"}` |
 | office_flip | Repeated unexpected failures after trying different approaches | `{"reason":"this cache is haunted"}` |
+| office_meeting | A short, explicit discussion between main terminal sessions | `{"action":"start","id":"handoff-906","title":"Billing handoff","agenda":"Confirm the accepted contract"}` |
+
+The meeting room contains the existing native goal/task whiteboard, left of the
+elevator. Meetings are optional display state, not another planning, approval,
+review or completion gate. Do not gather for ordinary status polling.
+
+Only main sessions may use `office_meeting`. Native OMP helpers must not join;
+their parent brings their findings. A main session starts a meeting with a short
+unique `id` and title, then invites other main sessions using existing Orca
+messages. Each invitee joins itself with `{"action":"join","id":"handoff-906"}`.
+The tool never dispatches, wakes, messages or moves another session on your behalf.
+Use `list` to read accepted membership; a queued request is not an attendance
+confirmation. Up to eight main sessions can attend; separate meetings keep exact
+session identities even within the same repository or Run.
+
+Only the host can `update` its title, agenda or decision, or `end` it. Anyone can
+`leave` their own meeting. End promptly after recording the decision and send the
+actual outcome through Orca. Leaving/end returns characters to existing desks;
+goals, worktrees, assignments and execution hosts are unchanged. Closing a host
+session also ends its meeting. Meeting text is public and follows the same secret
+scrubbing as status. If unavailable, continue work without retry loops.
 
 Keep text short and concrete. Include the existing issue number when assigned;
 otherwise use the task title. Do not create a GitHub issue just to label the office.
@@ -47,4 +68,4 @@ Anything displayed may be screen-recorded. Never send credentials, customer data
 private prompt text, source contents or tool output. Public summaries and ordinary
 file names are enough. If the office is closed, unavailable or rate-limited, carry
 on without retry loops, delaying work or changing configuration. These calls are
-not additional completion gates; there is no requirement to call all five.
+not additional completion gates; there is no requirement to call every tool.

@@ -29,6 +29,7 @@ process.stdin.on('end',()=>{
  // The observer and role guard share a presentation-readiness contract. Stage the
  // matching guard atomically for future loads; never signal/restart OMP.
  if(p.roleGuard)put('/home/agent/.omp/agent/extensions/orca-orchestration.mjs',Buffer.from(p.roleGuard,'base64').toString(),0o600);
+ if(p.officeSkill)put('/home/agent/.omp/agent/skills/agent-office/SKILL.md',Buffer.from(p.officeSkill,'base64').toString(),0o600);
  if(!fs.existsSync('/etc/teck-orca/pixtuoid-removed')){
    for(const id of fs.readdirSync('/proc').filter(n=>/^\d+$/.test(n)))try{const args=fs.readFileSync('/proc/'+id+'/cmdline','utf8').split('\0');if(args[0]==='/opt/teck-office/ttyd'||args[0]==='/opt/teck-office/pixtuoid')process.kill(Number(id),'SIGTERM')}catch{}
    for(const p of ['/home/agent/.omp/agent/extensions/pixtuoid.ts','/home/agent/.omp/agent/extensions/pixtuoid.ts.lock','/usr/local/bin/pixtuoid','/usr/local/bin/pixtuoid-hook'])if(fs.existsSync(p))fs.unlinkSync(p);

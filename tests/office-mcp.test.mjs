@@ -14,11 +14,11 @@ function bridge(options = {}) {
   return { replies, async call(line) { await server.handleLine(line); return replies.at(-1); } };
 }
 
-test('bundled native MCP provides its actual five tools and scrubbed, request-scoped signals', async () => {
+test('bundled native MCP provides its tools and scrubbed, request-scoped signals', async () => {
   const b = bridge();
   await b.call(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'oh-my-pi', version: 'test' } } }));
   const list = await b.call(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} }));
-  assert.deepEqual(list.result.tools.map(t => t.name), ['office_status','office_peers','office_shout','office_celebrate','office_flip']);
+  assert.deepEqual(list.result.tools.map(t => t.name), ['office_meeting','office_status','office_peers','office_shout','office_celebrate','office_flip']);
   await Promise.all([b.call(rpc('status','office_status',{text:'Checking cache',mood:'debugging'})), b.call(rpc('flip','office_flip',{reason:'this cache is haunted'}))]);
   const status = b.replies.find(r => r.id === 'status'), flip = b.replies.find(r => r.id === 'flip');
   assert.equal(status.result.structuredContent.officeSignal.kind, 'status');
@@ -29,6 +29,20 @@ test('bundled native MCP provides its actual five tools and scrubbed, request-sc
   const sanitized = await b.call(rpc('secret','office_status',{text:'Fix '+secret}));
   assert.ok(!JSON.stringify(sanitized).includes(secret));
   assert.ok(!JSON.stringify(status.result.structuredContent).includes('/isolated/project'));
+});
+
+test('meetings preserve request identity, scrub public text and never accept arbitrary participants',async()=>{
+  const b=bridge();
+  const result=await b.call(rpc('meeting','office_meeting',{action:'start',id:'handoff-906',title:'Contract handoff',agenda:'Check ghp_'+'a'.repeat(40)}));
+  assert.equal(result.result.isError,false);
+  const signal=officeSignalFromResult('agentoffice-office_meeting',{details:result.result});
+  assert.equal(signal.kind,'meeting');assert.equal(signal.meeting.id,'handoff-906');
+  assert.ok(!JSON.stringify(signal).includes('ghp_'));
+  assert.match(result.result.content[0].text,/queued/);
+  const invalid=await b.call(rpc('bad','office_meeting',{action:'join',id:'handoff-906',workerId:'another-session'}));
+  assert.ok(invalid.error||invalid.result?.isError);
+  const malformed={details:{structuredContent:{officeSignal:{v:1,kind:'meeting',meeting:{action:'join',id:'../escape'}}}}};
+  assert.equal(officeSignalFromResult('agentoffice-office_meeting',malformed),null);
 });
 
 test('native MCP batch responses keep each signal with its request and respect native cooldown failures', async () => {
@@ -84,5 +98,5 @@ test('the installed stdio entry answers real MCP frames without logging on stdou
     JSON.stringify({jsonrpc:'2.0',id:2,method:'tools/list',params:{}})];
   const child=spawnSync(process.execPath,[entry],{input:frames.join('\n')+'\n',encoding:'utf8',timeout:5000,windowsHide:true});
   assert.equal(child.status,0,child.stderr);const replies=child.stdout.trim().split(/\r?\n/).map(line=>JSON.parse(line));
-  assert.equal(replies.find(r=>r.id===2).result.tools.length,5);
+  assert.equal(replies.find(r=>r.id===2).result.tools.length,6);
 });

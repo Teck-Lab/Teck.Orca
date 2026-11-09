@@ -1,7 +1,7 @@
 // Observe documented OMP events only. Network delivery never gates tools or approvals.
 import { readFileSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
-import { isOfficeTool, officeSignalFromResult } from './lib/office-tools.mjs';
+import { isOfficeTool, officeSignalFromResult, officeToolName } from './lib/office-tools.mjs';
 import { createOfficeUsage, ompMessageTokens } from './lib/office-usage.mjs';
 import { cleanPlan } from './lib/office-plan.mjs';
 const registry = new Map();
@@ -58,7 +58,7 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
     if (queue.length >= 200) queue.shift();
     queue.push({ ...event, eventId: randomUUID(), ts: new Date(now()).toISOString(), agent: 'omp' });
     if (event.plan !== undefined) currentPlan = { ...event, kind: 'plan' };
-    if (['plan','usage','status','shout','celebrate','flip'].includes(event.kind)) {
+    if (['plan','usage','status','shout','celebrate','flip','meeting'].includes(event.kind)) {
       if (event.kind === 'status') currentStatus = event;
       if (current?.workerId === event.workerId && event.tokenTotal !== undefined) current = { ...current, tokenTotal: event.tokenTotal };
     } else if (!['session_end','subagent_end'].includes(event.kind)) current = event;
@@ -125,6 +125,7 @@ export default function activate(pi, dependencies = {}) {
     if (started) { planKey = undefined; liveGoal = undefined; }
     session = nextSession;
     identity = { workerId: key(`${session}:${agent.id}`), ...(parent ? { parentId: parent.workerId } : {}),
+      nativeKind: helper ? 'sub' : 'main',
       role: safe(helper ? agent.name : orchestration?.role ?? agent.name), model: safe(ctx.model?.id, 64),
       orchestration, placement: orchestration?.role === 'coordinator' ? 'office' : 'cloud', tokenTotal: usage.total(ctx) };
     registry.set(agent.id, identity);
@@ -138,6 +139,15 @@ export default function activate(pi, dependencies = {}) {
   function emit(kind, ctx, extra = {}) { if (ensure(ctx)) reporter.publish({ ...identity, kind, ...extra }); }
   const on = (name, handler) => pi.on(name, (event, ctx) => {
     try { handler(event, ctx); } catch { /* Best-effort observer; never affect a model turn. */ }
+  });
+  pi.on('tool_call', (event, ctx) => {
+    let name = event.toolName;
+    if (name === 'write' && typeof event.input?.path === 'string') {
+      const route = /^xd:\/\/([A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*)$/.exec(event.input.path);
+      if (route && pi.getAllTools?.().some(t => t.name === route[1])) name = route[1];
+    }
+    if (officeToolName(name) === 'office_meeting' && ctx.agent?.kind !== 'main')
+      return { block: true, reason: 'Meeting participation belongs to main terminal sessions. Return findings to your parent; native helpers stay at their desks.' };
   });
   function refresh(ctx) {
     // Ambient observers load before the explicitly loaded role guard. Wait for
@@ -175,7 +185,8 @@ export default function activate(pi, dependencies = {}) {
     const data = tools.get(e.toolCallId) ?? { tool: safe(e.toolName) ?? 'tool' };
     tools.delete(e.toolCallId); emit('tool_end', ctx, { ...data, isError: e.isError === true });
     const signal = !e.isError ? officeSignalFromResult(data.tool, e.result) : null;
-    if (signal) emit(signal.kind, ctx, { ...(signal.summary ? { summary: signal.summary } : {}), ...(signal.tool ? { tool: signal.tool } : {}) });
+    if (signal && (signal.kind !== 'meeting' || ctx.agent?.kind === 'main')) emit(signal.kind, ctx, {
+      ...(signal.summary ? { summary: signal.summary } : {}), ...(signal.tool ? { tool: signal.tool } : {}), ...(signal.meeting ? { meeting: signal.meeting } : {}) });
     if (!tools.size) emit('thinking', ctx);
   });
   on('tool_approval_requested', (_e, ctx) => emit('waiting', ctx, { summary: 'Awaiting approval' }));

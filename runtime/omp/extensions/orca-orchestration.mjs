@@ -10,7 +10,7 @@ const execute = promisify(execFile);
 // OMP rebinds the extension per native agent in the same process. Only actual
 // child turns can record delegation; copied prompts/tool receipts cannot.
 const nativeFamilies = new Map();
-const officeInstructions = 'When the Agent Office MCP tools are available, read skill://agent-office once before using them. Update your own status at meaningful phase/wait changes, check peers before shared edits, announce real milestones and celebrate verified wins. A rare table flip is optional. Office tools never replace Orca messages, evidence or acceptance, and office failure/cooldown never delays work.';
+const officeInstructions = 'When the Agent Office MCP tools are available, read skill://agent-office once before using them. Update your own status at meaningful phase/wait changes, check peers before shared edits, announce real milestones and celebrate verified wins. A rare table flip is optional. Explicit office_meeting discussions are optional and limited to main terminal sessions; native helpers stay at their desks and report to their parent. Office tools never replace Orca messages, evidence or acceptance, and office failure/cooldown never delays work.';
 const instructions = `Teck Orca role contract:
 The coordinator only plans and manages GitHub metadata, Orca Tasks/Dispatches and messages.
 Never inspect source, implement, integrate code, run tests or publish code as coordinator.

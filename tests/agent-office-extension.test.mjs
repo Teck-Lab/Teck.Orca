@@ -76,7 +76,22 @@ test('observer sends only lifecycle metadata and links native helper identities'
   assert.equal(helper.events.at(-1).kind, 'subagent_end');
   assert.ok(!JSON.stringify(main.events).includes('PRIVATE'));
   assert.ok(!JSON.stringify(main.events).includes('SECRET'));
-  assert.ok(!main.handlers.has('tool_call'));
+  assert.ok(main.handlers.has('tool_call'));
+});
+
+test('meeting requests are attributed to the main session and blocked for native helpers including mounted MCP',()=>{
+  const main=adapter(context('meeting-owner'),['agentoffice-office_meeting']);main.run('session_start');
+  const helper=adapter(context('meeting-helper',{kind:'sub',id:'meeting-sub',name:'researcher',parentId:'Main'}),['agentoffice-office_meeting']);
+  assert.equal(main.run('tool_call',{toolName:'agentoffice-office_meeting'}),undefined);
+  assert.equal(helper.run('tool_call',{toolName:'agentoffice-office_meeting'}).block,true);
+  assert.equal(helper.run('tool_call',{toolName:'write',input:{path:'xd://agentoffice-office_meeting',content:'{}'}}).block,true);
+  const result={details:{structuredContent:{officeSignal:{v:1,kind:'meeting',meeting:{action:'start',id:'handoff',title:'Review handoff'}}}}};
+  main.run('tool_execution_start',{toolCallId:'m',toolName:'agentoffice-office_meeting'});
+  main.run('tool_execution_end',{toolCallId:'m',toolName:'agentoffice-office_meeting',result});
+  const event=main.events.find(e=>e.kind==='meeting');assert.equal(event.nativeKind,'main');assert.equal(event.workerId,main.events[0].workerId);
+  helper.run('tool_execution_start',{toolCallId:'h',toolName:'agentoffice-office_meeting'});
+  helper.run('tool_execution_end',{toolCallId:'h',toolName:'agentoffice-office_meeting',result});
+  assert.ok(!helper.events.some(e=>e.kind==='meeting'));
 });
 
 test('mounted tool calls and helper messages are labelled as metadata rather than file editing',()=>{

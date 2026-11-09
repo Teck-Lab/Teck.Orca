@@ -1,5 +1,5 @@
 // Adapter around Agent Office's own MCP implementation. Identity/transport is
-// supplied by the OMP observer; the five native handlers still own semantics,
+// supplied by the OMP observer; the native handlers still own semantics,
 // text scrubbing, mood parsing, cooldowns and the peer briefing.
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { readFileSync } from 'node:fs';
@@ -18,6 +18,12 @@ export function readOfficeConfig() {
 export function createOfficeMcpBridge({ send, readConfig = readOfficeConfig, request = fetch, cooldown, cwd, now } = {}) {
   const calls = new AsyncLocalStorage();
   const server = createMcpServer({ version: OFFICE_VERSION, agentHint: 'omp', cooldown, cwd, now,
+    meeting(command) {
+      const call = calls.getStore();
+      if (!call) return { text: 'Missing request context', isError: true };
+      call.signal = { v: 1, kind: 'meeting', meeting: command };
+      return { text: 'Meeting display request queued for this session. Use office_meeting list to read accepted membership; continue coordination through Orca.' };
+    },
     findOffice: async () => { try { return Number(new URL(readConfig().url).port); } catch { return null; } },
     fetchSnapshot: async () => {
       try {
