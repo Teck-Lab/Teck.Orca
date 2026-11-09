@@ -19,8 +19,9 @@ they grant no source-editing, shell, publication or Orca lifecycle authority.
 | office_flip | Repeated unexpected failures after trying different approaches | `{"reason":"this cache is haunted"}` |
 | office_meeting | A short, explicit discussion between main terminal sessions | `{"action":"start","id":"handoff-906","title":"Billing handoff","agenda":"Confirm the accepted contract"}` |
 
-The meeting room contains the existing native goal/task whiteboard, left of the
-elevator. Meetings are optional display state, not another planning, approval,
+The native goal/task whiteboard is integrated into the existing office TV. Click
+the TV or meeting area to open the full plan and meeting agenda. The meeting area
+is left of the elevator. Meetings are optional display state, not another planning, approval,
 review or completion gate. Do not gather for ordinary status polling.
 
 Only main sessions may use `office_meeting`. Native OMP helpers must not join;
