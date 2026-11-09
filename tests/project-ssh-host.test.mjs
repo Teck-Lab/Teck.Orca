@@ -3,7 +3,15 @@ import { test } from 'node:test';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { ensurePersistentProjectHost, projectSshAlias, findPersistentProjectHost, createProjectHostManager, retireBootstrapConnections } from '../runtime/project-ssh-host.mjs';
+import { ensurePersistentProjectHost, projectSshAlias, findPersistentProjectHost, createProjectHostManager, retireBootstrapConnections, desktopCli } from '../runtime/project-ssh-host.mjs';
+
+test('Windows workers select the bundled CLI launcher instead of the GUI executable on PATH', () => {
+  const executable = join('install', 'orca.exe'), launcher = join('install', 'resources', 'bin', 'orca.exe');
+  assert.equal(desktopCli({ env: {}, platform: 'win32', executable, exists: p => p === launcher }), launcher);
+  assert.equal(desktopCli({ env: { ORCA_CLI_COMMAND: 'configured-cli' }, platform: 'win32', exists: () => false }), 'configured-cli');
+  assert.throws(() => desktopCli({ env: {}, platform: 'win32', exists: () => false }), /launcher is unavailable/);
+  assert.equal(desktopCli({ env: {}, platform: 'linux' }), 'orca-ide');
+});
 
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'teck-persistent-ssh-')); t.after(() => rmSync(root, { recursive: true, force: true }));
@@ -68,7 +76,11 @@ test('bootstrap retirement only unlinks an exact idle alias after matching both 
     recipeResult: { userData: { instanceId: 'instance-1', projectId: f.project.projectId, sandboxName: f.project.name, sandboxId: f.project.id } } }] }));
   const host = { targetId: 'persistent-target', connection: { managedServer: { environmentId: 'persistent' } } };
   let active = false, foreign = false, mismatched = false;
-  const run = async (_cli, args) => { calls.push(args); const id = args[args.indexOf('--environment') + 1];
+  const run = async (_cli, args, options) => {
+    assert.equal(options.env.ORCA_USER_DATA_PATH, f.root);
+    assert.equal(options.env.ORCA_ENVIRONMENT, undefined);
+    assert.equal(options.env.ORCA_PAIRING_CODE, undefined);
+    calls.push(args); const id = args[args.indexOf('--environment') + 1];
     if (args[1] === 'list' && args[0] === 'environment') return JSON.stringify({ ok: true, result: { environments: [
       { id: 'persistent', runtimeId: 'same-runtime', orcadDeployment: { sshTargetId: 'persistent-target' } },
       { id: 'bootstrap', runtimeId: foreign ? 'other-runtime' : 'same-runtime', orcadDeployment: { sshTargetId: 'runtime-ssh-instance-1' } }] } });
@@ -79,11 +91,11 @@ test('bootstrap retirement only unlinks an exact idle alias after matching both 
   };
   for (const scenario of ['active', 'foreign', 'mismatched']) {
     active = scenario === 'active'; foreign = scenario === 'foreign'; mismatched = scenario === 'mismatched';
-    assert.equal(await retireBootstrapConnections(f.project, host, { run, profile: f.root }), false);
+    assert.equal(await retireBootstrapConnections(f.project, host, { run, profile: f.root, cli: 'fixture-orca' }), false);
     assert.ok(!calls.some(args => args[1] === 'forget'));
   }
   active = foreign = mismatched = false;
-  assert.equal(await retireBootstrapConnections(f.project, host, { run, profile: f.root }), true);
+  assert.equal(await retireBootstrapConnections(f.project, host, { run, profile: f.root, cli: 'fixture-orca' }), true);
   assert.deepEqual(calls.filter(args => args[1] === 'forget'), [['environment', 'forget', '--environment', 'bootstrap', '--yes', '--json']]);
   assert.ok(!calls.some(args => args.includes('stop') || args.includes('rm') || args.includes('create')));
 });

@@ -42,6 +42,11 @@ ownership, desktop identity fencing, concurrent status refreshes, active-termina
 and inventory-mismatch refusal, recipe re-entry prevention, and execution of the
 real immutable destroy launcher through the host shell.
 
-All 265 plugin tests and generated-asset checks passed. The installed immutable
+All 267 plugin tests and generated-asset checks passed. The installed immutable
 create launcher was also tested against the live registered project: it refused
 re-entry with the correct GUI target label and left the single connection intact.
+
+Windows worker validation also covers missing APPDATA and explicit selection of
+the bundled CLI launcher: the worker PATH can otherwise select Electron's GUI
+executable and treat a CLI subcommand as a JavaScript filename. Child CLI calls
+are explicitly bound to the desktop profile and clear inherited remote routing.

@@ -2,9 +2,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:net';
 import { randomUUID } from 'node:crypto';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createDesktopRpc } from '../runtime/orca-desktop-rpc.mjs';
+import { createDesktopRpc, desktopProfile } from '../runtime/orca-desktop-rpc.mjs';
+
+test('Windows plugin workers resolve the desktop profile when APPDATA is absent', () => {
+  assert.equal(desktopProfile({}, 'win32'), join(homedir(), 'AppData', 'Roaming', 'orca'));
+  assert.equal(desktopProfile({ APPDATA: 'custom-roaming' }, 'win32'), join('custom-roaming', 'orca'));
+  assert.equal(desktopProfile({ ORCA_USER_DATA_PATH: 'custom-profile' }, 'win32'), 'custom-profile');
+});
 
 async function fixture(t, respond) {
   const endpoint = process.platform === 'win32' ? '\\\\.\\pipe\\teck-ssh-rpc-' + randomUUID() : join(tmpdir(), 'teck-ssh-' + randomUUID() + '.sock');

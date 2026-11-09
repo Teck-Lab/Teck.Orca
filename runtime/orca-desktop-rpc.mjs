@@ -8,7 +8,7 @@ import { homedir } from 'node:os';
 
 const methods = new Set(['status.get', 'ssh.listEditableTargets', 'ssh.addTarget', 'ssh.connect', 'ssh.getState']);
 export function desktopProfile(env = process.env, platform = process.platform) {
-  return env.ORCA_USER_DATA_PATH || (platform === 'win32' ? join(env.APPDATA, 'orca') :
+  return env.ORCA_USER_DATA_PATH || (platform === 'win32' ? join(env.APPDATA || join(homedir(), 'AppData', 'Roaming'), 'orca') :
     platform === 'darwin' ? join(homedir(), 'Library/Application Support/orca') : join(env.XDG_CONFIG_HOME || join(homedir(), '.config'), 'orca'));
 }
 export function createDesktopRpc({ readMetadata = () => JSON.parse(readFileSync(join(desktopProfile(), 'orca-runtime.json'), 'utf8')),

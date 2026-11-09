@@ -1,10 +1,23 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync, lstatSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
 import { desktopRpc, desktopProfile } from './orca-desktop-rpc.mjs';
 
 const sourceRoot = () => join(homedir(), '.teck-orca-native-ssh');
+export function desktopCli({ env = process.env, platform = process.platform, executable = process.execPath, exists = existsSync } = {}) {
+  if (env.ORCA_CLI_COMMAND) return env.ORCA_CLI_COMMAND;
+  if (platform === 'win32') {
+    // The worker PATH can resolve orca.exe to Electron's GUI executable. The
+    // actual CLI launcher is in resources/bin, beside the running application.
+    const bundled = join(dirname(executable), 'resources', 'bin', 'orca.exe');
+    if (exists(bundled)) return bundled;
+    const installed = join(env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), 'Programs', 'orca', 'resources', 'bin', 'orca.exe');
+    if (exists(installed)) return installed;
+    throw Error('Orca desktop CLI launcher is unavailable');
+  }
+  return platform === 'linux' ? 'orca-ide' : 'orca';
+}
 export function projectSshAlias(projectId) {
   if (typeof projectId !== 'string' || !projectId.trim() || projectId !== projectId.trim() || /[\r\n\0]/.test(projectId)) throw Error('Invalid sandbox project identity');
   return `teck-orca-ssh-${createHash('sha256').update(projectId).digest('hex').slice(0, 12)}.sbx`;
@@ -57,8 +70,13 @@ export async function ensurePersistentProjectHost(project, { rpc = desktopRpc, s
 }
 // Retire only our proven bootstrap aliases through Orca's local-only unlink
 // operation. Never stop the shared server or write Orca's private stores.
-export async function retireBootstrapConnections(project, host, { run, profile = desktopProfile(), cli = process.env.ORCA_CLI_COMMAND || 'orca' } = {}) {
+export async function retireBootstrapConnections(project, host, { run, profile = desktopProfile(), cli } = {}) {
   if (!run) return true;
+  // Orca worker environments omit APPDATA and can carry inherited routing.
+  // Explicitly select this desktop profile; environment selectors below are
+  // the only remote routes this reconciliation may use.
+  const execute = args => run(cli || desktopCli(), args, { env: { ...process.env, ORCA_USER_DATA_PATH: profile,
+    ORCA_ENVIRONMENT: undefined, ORCA_PAIRING_CODE: undefined, ORCA_REMOTE_PAIRING: undefined } });
   const canonicalId = host?.connection?.managedServer?.environmentId;
   if (!canonicalId) return false;
   const file = join(profile, 'orca-ephemeral-vm-runtimes.json');
@@ -71,12 +89,12 @@ export async function retireBootstrapConnections(project, host, { run, profile =
     r.recipeResult.userData.projectId === project.projectId && r.recipeResult.userData.sandboxName === project.name &&
     r.recipeResult.userData.sandboxId === project.id && r.runtimeEnvironmentId !== canonicalId);
   if (!owned.length) return true;
-  const response = JSON.parse(await run(cli, ['environment', 'list', '--json']));
+  const response = JSON.parse(await execute(['environment', 'list', '--json']));
   if (!response.ok || !Array.isArray(response.result?.environments)) throw Error('Cannot verify desktop connections');
   const environments = response.result.environments, canonical = environments.find(e => e.id === canonicalId && e.orcadDeployment?.sshTargetId === host.targetId);
   if (!canonical?.runtimeId) return false;
   const call = async (args, id) => {
-    const value = JSON.parse(await run(cli, [...args, '--environment', id, '--json']));
+    const value = JSON.parse(await execute([...args, '--environment', id, '--json']));
     if (!value.ok || value._meta?.runtimeId !== canonical.runtimeId || value.result?.truncated) throw Error('Connection verification changed');
     return value.result;
   };
@@ -93,7 +111,7 @@ export async function retireBootstrapConnections(project, host, { run, profile =
     if (alias.runtimeId !== canonical.runtimeId) return false;
     const a = await snapshot(canonicalId), b = await snapshot(alias.id);
     if (a === null || b === null || a !== b) return false;
-    const forgotten = JSON.parse(await run(cli, ['environment', 'forget', '--environment', alias.id, '--yes', '--json']));
+    const forgotten = JSON.parse(await execute(['environment', 'forget', '--environment', alias.id, '--yes', '--json']));
     if (!forgotten.ok || forgotten.result?.outcome !== 'forgotten' || forgotten.result.environmentId !== alias.id) return false;
   }
   return true;
@@ -104,7 +122,12 @@ export function createProjectHostManager({ ensure = ensurePersistentProjectHost,
     for (const p of projects) {
       if (p.state !== 'running' || done.has(p.id) || pending.has(p.id)) continue;
       const task = ensure(p).then(async host => { if (await retire(p, host, { run })) { done.add(p.id); log(`Persistent sandbox SSH host ready for ${p.title}`); } })
-        .catch(() => log(`Persistent sandbox SSH host unavailable for ${p.title}; retained existing connections`))
+        .catch(error => {
+          let reason = error.code || error.message || 'unavailable';
+          if (error.stdout) try { const response = JSON.parse(error.stdout); reason = response.error?.message || response.error?.code || reason; } catch { reason = error.message; }
+          else if (error.stderr) reason = String(error.stderr).trim();
+          log(`Persistent sandbox SSH host unavailable for ${p.title}: ${String(reason).replace(/[\r\n]/g, ' ').replace(/Bearer\s+\S+/gi, '[redacted]').slice(0, 180)}; retained existing connections`);
+        })
         .finally(() => pending.delete(p.id));
       pending.set(p.id, task);
     }
