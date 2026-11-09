@@ -26,6 +26,7 @@ export function runtimeFiles(repositorySource = repository) {
   if (new Set(projects.map(project => project.id)).size !== projects.length) throw Error('Duplicate project ID');
   const files = { 'projects.json': json(projects) };
   files['workflow-assets.mjs'] = readFileSync(join(repositorySource, 'runtime/workflow-assets.mjs'));
+  for (const file of ['project-ssh-host.mjs', 'orca-desktop-rpc.mjs']) files[`src/${file}`] = readFileSync(join(repositorySource, 'runtime', file));
   function copyTree(source, target) {
     for (const relative of walk(source)) files[target + '/' + relative] = readFileSync(join(source, relative));
   }
@@ -52,9 +53,11 @@ export function runtimeFiles(repositorySource = repository) {
 // Internal runtime builder; plugin registration and installation live at the repository root.
 export function nativeRecipe(repositorySource = repository) {
   const { digest } = snapshot(runtimeFiles(repositorySource));
-  const recipe = { schemaVersion: 1, id: 'teck-native-ssh-project', name: 'Teck OMP Project',
-    description: 'One persistent project sandbox with OMP and optional local KIND. Created on first use, shared by later worktrees, connected automatically over Docker SSH. Worktree deletion retains the sandbox.',
-    ...Object.fromEntries(['create', 'suspend', 'resume'].map(mode => [mode, recipeCommand(digest, mode)])), destroy: 'none' };
-  for (const mode of ['create', 'suspend', 'resume']) if (Buffer.byteLength(recipe[mode]) >= 8191) throw Error('Native SSH launcher exceeds Windows command limit');
+  const recipe = { schemaVersion: 1, id: 'teck-native-ssh-project', name: 'Create project sandbox',
+    description: 'First use only. Provision the project sandbox; the plugin registers its persistent SSH target. For later workspaces select the project sandbox target in Run on. Workspace cleanup retains the sandbox.',
+    // A no-op provider destroy lets Orca clean up this workspace's SSH route.
+    // `none` disables Orca's cleanup entirely and strands the saved connection.
+    ...Object.fromEntries(['create', 'suspend', 'resume', 'destroy'].map(mode => [mode, recipeCommand(digest, mode)])) };
+  for (const mode of ['create', 'suspend', 'resume', 'destroy']) if (Buffer.byteLength(recipe[mode]) >= 8191) throw Error('Native SSH launcher exceeds Windows command limit');
   return recipe;
 }

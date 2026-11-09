@@ -124,7 +124,7 @@ export async function prepareProject({ project, assetRoot, stateRoot = stateDire
   });
 }
 export function sshInstructions(state) {
-  return `Choose Teck OMP Project in Run on for each workspace. Orca registers SSH to ${state.sandboxName}.sbx as _default_user_ and creates a linked worktree under ${state.projectRoot}. The project sandbox is shared.`;
+  return `For additional workspaces choose ${state.displayName} sandbox in Run on. Orca reuses its persistent SSH target at ${state.sandboxName}.sbx as _default_user_ and creates a linked worktree under ${state.projectRoot}. Create project sandbox is for first use only.`;
 }
 export function sshConnection(state) {
   return { type: 'ssh', projectRoot: state.projectRoot, target: { label: `${state.displayName} SSH Preview`,

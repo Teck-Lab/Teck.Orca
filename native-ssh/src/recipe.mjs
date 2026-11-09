@@ -3,13 +3,14 @@
 import { readFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { prepareProject, sandboxName, sshConnection, stateDirectory } from './provider.mjs';
+import { inventory, prepareProject, sandboxName, sshConnection, stateDirectory } from './provider.mjs';
 import { command, redact } from './system.mjs';
+import { findPersistentProjectHost } from './project-ssh-host.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 export function createLifecycle({ env = process.env, assetRoot = root, stateRoot = stateDirectory(), run = command,
   provision = prepareProject, projects = JSON.parse(readFileSync(new URL('../projects.json', import.meta.url), 'utf8')),
-  log = message => process.stderr.write(redact(message)) } = {}) {
+  findHost = async () => null, log = message => process.stderr.write(redact(message)) } = {}) {
   return async (mode, payload = {}) => {
     if (!['create', 'suspend', 'resume', 'destroy'].includes(mode)) throw Error('Unknown preview lifecycle mode');
     const previous = payload.recipeResult?.userData;
@@ -26,6 +27,10 @@ export function createLifecycle({ env = process.env, assetRoot = root, stateRoot
       (await run('git', ['-C', env.ORCA_REPO_PATH || process.cwd(), 'remote', 'get-url', 'origin'])).trim();
     const project = { id, name: configured?.name || previous?.projectName || env.ORCA_PROJECT_NAME?.trim() || env.ORCA_REPO_NAME?.trim() || basename(env.ORCA_REPO_PATH || process.cwd()), cloneUrl,
       cpus: configured?.cpus ?? 8, memory: configured?.memory ?? '16g',kubernetes:configured?.kubernetes??false };
+    if (mode === 'create') {
+      const existing = await findHost(id);
+      if (existing) throw Error(`Project sandbox already registered. In Run on choose "${existing.label}" to create another workspace on its existing connection.`);
+    }
     const state = await provision({ project, assetRoot, stateRoot, run, log,
       recreateMissing: mode === 'create', expectedSandboxId: mode === 'resume' ? previous.sandboxId : undefined });
     return { schemaVersion: 1, connection: sshConnection(state), userData: { version: 1,
@@ -39,7 +44,8 @@ export async function main(mode) {
     for await (const chunk of process.stdin) { input += chunk; if (input.length > 1_048_576) throw Error('Lifecycle payload is too large'); }
     payload = JSON.parse(input);
   }
-  const result = await createLifecycle({ run: (program, args, options = {}) => command(program, args,
+  const result = await createLifecycle({ findHost: async id => (await inventory(command)).some(r => r.name === sandboxName(id))
+    ? findPersistentProjectHost(id) : null, run: (program, args, options = {}) => command(program, args,
     { ...options, log: message => process.stderr.write(redact(message)) }) })(mode, payload);
   if (result) process.stdout.write(JSON.stringify(result) + '\n');
 }

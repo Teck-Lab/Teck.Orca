@@ -4,7 +4,7 @@ This directory contains the native SSH provider used by the main **Teck OMP Dock
 
 ## Install and use
 
-From the repository root, run npm run build, npm test, npm run check and npm run setup. Install or refresh **plugin/** in Orca Settings > Plugins. Select **Teck OMP Project** in the GUI **Run on** picker for each workspace. The first workspace creates a project sandbox if absent; later workspaces reuse it. Orca registers SSH and manages its matching guest daemon. No manual VM creation or SSH-host addition is part of this flow.
+From the repository root, run npm run build, npm test, npm run check and npm run setup. Install or refresh **plugin/** in Orca Settings > Plugins. Select **Create project sandbox** in the GUI **Run on** picker for first use. The plugin automatically registers **<project> sandbox** as a persistent SSH target; use that target for later workspaces. Re-running the provisioning recipe after registration is refused before creating another route. Orca manages its matching guest daemon. No manual VM creation or SSH-host addition is needed.
 
 If **Teck OMP Native SSH Preview** is still installed, remove that old plugin entry after refreshing the main plugin. Keep its VM, saved workspaces and ownership records. The main plugin retains the native recipe ID (teck-native-ssh-project), sandbox names (teck-orca-ssh-<hash>), project configuration (native-ssh/projects.json), release store and ownership root (~/.teck-orca-native-ssh). Existing native VMs are reused. Existing workspaces keep their immutable lifecycle snapshots; new/reused recipe runs install the current managed policy without replacing user model configuration or sessions.
 
@@ -12,7 +12,7 @@ The older bundled-daemon sandboxes retain their own records and data. The main p
 
 ## Lifecycle and ownership
 
-Creation is serialized and checks the original provider identity. A manually deleted VM can be replaced by a new workspace create; resume never replaces it. Unowned, renamed or substituted VMs are refused. Suspend is a provider no-op and destroy is disabled: sleeping/deleting a worktree retains the project VM. Build, tests, setup and plugin activation create no project VM or workspace.
+Creation is serialized and checks the original provider identity. Resume never replaces a missing VM. Unowned, renamed or substituted VMs are refused. Suspend and destroy are ownership-checked provider no-ops: Orca can clean up a workspace's route while retaining the project VM. Existing workspaces retain their original lifecycle snapshots. Build, tests, setup and plugin activation create no project VM or workspace.
 
 The provider emits schema version 1 and connection.type=ssh, allowing Orca to create linked worktrees. Docker Sandboxes supplies the .sbx SSH transport; Docker Engine inside the VM runs application/test containers. Project naming and OMP-session recovery hooks run on normal startup. Existing custom models, settings, credentials and conversations are retained.
 

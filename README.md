@@ -1,6 +1,13 @@
 # Teck.Orca
 
-One plugin provides one persistent Docker Sandbox per Orca project, shared by its worktrees, with OMP and optional local KIND. **Teck OMP Project** in the GUI **Run on** picker creates or reuses the VM. Orca connects over Docker's native SSH and manages its guest daemon.
+One plugin provides one persistent Docker Sandbox per Orca project, shared by its worktrees, with OMP and optional local KIND. For first use choose **Create project sandbox** in the GUI **Run on** picker. The plugin registers a persistent **<project> sandbox** SSH target automatically; select that target for additional workspaces. Orca connects over Docker's native SSH and manages its guest daemon.
+
+The provisioning recipe is not a reusable connection: Orca 1.4.248 registers a
+separate route for each recipe invocation. Once the persistent target exists,
+the recipe refuses another invocation before provisioning or returning a new
+connection. Workspace cleanup runs an ownership-checked provider no-op, allowing
+Orca to retire the workspace route without stopping or deleting the shared VM.
+Existing workspaces retain their old lifecycle snapshots.
 
 New Orca executors always use separate parent-linked child worktrees. The OMP
 dispatch tool defaults to `new-child` and rejects fresh editing workers in the

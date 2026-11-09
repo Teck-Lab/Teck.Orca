@@ -59,3 +59,23 @@ test('resume preserves the original project name even when its working directory
   await make({ ...env, ORCA_REPO_PATH: '/home/agent/project' })('resume', { recipeResult: created });
   assert.equal(options.project.name, 'Teck.Monorepo');
 });
+
+test('connection cleanup verifies workspace ownership and never calls sandbox or guest tools', async () => {
+  const f = fixture(), created = await f.lifecycle('create');
+  f.calls.length = 0;
+  const lifecycle = createLifecycle({ env, projects: [project],
+    run: async () => { throw Error('Cleanup must not run host/guest commands'); },
+    provision: async () => { throw Error('Cleanup must not provision or change the sandbox'); } });
+  assert.equal(await lifecycle('destroy', { recipeResult: created }), undefined);
+  await assert.rejects(lifecycle('destroy', { recipeResult: { ...created,
+    userData: { ...created.userData, instanceId: 'another-workspace' } } }), /another project or workspace/);
+});
+
+test('a persistent GUI target prevents a repeated recipe from creating another SSH connection', async () => {
+  let provisions = 0;
+  const lifecycle = createLifecycle({ env, projects: [project],
+    findHost: async () => ({ id: 'ssh-project', label: 'Project sandbox' }),
+    provision: async () => { provisions++; throw Error('Must not provision'); } });
+  await assert.rejects(lifecycle('create'), /In Run on choose "Project sandbox"/);
+  assert.equal(provisions, 0);
+});

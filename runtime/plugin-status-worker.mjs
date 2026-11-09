@@ -2,9 +2,11 @@ import { connectionIndicator, readSandboxStatus, statusCommand, statusSettings }
 import { readSandboxActivity } from './sandbox-activity.mjs';
 import { managedTarget, updateSandbox } from './sandbox-update.mjs';
 import { createOfficeManager } from './agent-office-manager.mjs';
+import { createProjectHostManager } from './project-ssh-host.mjs';
 
 export function activateStatus(orca, { collect = readSandboxStatus, collectActivity = readSandboxActivity, update = updateSandbox, targetDigest = managedTarget, run = statusCommand,
-  interval = setInterval, clear = clearInterval, now = Date.now, office = createOfficeManager({ log: message => orca.log(message) }) } = {}) {
+  interval = setInterval, clear = clearInterval, now = Date.now, office = createOfficeManager({ log: message => orca.log(message) }),
+  hosts = createProjectHostManager({ run, log: message => orca.log(message) }) } = {}) {
   let snapshot = { checkedAt: null, projects: [], error: null }, settings = { ...statusSettings }, pending, timer, disposed = false;
   let activity = [], activityError = null, launch = null;
   const updates = {};
@@ -19,6 +21,7 @@ export function activateStatus(orca, { collect = readSandboxStatus, collectActiv
       try { snapshot = await collect({ runtimeDetails: settings.runtimeDetails }); }
       catch { snapshot = { checkedAt: now(), projects: [], error: 'Sandbox ownership could not be verified. Inspect the retained records.' }; }
       if (disposed) return snapshot;
+      void hosts.sync(snapshot.projects);
       void office.sync(snapshot.projects, { autoOpen: settings.autoOpenOffice !== false });
       try { ({ activity, activityError } = await collectActivity({ projects: snapshot.projects, run })); }
       catch { activity = []; activityError = 'Agent activity could not be read from the project sandboxes.'; }

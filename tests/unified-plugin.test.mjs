@@ -19,8 +19,8 @@ test('one main plugin offers native SSH and retains the existing preview VM iden
   assert.equal(manifest.contributes.statusBarItems[0].command, 'teck.sandboxStatus');
   const recipe = JSON.parse(readFileSync(join(repositoryRoot, 'plugin/recipes/native-ssh-project.json')));
   assert.equal(recipe.id, 'teck-native-ssh-project');
-  assert.equal(recipe.name, 'Teck OMP Project');
-  assert.equal(recipe.destroy, 'none');
+  assert.equal(recipe.name, 'Create project sandbox');
+  assert.notEqual(recipe.destroy, 'none');
   assert.equal(recipe.checkoutMode, undefined);
   assert.match(sandboxName('github:teck-lab/teck.monorepo'), /^teck-orca-ssh-/);
   assert.match(stateDirectory().replaceAll('\\', '/'), /\/\.teck-orca-native-ssh$/);
@@ -57,9 +57,11 @@ test('root setup installs both approved runtimes and its native recipe runs with
   const projectId = 'test-unified-install', instanceId = 'workspace';
   const input = JSON.stringify({ recipeResult: { userData: { version: 1, projectId, instanceId,
     sandboxName: sandboxName(projectId), sandboxId: 'retained-vm', connectionMode: 'native-ssh' } } });
-  const result = spawnSync(recipe.suspend, { shell: true, encoding: 'utf8', input, timeout: 30_000, windowsHide: true,
-    env: { ...process.env, TECK_ORCA_NATIVE_SSH_RELEASES_DIR: join(root, 'ssh'),
-      ORCA_PROJECT_ID: projectId, ORCA_VM_INSTANCE_ID: instanceId } });
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout, '');
+  for (const mode of ['suspend', 'destroy']) {
+    const result = spawnSync(recipe[mode], { shell: true, encoding: 'utf8', input, timeout: 30_000, windowsHide: true,
+      env: { ...process.env, TECK_ORCA_NATIVE_SSH_RELEASES_DIR: join(root, 'ssh'),
+        ORCA_PROJECT_ID: projectId, ORCA_VM_INSTANCE_ID: instanceId } });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '');
+  }
 });
