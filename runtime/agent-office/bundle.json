@@ -4,10 +4,10 @@
   "commit": "169b5490b8cf42f4e89e079ae2ae6b3b96d15137",
   "files": {
     "LICENSE": "c388db48dcbcc40f64648e701efaf1f268134486f3c8980f45f142d24541d97b",
-    "cli.js": "c76f9c2614f1d0509c5bdccbe3bf5ef21234974cc3cd6f71af33ba50751a1a1a",
+    "cli.js": "0ef1763b9a450a57e8c45c53035f3aa5cc615a0df65f8486905c80cd9fe37448",
     "package.json": "36b367648e8a8383b9f5f2d15648121bc1fd24d808fa5b78aa8406b4a5ab08bb",
     "term-worker.mjs": "d35ab1587cc561df95f2305384592600383746f073a70e96d8d6530d5e2854ac",
-    "web/assets/app-AYFI7MEJ.js": "a6ac9f3b08e7be6b01f8b3134318a6fb3f16fd310aafccf15618afefb6d30894",
+    "web/assets/app-NWXPS2WH.js": "6102016d317c70a18ef43c828ca75e8d119262ff26527371bd371fecf88d45ab",
     "web/assets/chat-O2ICCHJD.js": "80d94fd00ada9b3bf6acd90a75fc3cb8e8ae33724e731e45854bffb347e48755",
     "web/assets/chunk-53CCVUHC.js": "eb3db596554432aad3627852d6880a8e375e718491b261d005d4f453ae65f68b",
     "web/assets/chunk-5BDGWZRB.js": "22942512997cfdbac5e6f4b71d7e71eaf208479340de3bbbf64400fb5f47e11e",
@@ -30,6 +30,6 @@
     "web/assets/logos/vercel.svg": "f5c1c44ce5004b3324a7fc75eacb88debc4d7e50fc068a47e513d9f198aae9c4",
     "web/assets/settings-CM6ZU5IG.js": "9cfe49086b05711e036e5807c577e0bbc4502ec7828cbaa07b1da11e9de03286",
     "web/assets/terminal-6QXASFE7.js": "2f3a0eeff00640819201b96027223373f2d9c78038977df5b71116b9fd20269f",
-    "web/index.html": "aa40f0b93fc383e14a33ed3536c0b5b30a741efcbe7d6155da0aa21209580512"
+    "web/index.html": "3d699092c16f984ad5af5a76e447a0c27900da0f6fafa74ff35b295c2c9465cf"
   }
 }
