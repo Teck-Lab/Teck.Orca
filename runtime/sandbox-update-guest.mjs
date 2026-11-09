@@ -11,7 +11,15 @@ export function ompProcesses() {
   }).length;
 }
 export function validManagedPath(path) {
-  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:(?:orca-policy|github-plan-scope|mcphub-client|mcphub-search|mcphub-firecrawl|office-tools|office-usage|office-mcp|office-mcp-server)\.mjs|agent-office\.LICENSE))|skills\/(?:agent-office|orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
+  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:(?:orca-policy|github-plan-scope|mcphub-client|mcphub-search|mcphub-firecrawl|office-tools|office-usage|office-plan|office-mcp|office-mcp-server)\.mjs|agent-office\.LICENSE))|skills\/(?:agent-office|orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
+}
+export function withMaintenanceFence(script) {
+  const header = '#!/bin/sh\n';
+  if (!script.startsWith(header) || !script.includes('omp-launch.mjs')) throw Error('Unsupported OMP launcher');
+  if (script.includes('/etc/teck-orca/update.lock')) return script;
+  // Insert a shell statement after the known shebang. This is structural
+  // insertion, not escaping/replacing newline characters in user data.
+  return header + 'if test -e /etc/teck-orca/update.lock; then echo "Teck: sandbox maintenance is in progress; reopen OMP afterward." >&2; exit 1; fi\n' + script.slice(header.length);
 }
 export function validatePayload(data) {
   if (data?.version !== 1 || !/^\d+\.\d+\.\d+$/.test(data.omp) || !/^[a-f0-9]{64}$/.test(data.digest) || !Array.isArray(data.files) || !data.files.length || data.files.length > 1000) throw Error('Invalid update payload');
@@ -63,8 +71,8 @@ export async function applyUpdate(payload, { forceInstall = false } = {}) {
     const wrapper = '/usr/local/lib/teck-orca/omp';
     if (fs.existsSync(wrapper)) {
       const script = fs.readFileSync(wrapper, 'utf8');
-      if (!script.startsWith('#!/bin/sh\n') || !script.includes('omp-launch.mjs')) throw Error('Unsupported OMP launcher');
-      if (!script.includes('/etc/teck-orca/update.lock')) save(wrapper, script.replace('\n', '\nif test -e /etc/teck-orca/update.lock; then echo "Teck: sandbox maintenance is in progress; reopen OMP afterward." >&2; exit 1; fi\n'), { mode: 0o755 });
+      const fenced = withMaintenanceFence(script);
+      if (fenced !== script) save(wrapper, fenced, { mode: 0o755 });
     }
     const agent = fs.statSync('/home/agent/.omp/agent');
     const target = '/opt/teck-omp/releases/' + payload.omp;

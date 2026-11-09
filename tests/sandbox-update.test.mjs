@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { updatePayload, updateSandbox } from '../runtime/sandbox-update.mjs';
-import { isOmpProcess, validManagedPath, validatePayload } from '../runtime/sandbox-update-guest.mjs';
+import { isOmpProcess, validManagedPath, validatePayload, withMaintenanceFence } from '../runtime/sandbox-update-guest.mjs';
 import { workflowDigest, workflowFiles } from '../runtime/workflow-assets.mjs';
 
 test('maintenance payload verifies every file and rejects attempts to overwrite user config or escape managed paths', () => {
@@ -20,7 +20,7 @@ test('maintenance payload verifies every file and rejects attempts to overwrite 
     assert.equal(validManagedPath(path),true);
     assert.ok(payload.files.some(file=>file.path===path),'managed updates must carry the native worker/review presets and their advisor policy together');
   }
-  for(const name of ['office-tools.mjs','office-usage.mjs','office-mcp.mjs','office-mcp-server.mjs','agent-office.LICENSE']){
+  for(const name of ['office-tools.mjs','office-usage.mjs','office-plan.mjs','office-mcp.mjs','office-mcp-server.mjs','agent-office.LICENSE']){
     const path='extensions/lib/'+name;assert.equal(validManagedPath(path),true);
     assert.ok(payload.files.some(file=>file.path===path),'the observer/MCP dependencies must ship with the workflow');
   }
@@ -29,6 +29,15 @@ test('maintenance payload verifies every file and rejects attempts to overwrite 
   assert.throws(() => validatePayload(broken), /checksum/);
   const duplicate = structuredClone(payload); duplicate.files.push(duplicate.files[0]); assert.throws(() => validatePayload(duplicate), /path/);
   assert.equal(payload.files.some(f => /config\.yml|mcp\.json|session.*jsonl|token/.test(f.path)), false);
+});
+
+test('maintenance fence preserves the launcher body and inserts exactly once after its shebang',()=>{
+  const script='#!/bin/sh\n# Existing launcher\nexec node /usr/local/lib/teck-orca/omp-launch.mjs "$@"\n';
+  const fenced=withMaintenanceFence(script);
+  assert.ok(fenced.startsWith('#!/bin/sh\nif test -e /etc/teck-orca/update.lock;'));
+  assert.ok(fenced.endsWith(script.slice('#!/bin/sh\n'.length)));
+  assert.equal(withMaintenanceFence(fenced),fenced);
+  assert.throws(()=>withMaintenanceFence('#!/usr/bin/env python\nprint("omp-launch.mjs")'),/Unsupported/);
 });
 test('process guard covers both old and staged OMP plus the pane launcher, excluding unrelated tools', () => {
   for (const args of [['bun','/opt/paseo-omp/lib/node_modules/agent/cli.ts'], ['bun','/opt/teck-omp/releases/18.16.0/bin/omp'], ['node','/usr/local/lib/teck-orca/omp-launch.mjs'], ['sh','/usr/local/lib/teck-orca/omp']]) assert.equal(isOmpProcess(args), true);

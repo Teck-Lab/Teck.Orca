@@ -39,7 +39,7 @@ observer, sanitizer and role guard atomically for subsequent OMP loads without
 restarting running sessions. Existing loaded extensions need their normal OMP
 reload/session restart to adopt the new observer; no user session was interrupted.
 
-Validation includes 275 passing plugin tests, generated package checks, Agent
+Validation includes 276 passing plugin tests, generated package checks, Agent
 Office typechecking and its full Linux/Node 24 suite (523 passed, two skipped).
 The Linux test directory is disposable and outside any user project. The normal
 Windows full-suite attempt encounters upstream Unix/symlink assumptions; it is
@@ -52,3 +52,10 @@ plan updates with zero model turns. The probe intercepted only its own Office
 metadata requests so no test goal/worker appeared in the user's live office.
 The host Office build and served browser entry matched the approved bundle,
 and the installed guest assets matched their source hashes.
+
+The managed workflow payload also includes the shared plan sanitizer, so fresh
+provisioning and the settings updater carry the same observer dependencies.
+Final CodeQL review flagged the updater's pre-existing single-newline launcher
+edit as incomplete escaping. It now inserts the maintenance check after the
+validated shebang structurally, preserves the entire existing launcher body and
+remains idempotent; a regression test covers that behavior.
