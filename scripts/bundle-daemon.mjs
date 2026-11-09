@@ -33,8 +33,8 @@ function copyVerified(root, files, output, inputPath = path => join(root, path))
     cpSync(input, join(output, path));
   }
 }
-if (version !== '1.4.245') throw new Error(`Review the runtime/Node pins before bundling Orca ${version}`);
-if (manifest.commonSha256['orcad-server.js'] !== '33458faa0690a64159776e1857ef3b40a6bea1b697ca289214064e8ed6dfff82') throw new Error('Review the daemon artifact version before bundling a different build');
+if (version !== '1.4.248') throw new Error(`Review the runtime/Node pins before bundling Orca ${version}`);
+if (manifest.commonSha256['orcad-server.js'] !== '02bf9de4c78ae871ec544068a49a9c483c9e7a4e948afbd1662a6d04fac3aafe') throw new Error('Review the daemon artifact version before bundling a different build');
 // Retire only files declared by the previous distribution manifest. Generated
 // mobile asset names change between releases; retaining them bloats every kit.
 const previousPath = join(destination, 'provenance.json');

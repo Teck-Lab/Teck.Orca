@@ -1,0 +1,20 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Teck development tools
+description: .NET SDK, language servers and native .NET/JavaScript debuggers.
+requires:
+  - dk.tecklab/base >= 1
+provides:
+  - dotnet@10.0.401
+  - typescript@5.9.3
+  - dk.tecklab/language-servers@1
+  - netcoredbg@3.2.0-1092
+  - js-debug-adapter@1.140.0
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: install -d -o agent -g agent -m 700 /home/agent/.dotnet /home/agent/.nuget
+          user: "0"
+          description: Initialize per-agent SDK state.

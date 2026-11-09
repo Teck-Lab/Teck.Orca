@@ -1,30 +1,168 @@
 # Teck.Orca
 
-One plugin provides one persistent Docker Sandbox per Orca project, shared by its worktrees, with OMP and optional local KIND. **Teck OMP Project** in the GUI **Run on** picker creates or reuses the VM. Orca connects over Docker's native SSH and manages its guest daemon.
+One plugin provides one persistent Docker Sandbox per Orca project, shared by its worktrees, with OMP and optional local KIND. For first use choose **Create project sandbox** in the GUI **Run on** picker. The plugin registers a persistent **<project> sandbox** SSH target automatically; select that target for additional workspaces. Orca connects over Docker's native SSH and manages its guest daemon.
+
+The provisioning recipe is not a reusable connection: Orca 1.4.248 registers a
+separate route for each recipe invocation. Once the persistent target exists,
+the recipe refuses another invocation before provisioning or returning a new
+connection. Workspace cleanup runs an ownership-checked provider no-op, allowing
+Orca to retire the workspace route without stopping or deleting the shared VM.
+Existing workspaces retain their old lifecycle snapshots.
+
+Each feature keeps one executor child worktree per canonical GitHub issue, or
+stable `workspace_key` for work without an issue. Follow-ups and retries reuse
+that checkout, even across Runs or after its terminal has been released. Active
+or uncertain ownership blocks another executor; legacy duplicates require an
+explicit canonical child choice after reconciling changes. Planned parallel lanes
+need a stable `parallel_key` and a `parallel_reason` with file ownership and
+dependencies. Native OMP helpers continue sharing their owning executor checkout.
+Integration has its own stable issue/task key; final review and publication target
+that resulting child. The coordinator checkout remains isolated from editing.
+These checks govern managed dispatch, not arbitrary manual shell commands.
+
+Dispatch labels default to issue number, role and a short task description, for
+example `#906 · Executor · Verify Billing finalize`. An optional `title` supplies
+the concise description; otherwise the first objective line is used. New child
+names include a readable slug and short unique suffix. The adapter labels only
+a verified worker pane and may replace an unshared generic worker tab title;
+custom/shared tabs are preserved. Naming is bounded and never replaces the
+dispatch receipt or authorizes launching another worker if desktop routing fails.
+
+The plugin installs Agent Office's bundled stdio MCP server in OMP automatically,
+preserving any existing Office MCP connection and other server settings. All roles
+can use its five tools under the shared `agent-office` skill: meaningful status
+changes, peer checks before shared edits, milestone shouts, verified-win
+celebrations and a rare optional table flip. Native handlers retain text scrubbing
+and cooldowns. Only their intentional public structured signals are relayed by the
+observer; peer snapshots use the authenticated project tunnel. No extra server URL
+or token is needed. Office availability is never a work or acceptance gate.
+
+OMP token counts use cumulative own-assistant usage, including normalized cache
+usage, with separate parent/helper ledgers and replay-safe office totals. They
+exclude helper aggregates and inherited fork history. The OMP icon uses the
+official pi mark on monitor/TV screens and the top-right agent legend.
 
 ## Setup and GUI workflow
 
-Requires Orca 1.4.245+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH, a Docker login and configured Docker-managed OmniRoute/MCPHub/GitHub service credentials. Tokens stay in Docker's credential store.
+Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.51+, OpenSSH, a Docker login and configured Docker-managed OmniRoute/MCPHub/GitHub/Hindsight service credentials. Tokens stay in Docker's credential store.
 
-```powershell
-sbx setup ssh
-npm run build
-npm test
-npm run check
-npm run setup
-```
+The portable release includes its host runtime and integrity-pinned native SSH
+runtime. After a release is published, add this repository's catalogue in Orca
+Settings > Plugins, install **Teck OMP Docker Sandbox**, and approve its fingerprint.
+Installation needs no repository checkout or `npm run setup`. Activation
+materializes the bundled runtime into the user's versioned cache; it creates no
+sandbox, connection or workspace. Docker's SSH integration and credentials must
+already be configured on the machine.
 
-Install or refresh **plugin/** in Orca Settings > Plugins and approve the updated fingerprint. It is the only installable package; the repository root contains large runtime binaries. Setup installs the pinned native SSH runtime and older-sandbox recovery runtime, creating no project VM, connection or workspace.
+**Release status:** `orca-catalog.json` is intentionally empty until the first
+portable package and signed kit set have been published and verified. The
+catalogue must reference the actual committed package, never an uncommitted
+candidate. See [release and promotion](docs/release-kits.md).
 
-Create a workspace from the local project, enable Per-Workspace Environments if required by Orca, and choose **Teck OMP Project** in **Run on**. Orca creates the sandbox only if absent, configures OMP, clones once, registers native SSH and creates the linked worktree. Choose that same recipe again for concurrent workspaces; they share the VM and retain independent sessions/checkouts. No pre-provisioning command or manual SSH-host registration is needed.
+Create a workspace from the local project, enable Per-Workspace Environments if
+required by Orca, and choose **Create project sandbox** in **Run on** for the
+first workspace. Orca creates the sandbox only if absent, configures OMP, clones
+once, and registers the persistent **<project> sandbox** SSH target. Choose that
+saved target for every additional workspace. They share the project sandbox and
+retain independent sessions/checkouts; the first-use recipe is not the reusable
+connection. No pre-provisioning or manual SSH-host registration is needed.
+
+For maintainers, `npm run validate` builds and tests a disposable source copy
+without changing the installed plugin. The existing `npm run build`, `npm test`,
+`npm run check` and `npm run setup` workflow remains available. It generates and
+installs the local `plugin/` package and its versioned runtimes. Building into an
+installed `plugin/` can reload it, so release validation instead uses
+`scripts/package-portable-plugin.mjs --output <isolated-folder> --kit-release
+<published-lock.json>`. Never install the repository root as a plugin.
+
+New sandbox provisioning requires the real signed kit lock. An explicit
+`TECK_ORCA_SOURCE_KITS=1` override retains the previous monolithic builder for
+source development only; it is not a fallback in portable releases. See the
+[component layout](kits/README.md) and [validation evidence](docs/validation-v3-kits-2026-11-09.md).
 
 ## Updating from either previous plugin
 
-The main plugin keeps its identity, teck-lab.teck-sbx-recipes, now version 0.6.0. Native SSH is integrated into it; native-ssh/ is internal source and has no separate plugin/package/setup.
+The main plugin keeps its identity, `teck-lab.teck-sbx-recipes`. Version 0.8.0
+adds portable packaging and the signed Docker Sandboxes v3 kit set. Native SSH
+is integrated into it; `native-ssh/` is internal source and has no separate
+plugin entry. Update the existing plugin through the catalogue once that release
+is published, or refresh its local package when using the source workflow.
 
-If **Teck OMP Native SSH Preview** is installed, remove that old plugin entry after refreshing plugin/. Keep its VM, saved workspaces and ownership records. The native recipe ID, sandbox names, ~/.teck-orca-native-ssh ownership/release roots and native-ssh/projects.json configuration are retained. New recipe runs reuse the existing native VM; old workspaces keep their immutable snapshots.
+If **Teck OMP Native SSH Preview** is installed, remove that old plugin entry
+after updating the main plugin. Keep its VM, saved workspaces and ownership
+records. The native recipe ID, sandbox names, `~/.teck-orca-native-ssh`
+ownership/release roots and project defaults are retained. Existing workspaces
+keep their immutable lifecycle snapshots; additional workspaces use the saved
+project sandbox SSH target. Installing new kit images does not recreate or
+silently upgrade an existing sandbox.
 
 Older bundled-daemon project/feature sandboxes retain their data and **Teck: Reconnect sandboxes** recovery command. Their compatibility recipes remain available to saved snapshots and are no longer offered for new workspaces. No checkout/profile/data migration is performed. On Windows setup retains the older project transport's hidden login companion; native SSH connections use Orca's own relay and daemon management.
+
+## Sandbox status in Orca
+
+**Agent Office:** the plugin starts our bundled [Agent Office fork](https://github.com/Teck-Lab/agent-office)
+locally and opens its browser view when an owned sandbox starts, reusing a live
+viewer. Use **Open pixel office** in Overview to reopen it, or turn off automatic
+opening in Panel settings. Confirmed Orca coordinators sit in the office with their
+native OMP helpers. Dispatched workers keep separate desks in their project's
+Docker/cloud pod, with their own native helpers beside them. Physical sandbox
+identity is retained. The inspector shows role, Run, Task, Dispatch and issue;
+selection highlights the native family and workers sharing its Run. Unbound
+sessions remain in the cloud area.
+Orca retains workspace, terminal and sandbox ownership. The office runs with agent
+control and transcript/cloud discovery disabled. Authenticated events travel through
+a guest loopback relay through Docker's host-service proxy; no LAN listener or
+firewall change is required. The plugin scopes network access to that sandbox,
+the Office host port, GET /healthz and POST /api/ingest. Fresh connections are
+checked on refresh so an alive helper cannot conceal a broken listener.
+Existing OMP sessions must be reopened/resumed to load the observer. Pixtuoid is removed
+from new images and cleaned up in owned running sandboxes when the plugin connects.
+See [native runtime details](native-ssh/README.md).
+
+The plugin requires Orca 1.4.248 or newer. Open **Teck sandbox** in the right sidebar,
+use **Teck: Sandbox status** in the command palette, or click the Teck status-bar
+indicator. **Overview** shows verified connection, CPU/memory, Orca/OMP versions,
+KIND node readiness and separate root and Docker/KIND disks. Each storage meter
+labels percentage used, space free, total capacity and used space; 85% usage
+raises a warning. Docker/KIND includes images, containers and Kubernetes volumes.
+Running without a successful runtime check is shown as running, not connected.
+Agent activity comes from Orca's public `worktree ps` on each verified running
+project sandbox, including OMP subagents and their workspace. It refreshes on
+every poll, manual refresh and workspace/status event. The desktop plugin API's
+local-only agent list does not cover SSH sandbox agents. Unavailable activity is
+shown as a warning; restored child reports without live observations are marked
+unconfirmed. **Agents** groups children beneath their parent and shows time in
+the current state, last reported tool and report age. Verified Orca assignments
+can supply an issue/sub-issue link; workspace links and inherited parent links
+are labelled separately. Missing issue metadata is never inferred from a title,
+branch name or task brief. A launch or dispatch prompt receipt is labelled as a request and
+never as proof of execution or task completion.
+
+The panel and the plugin's Settings page offer refresh interval, runtime-detail
+checks and status-bar visibility. Checks verify the ownership record and current
+provider identity before probing a running sandbox. Stopped, missing and replaced
+sandboxes are skipped. No check provisions a VM, starts Kubernetes or restarts an
+agent. CPU/memory are read-only because the installed Docker Sandboxes CLI offers
+no in-place resize operation. The panel does not expose service tokens or prompts.
+
+Update the existing plugin entry after updating desktop. Orca will review
+the added workspace/agent read access and the plugin's own settings access.
+Activation creates no sandbox. Native SSH servers are managed by the matching
+desktop, with 1.4.254 as the current target; bundled compatibility daemons retain 1.4.248. OMP 18.18.3 is pinned in
+the image; existing sandboxes/processes are not silently replaced or upgraded.
+Use the Updates panel to refresh existing sandbox workflow files while preserving
+the configured models, credentials and sessions.
+
+**Updates** offers **Update &lt;project&gt;** for an existing running native sandbox.
+Close OMP sessions first; the action checks actual processes again before applying
+changes and never interrupts an agent. It stages and verifies the pinned OMP
+version when needed, refreshes managed orchestration/skill/launch files, and
+restores the previous managed files if applying them fails. Configured models,
+MCP configuration, credentials, saved conversations and project files are preserved.
+Reopen OMP afterward. Progress and failures appear in this tab; repeat clicks do
+not start duplicate updates. A desktop-managed Orca server update is separate.
+Image packages and resource/disk limit changes still require recreation, which
+this action never performs. It does not stop KIND or remove Docker data.
 
 ## Lifetime and resources
 
@@ -34,9 +172,29 @@ Defaults are 8 CPU / 16g memory; native-ssh/projects.json configures projects. E
 
 The workload permits HTTPS to quay.io and *.quay.io, plus the existing SDK/browser download hosts and Docker default allowlist. Proxy-managed service credentials are used; host personal credential helpers are not copied. See [native runtime details](native-ssh/README.md).
 
+The plugin prepares shared Kubernetes device prerequisites automatically, even when managed KIND is disabled. It exposes a real /dev/kmsg for privileged K3s Testcontainers and keeps KIND's persistent /var/lib/teck-kubernetes/kmsg mount. Creation, recipe reuse, sandbox startup and terminal startup restore the prerequisites; no manual device command or application-side kmsg mount is required. K3s clusters remain owned by their test fixtures, while the managed KIND cluster remains shared by project worktrees. After updating the plugin, a normal Teck OMP Project recipe run upgrades the prerequisites in an existing owned native sandbox without replacing it. Saved workspaces retain their old immutable recipe until that upgrade has run.
+
 ## Runtime and validation
 
-The workload retains OMP 18.14.0, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.245 and Node 24.22.1. No initialized runtime identity is baked into the image.
+URL reads use the self-hosted Firecrawl MCP at `https://mcp.tecklab.dk/mcp/firecrawl`
+with the existing `mcphub` service credential; that key needs Firecrawl access.
+Search continues through MCPHub SearXNG. The research extension does not fall back
+to paid Firecrawl through OmniRoute. Native reads of explicit raw/ranged URLs use
+OMP's native reader.
+
+Automatic memory uses OMP's native Hindsight backend at
+`https://hindsight-api.tecklab.dk` (no API suffix), bank `teck`, with project tags,
+automatic recall and retention. Recall allows up to 90 seconds for the self-hosted
+service to respond. The kit requests the separate `hindsight` service
+secret as `HINDSIGHT_API_KEY`; the launch environment maps its placeholder to OMP's
+`HINDSIGHT_API_TOKEN`. Store the real key in Docker Sandboxes, never in this repo
+or the guest profile. Its binding permits only `hindsight-api.tecklab.dk`. Existing
+local memory files remain on disk; they are not automatically uploaded or deleted.
+Existing sandboxes need a verified credential route before switching their memory
+backend. Do not use `sbx kit add` on a live project as an update shortcut: it
+recreates the container. New OMP sessions load the updated extension/configuration.
+
+The workload retains OMP 18.18.3, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, kind 0.33.0, kubectl 1.37.1, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.248 and Node 24.22.1. No initialized runtime identity is baked into the image.
 
 Root build/check cover the single plugin and both integrity-pinned runtime stores. Root npm test includes native SSH/provider tests as well as legacy recovery. See [consolidation validation](docs/validation-unified-plugin-2026-10-30.md). Historical smoke scripts below exercise their named legacy paths; provider/GUI acceptance is recorded separately.
 
@@ -50,15 +208,43 @@ tracking blocked and ready work independently. Risk, file count and helper/revie
 sessions alone do not require sub-issues. See the canonical
 [issue decision rule](runtime/omp/skills/github-execution-planning/references/issue-structure.md).
 
-The lead coordinates and an OMP executor implements in a visible parent-linked
-Orca child worktree. In a single-issue run both can link the same GitHub issue;
-Orca worktree hierarchy does not require GitHub issue hierarchy. The single-issue
-path has one independent final review after integration and combined checks.
-A feature with execution sub-issues keeps child reviews before integration plus
-the final integrated review. Both paths verify the exact reviewed snapshot and
-use one canonical PR through GitHub MCP. Explicit narrower user instructions
+The lead coordinates planning and acceptance. Native OMP task/wait helpers are
+available to every role; use Orca task-role workers for independently owned visible
+checkouts. Each executor starts a real `implementation-worker` turn before
+implementation: one focused helper for a small change, or a parallel wave with
+disjoint file ownership for independent parts. Helpers perform RED/implementation/
+GREEN; the parent integrates and verifies acceptance and test evidence.
+Both single issues and multi-deliverable features use
+one independent final review by default, at medium effort. Early targeted reviews
+and high effort are reserved for concrete risks or required contract gates;
+correction reviews focus on the fix and affected interactions. Independent work
+continues while a stable checkout is reviewed. Verify the exact reviewed snapshot
+through the reviewer/publication worker reports and use one canonical PR through
+GitHub MCP. Explicit narrower user instructions
 apply; merging still requires separate authorization. See
 [review gates](runtime/omp/skills/orca-feature-workflow/references/review-gates.md).
+The independent reviewer uses parallel `correctness-reviewer` and `security-auditor`
+helpers for code/deployment changes, validates their findings and owns one verdict.
+This works through the existing model route without requiring native `/security`
+OAuth authentication or personal `gh` access for PR review.
+
+Every new feature/behavior needs automated behavioral tests; bug fixes need a
+reproducing regression. Use test-first RED/GREEN cycles and preserve assertions.
+Compare base and candidate line/branch coverage with matching tooling and filters:
+affected modules and measured project/repository aggregates must not decrease.
+Increase meaningful coverage when adding behavior; do not game thresholds, ignores,
+filters or assertions. Missing reports remain unresolved evidence. See the
+[test-first and coverage contract](runtime/omp/skills/orca-feature-workflow/references/testing.md).
+
+The `implementation-worker` preset enables one nonblocking Supervisor at turn
+interval 3, reporting concrete drift, repeated unaddressed failures or contradicted
+completion claims. The coordinator, reviewer and read-only review helpers keep
+background advisors off. Native task helpers reuse the parent's automatic memory
+state rather than repeating long first-turn Hindsight recalls.
+Periodic Architecture, Security, Fixer and Final reviewer presets are disabled;
+request specialist analysis explicitly when relevant. Bundled advisor-model
+sessions disable nested WATCHDOG activity with a session-local overlay. An
+explicit --advisor request preserves user control.
 
 A whole-task blocker stays on the existing issue with evidence, owner and resume
 condition. Split blocked/ready deliverables only when independent tracking is
@@ -73,9 +259,9 @@ Dispatch rather than repeating coordinator planning. Full official Orca guides
 remain bundled; placement/recovery references, label catalogs and PR-stack
 mechanics load only when needed.
 
-The existing OMP modelRoles mappings remain in place. OMP chooses its internal task agents for scouting and helpers; those helpers do not replace sidebar-visible implementation workers. Terminal workers are the intended interface. The sandbox bundles `orca` and `orca-ide`, routed to Orca's managed guest runtime and user-data directory.
+The existing OMP modelRoles mappings remain in place. The default/plan session coordinates planning and acceptance. It can delegate canonical issue/sub-issue/dependency writing to a verified Orca planner on the existing slow role, then check returned IDs and records before dispatch. Researchers remain read-only; one writer owns the plan at a time. Every role can use native OMP task/wait helpers as needed, including planners, researchers, executors and reviewers. Unrestricted eval is executor-only; it does not provide a read-only delegation boundary. Canonical execution issues/sub-issues use tracked Orca executors with bounded goals; their native helpers support that owner. Native helpers use OMP's own lifecycle and return to their parent; the parent owns scope, evidence and final acceptance. The coordinator's native goal matches the authorized milestone/delivery scope, while each Orca worker owns its bounded goal. Apply the same planning/dependency-wave pattern within sub-issues, creating durable sub-sub-issues only when independently trackable work warrants them. Explicit independent reviews replace periodic WATCHDOG loops. See [goals and milestones](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md). The sandbox bundles `orca` and `orca-ide`, routed to Orca's managed guest runtime and user-data directory.
 
-After accepting a settled worker report, the coordinator releases that worker's owned terminal through Orca, preserving its child worktree and archived output. Immediate follow-up work can reuse the terminal; keeping it alive otherwise requires an explicit user request. Keeping worktrees or forbidding workspace deletion does not request terminal retention. This policy is in Teck's shared OMP rules and its own workflow skills; the official Orca skill snapshots remain unchanged. Existing feature sandboxes retain their original installed rules; refresh the plugin and create a fresh feature to use the latest workflow rules. The reconnect command does not change those rules.
+After accepting a settled worker report, the coordinator releases that worker's owned terminal through Orca, preserving its child worktree and archived output. Immediate follow-up work can reuse the terminal; keeping it alive otherwise requires an explicit user request. Keeping worktrees or forbidding workspace deletion does not request terminal retention. This policy is in Teck's shared OMP rules and its own workflow skills; the official Orca skill snapshots remain unchanged. Existing sandboxes retain their installed workflow until updated. After current work finishes, close OMP sessions and use Teck sandbox ? Updates ? Update for the project, then reopen OMP. Session history and project files are preserved; the reconnect command alone does not update workflow rules.
 
 Issue classification and agent status follow the repository's live types and
 label conventions, with [Teck.Monorepo guidance](runtime/omp/skills/github-execution-planning/references/issue-classification.md)
@@ -91,6 +277,8 @@ refresh reads GitHub through the host's existing gh login and changes no labels.
 Ordinary builds stay offline. New feature sandboxes receive the updated catalog.
 
 Refresh the packaged CLI/orchestration guides deliberately with `npm run bundle:skills`, then build and setup. Normal builds use the checked-in snapshots and do not need a running Orca instance. Live execution-host guides take precedence when available.
+
+The bundled official Orca CLI and orchestration guides are refreshed from 1.4.237. For direct OMP launches, use `orca agent launch --agent omp --surface terminal --model <role-model> --json` with the intended worktree selector. Supervised `orchestration worker-start` has no `--surface` flag; follow its receipt and use `worker-read --source auto`.
 
 OMP runs in sandbox-backed Orca terminals. Orca's managed SSH daemon supplies filesystem, Git, terminal and orchestration services. This plugin does not translate Paseo's OMP JSONL RPC into Orca's structured UI protocol.
 
@@ -129,9 +317,10 @@ tests the guest fallback without clicking desktop Retry; it removes only its
 generated sandbox.
 
 `npm run smoke:review` creates one disposable feature and a synthetic local
-repository. Three real advisor-model review Dispatches evaluate a defective
-child with weak green tests, its corrected snapshot, and the integrated parent.
-It requires explicit request-changes/approve/approve verdicts, unchanged reviewed
+repository. Two medium-effort advisor-model review Dispatches evaluate an
+integrated defective change with weak green tests and its corrected snapshot.
+The fixture captures behavioral RED/GREEN and comparable coverage evidence.
+It requires explicit request-changes/approve verdicts, unchanged reviewed
 checkouts and released reviewer terminals, then removes only the generated test
 sandbox. It makes model requests but creates no GitHub records.
 
@@ -187,8 +376,8 @@ replace periodic WATCHDOG loops and per-helper full reviews. See the
 [runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md).
 
 The unified plugin 0.6.0 uses the Orca desktop-managed guest daemon over native
-SSH. Compatibility images retain Orca 1.4.245 and Node 24.22.1. All image paths
-pin OMP 18.14.0 and Bun 1.4.4. See the
+SSH. Compatibility images retain Orca 1.4.248 and Node 24.22.1. All image paths
+pin OMP 18.18.3 and Bun 1.4.4. See the
 [release changes and validation](docs/validation-orca-omp-2026-10-30.md).
 
 ## Planner-owned issue decomposition
@@ -207,3 +396,18 @@ The vendored YAML 2.9.1 package includes reproducible linear-time scalar patches
 for the four CodeQL ReDoS findings. `npm run check` verifies all vendor hashes
 offline; `npm run vendor:yaml` is explicit dependency maintenance. See the
 [security validation](docs/validation-yaml-security-2026-10-30.md).
+## OMP goal/task whiteboard
+
+Agent Office has a pixel whiteboard to the left of the elevator, aligned with
+the TV. Click it, use **Whiteboard**, or press **B** to see the selected
+orchestrator's native goal, todo phases, progress, blockers and connected Orca
+assignments with GitHub issue links. Concurrent orchestrators have separate
+boards. Goal completion, todo completion and worker activity remain distinct.
+
+This read-only view sends sanitized, bounded goal/task titles and blocker
+notes through the existing authenticated observer connection. It does not
+transmit prompts or tool contents. New OMP sessions use the updated observer;
+already running sessions adopt it on their normal reload. Large plans show an
+explicit preview notice. See
+[validation](docs/validation-office-whiteboard-2026-11-09.md).
+

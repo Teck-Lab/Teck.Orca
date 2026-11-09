@@ -48,7 +48,7 @@ try {
   const status = cli(['status']);
   report.runtimeStatus = status;
   assert.equal(status.runtime.reachable, true);
-  assert.equal(status.runtime.appVersion, '1.4.245');
+  assert.equal(status.runtime.appVersion, '1.4.248');
   cli(['worktree', 'list']);
   report.checks.push('guest CLI reaches its own daemon without an SSH permission gate');
   const paired = spawnSync(process.execPath, [join(repositoryRoot, 'runtime/kits/orcad/bundle/common/out/cli/index.js'), 'status', '--pairing-code', created.pairingCode, '--json'], {
@@ -67,7 +67,7 @@ try {
   assert.ok(repoId, 'repo add did not return its id');
   const parent = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'daemon-smoke-feature', '--no-parent', '--setup', 'skip']);
   assert.ok(parent.worktree?.id);
-  const childResult = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'daemon-smoke-child', '--parent-worktree', `id:${parent.worktree.id}`, '--base-branch', parent.worktree.branch, '--setup', 'skip', '--agent', 'omp']);
+  const childResult = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'daemon-smoke-child', '--parent-worktree', `id:${parent.worktree.id}`, '--base-branch', parent.worktree.branch, '--setup', 'skip', '--agent', 'omp', '--surface', 'terminal']);
   assert.ok(childResult.worktree?.id);
   report.workspaces = { parent: parent.worktree.id, child: childResult.worktree.id };
   report.child = cli(['worktree', 'show', '--worktree', `id:${childResult.worktree.id}`]);

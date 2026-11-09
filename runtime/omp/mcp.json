@@ -1,6 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json",
   "mcpServers": {
+    "agentoffice": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/home/agent/.omp/agent/extensions/lib/office-mcp.mjs"],
+      "timeout": 5000
+    },
     "github": {
       "type": "http",
       "url": "https://mcp.tecklab.dk/mcp/github?features=issue_dependencies",
@@ -12,6 +18,12 @@
     "github-projects": {
       "type": "http",
       "url": "https://mcp.tecklab.dk/mcp/github-projects",
+      "headers": { "Authorization": "Bearer ${MCPHUB_API_KEY}" },
+      "timeout": 120000
+    },
+    "firecrawl": {
+      "type": "http",
+      "url": "https://mcp.tecklab.dk/mcp/firecrawl",
       "headers": { "Authorization": "Bearer ${MCPHUB_API_KEY}" },
       "timeout": 120000
     },

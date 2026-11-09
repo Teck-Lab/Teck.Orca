@@ -40,8 +40,8 @@ idle. A request_changes verdict completes the review successfully, not the code.
 Do not inspect unrelated files, runtime credentials or provider settings.`;
   report.phase = `reviewing-${expected}`; save();
   const worker = cli(['orchestration', 'worker-start', '--spec', spec, '--task-title', 'Read-only completed change review',
-    '--worktree', `id:${worktree.id}`, '--agent', 'omp', '--model', 'omniroute/teck-advisor:high', '--timeout-ms', '90000']);
-  assert.equal(worker.launch.effective.model, 'omniroute/teck-advisor:high');
+    '--worktree', `id:${worktree.id}`, '--agent', 'omp', '--model', 'omniroute/teck-advisor:medium', '--timeout-ms', '90000']);
+  assert.equal(worker.launch.effective.model, 'omniroute/teck-advisor:medium');
   const deadline = Date.now() + 360_000;
   while (Date.now() < deadline) {
     const delivery = cli(['orchestration', 'check', '--wait', '--types', 'worker_done,escalation,question', '--timeout-ms', '15000']);
@@ -67,10 +67,12 @@ Do not inspect unrelated files, runtime credentials or provider settings.`;
 try {
   const parent = cli(['worktree', 'current']).worktree;
   report.parent = parent.id;
-  const createdRun = cli(['orchestration', 'run-create', '--objective', 'Explicit child and final parent review regression']);
+  const createdRun = cli(['orchestration', 'run-create', '--objective', 'One final review and a focused correction review']);
   report.run = createdRun.run ?? createdRun;
   const parentPath = worktreePath(parent);
   const base = git(parentPath, 'rev-parse', 'HEAD');
+  const testArgs = ['--test', '--experimental-test-coverage', '--test-coverage-include=**/clamp.mjs', 'clamp.test.mjs'];
+  const baseline = run('node', testArgs, parentPath);
   const child = cli(['worktree', 'create', '--repo', `id:${parent.id.split('::')[0]}`, '--name', 'review-test-child',
     '--parent-worktree', `id:${parent.id}`, '--base-branch', parent.branch, '--setup', 'skip']).worktree;
   const childPath = worktreePath(child);
@@ -82,18 +84,21 @@ try {
   git(childPath, 'add', 'clamp.mjs'); git(childPath, 'commit', '-m', 'fix: reject inverted clamp ranges');
   // The regression must prevent accepting a plausible implementation with only
   // weak green tests; the reviewer is not told which verdict is expected.
-  const weakTests = run('node', ['--test', 'clamp.test.mjs'], childPath);
-  review(child, base, 'request_changes', weakTests);
-  writeFileSync(join(childPath, 'clamp.mjs'), correct);
-  writeFileSync(join(childPath, 'clamp.test.mjs'), tests);
-  git(childPath, 'add', 'clamp.mjs', 'clamp.test.mjs'); git(childPath, 'commit', '-m', 'fix: clamp ranges and expand coverage');
-  const childTests = run('node', ['--test', 'clamp.test.mjs'], childPath);
-  review(child, base, 'approve', childTests);
   git(parentPath, 'merge', '--ff-only', child.branch);
-  const combinedTests = run('node', ['--test', 'clamp.test.mjs'], parentPath);
-  review(parent, base, 'approve', combinedTests);
+  const weakTests = run('node', testArgs, parentPath);
+  review(parent, base, 'request_changes', `Baseline coverage (same runner/filter):\n${baseline}\nCandidate weak tests:\n${weakTests}`);
+  writeFileSync(join(childPath, 'clamp.test.mjs'), tests);
+  const red = spawnSync('node', testArgs, { cwd: childPath, encoding: 'utf8' });
+  assert.equal(red.status, 1, 'Regression tests must fail against the broken implementation');
+  assert.match(red.stdout + red.stderr, /AssertionError|ERR_ASSERTION/);
+  report.red = red.stdout + red.stderr;
+  writeFileSync(join(childPath, 'clamp.mjs'), correct);
+  git(childPath, 'add', 'clamp.mjs', 'clamp.test.mjs'); git(childPath, 'commit', '-m', 'fix: clamp ranges and expand coverage');
+  git(parentPath, 'merge', '--ff-only', child.branch);
+  const combinedTests = run('node', testArgs, parentPath);
+  review(parent, base, 'approve', `Baseline coverage (same runner/filter):\n${baseline}\nBehavioral RED before correction:\n${report.red}\nGREEN with coverage:\n${combinedTests}`);
   const workers = cli(['orchestration', 'worker-list', '--run', report.run.id ?? report.run.runId]);
-  assert.equal(workers.workers.length, 3);
+  assert.equal(workers.workers.length, 2);
   assert.ok(workers.workers.every(worker => worker.terminalState === 'released'));
   assert.equal(cli(['orchestration', 'worker-list', '--run', report.run.id ?? report.run.runId, '--terminal-state', 'reclaimable']).workers.length, 0);
   assert.equal(cli(['worktree', 'show', '--worktree', `id:${child.id}`]).worktree.parentWorktreeId, parent.id);

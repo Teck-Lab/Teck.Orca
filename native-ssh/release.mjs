@@ -33,7 +33,7 @@ export function installRelease(files, root = releasesRoot()) {
   return { digest, destination };
 }
 export function recipeCommand(digest, mode) {
-  if (!/^[a-f0-9]{64}$/.test(digest) || !['create', 'suspend', 'resume'].includes(mode)) throw Error('Invalid preview recipe identity');
+  if (!/^[a-f0-9]{64}$/.test(digest) || !['create', 'suspend', 'resume', 'destroy'].includes(mode)) throw Error('Invalid preview recipe identity');
   const source = `const fs=require('node:fs'),p=require('node:path'),c=require('node:crypto');const hash=x=>c.createHash('sha256').update(x).digest('hex');const root=p.join(process.env.TECK_ORCA_NATIVE_SSH_RELEASES_DIR||p.join(require('node:os').homedir(),'.teck-orca-native-ssh','releases'),'${digest}');(async()=>{const raw=fs.readFileSync(p.join(root,'release.json'));if(hash(raw)!=='${digest}')throw Error('Preview release manifest changed');for(const[f,h]of Object.entries(JSON.parse(raw))){if(f.startsWith('/')||f.includes('\\\\')||f.split('/').includes('..'))throw Error('Unsafe release path');const t=p.join(root,f);if(!fs.lstatSync(t).isFile()||hash(fs.readFileSync(t))!==h)throw Error('Preview release changed: '+f)}const m=await import(require('node:url').pathToFileURL(p.join(root,'src','recipe.mjs')).href);await m.main('${mode}')})().catch(e=>{console.error('Teck SSH preview: '+e.message);process.exitCode=1})`;
   return `node -e "eval(Buffer.from('${Buffer.from(source).toString('base64')}','base64').toString())"`;
 }

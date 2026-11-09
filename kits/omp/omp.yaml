@@ -1,0 +1,17 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: OMP and Bun
+description: Pinned OMP and Bun runtime, installed at image build time.
+requires:
+  - dk.tecklab/base >= 1
+provides:
+  - omp@18.18.3
+  - bun@1.4.4
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: install -d -o agent -g agent -m 700 /home/agent/.omp /home/agent/.omp/run /home/agent/.bun/install/cache
+          user: "0"
+          description: Initialize writable OMP session and Bun cache directories.

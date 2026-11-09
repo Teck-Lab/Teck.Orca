@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { chmodSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync } from 'node:fs';
 import { installKubernetesTools } from './kubernetes-tools.mjs';
+import { installDebugTools } from './debug-tools.mjs';
 
 // Build-time only. No host tools, credentials or user-data enter the image.
 const lock = JSON.parse(readFileSync(new URL('./devtools.json', import.meta.url), 'utf8'));
@@ -18,6 +19,7 @@ const download = (url, path, hash, algorithm = 'sha256') => {
 
 if (!process.argv.includes('--chrome')) {
 installKubernetesTools({ lock });
+installDebugTools({ lock });
 mkdirSync('/usr/share/dotnet', { recursive: true });
 download(`https://builds.dotnet.microsoft.com/dotnet/Sdk/${lock.dotnet.version}/dotnet-sdk-${lock.dotnet.version}-linux-${arch}.tar.gz`, '/tmp/teck-dotnet.tar.gz', lock.dotnet.sha512[arch], 'sha512');
 run('tar', ['-xzf', '/tmp/teck-dotnet.tar.gz', '-C', '/usr/share/dotnet']);
@@ -46,7 +48,8 @@ if (process.argv.includes('--pack')) {
   // Keep the final kit layer below Docker's path-component inventory limit.
   // The lifecycle expands the complete toolchain into each new feature VM.
   run('tar', ['-C', '/', '-czf', '/tmp/teck-devtools-runtime.tar.gz',
-    'usr/share/dotnet', 'opt/teck-devtools', 'usr/local/lib/omnisharp',
+    'usr/share/dotnet', 'opt/teck-devtools', 'opt/teck-debuggers', 'usr/local/lib/omnisharp',
+    'home/agent/.local/opt/js-debug', 'usr/local/bin/netcoredbg',
     ...readdirSync('/opt/teck-devtools/bin').map(name => 'usr/local/bin/' + name),
     ...['dotnet', 'omnisharp', 'marksman', 'terraform-ls', 'helm_ls', 'kind', 'kubectl'].map(name => 'usr/local/bin/' + name)]);
 }

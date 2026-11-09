@@ -90,7 +90,7 @@ try {
   run('python3', ['-m', 'pip', '--version']);
   run('uv', ['--version']);
   const buildOnly = process.argv.includes('--build');
-  for (const binary of ['next-devtools-mcp', 'gpg', 'git', 'gh', 'chromium', 'google-chrome-stable', 'agent-browser', ...(buildOnly ? [] : ['bun', 'bunx', 'omp'])]) {
+  for (const binary of ['next-devtools-mcp', 'netcoredbg', 'gpg', 'git', 'gh', 'chromium', 'google-chrome-stable', 'agent-browser', ...(buildOnly ? [] : ['bun', 'bunx', 'omp'])]) {
     accessSync(run('sh', ['-c', `command -v ${binary}`]), constants.X_OK);
   }
   const report = { uid: process.getuid(), dotnet: lock.dotnet.version, node: run('node', ['--version']),
@@ -106,5 +106,6 @@ try {
     ['helm_ls', 'serve'], ['omnisharp', '--languageserver', '--hostPID', String(process.pid)],
   ];
   for (const [binary, ...args] of servers) { await initialize(binary, args); report.languageServers.push(binary); }
+  if (!buildOnly) report.debuggers = JSON.parse(run('bun', [new URL('./debug-smoke.mjs', import.meta.url).pathname]));
   console.log(JSON.stringify(report));
 } finally { rmSync(root, { recursive: true, force: true }); }

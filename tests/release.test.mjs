@@ -54,7 +54,7 @@ test('plugin recipes use pinned launchers and fit Orca and cmd limits', () => {
     const recipe = JSON.parse(readFileSync(join(repositoryRoot, path)));
     assert.equal(recipe.schemaVersion, 1);
     for (const mode of ['create', 'suspend', 'resume', 'destroy']) {
-      if (mode === 'destroy' && ['teck-sbx-project', 'teck-native-ssh-project'].includes(recipe.id)) { assert.equal(recipe[mode], 'none'); continue; }
+      if (mode === 'destroy' && recipe.id === 'teck-sbx-project') { assert.equal(recipe[mode], 'none'); continue; }
       assert.ok(recipe[mode].length < 8191);
       assert.ok(recipe[mode].startsWith('node -e '));
     }

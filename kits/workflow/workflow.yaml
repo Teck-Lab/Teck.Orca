@@ -1,0 +1,17 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Teck OMP workflow
+description: Canonical models, roles, worktree policy, skills and session launch helpers.
+requires:
+  - dk.tecklab/base >= 1
+  - omp >= 18.18.3
+provides:
+  - dk.tecklab/workflow@1
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: install -d -o agent -g agent -m 700 /home/agent/.local/share/teck-orca/memory /home/agent/.omp/run
+          user: "0"
+          description: Initialize workflow state without creating sessions or worktrees.

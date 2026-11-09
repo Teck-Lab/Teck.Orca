@@ -9,6 +9,6 @@ try {
     if (!response.ok) throw Error(response.error?.message || 'Cannot list projects');
     console.log(response.result.projects.map(item => `${item.id}\t${item.displayName}`).join('\n'));
   }
-  console.log('Create a workspace in Orca and select Teck OMP Project in Run on. Orca creates the project sandbox if it does not exist, then reuses it.');
+  console.log('For the first workspace select Teck OMP Project in Run on. For later workspaces select the saved project connection, not the recipe.');
   console.log('No sandbox or connection was created by this command.');
 } catch (error) { process.stderr.write(`${error.message}\n`); process.exitCode = 1; }

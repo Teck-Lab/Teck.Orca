@@ -7,7 +7,7 @@ import { repositoryRoot, sha256 } from './release.mjs';
 const executable = process.env.ORCA_CLI_COMMAND || (process.env.ORCA_DEV_REPO_ROOT ? 'orca-dev' : process.platform === 'linux' ? 'orca-ide' : 'orca');
 const orcaVersion = command(executable, ['--version']).trim();
 const snapshots = [];
-for (const name of ['orca-cli', 'orchestration']) {
+for (const name of ['orca-cli', 'orchestration', 'orca-per-workspace-env']) {
   const guide = JSON.parse(command(executable, ['skills', 'get', name, '--full', '--json'], { timeout: 30_000 }));
   if (guide.name !== name || guide.full !== true || typeof guide.markdown !== 'string') throw new Error(`Incomplete Orca guide: ${name}`);
   const boundary = guide.markdown.indexOf('# Bundled references');

@@ -10,7 +10,7 @@ args:
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: BUN_VERSION
   ompVersion:
-    default: "18.14.0"
+    default: "18.18.3"
     pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
     buildArg: OMP_VERSION
   playwrightVersion:
@@ -26,6 +26,8 @@ provides:
   - "kind@0.33.0"
   - "kubectl@1.35.8"
   - "teck-language-servers@1"
+  - "netcoredbg@3.2.0-1092"
+  - "js-debug-adapter@1.140.0"
   - "agent-browser@0.38.1"
   - "playwright@${{ kit.args.playwrightVersion }}"
 
@@ -70,12 +72,21 @@ capabilities:
             test "$(kubectl version --client --output=json | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).clientVersion.gitVersion')" = "v1.35.8"
             test -x /usr/local/bin/omnisharp
             test -x /usr/local/bin/typescript-language-server
+            test -x /usr/local/bin/netcoredbg
+            test -f /home/agent/.local/opt/js-debug/src/dapDebugServer.js
+            install -d -o agent -g agent -m 755 /home/agent/.local/opt
+            chown -h agent:agent /home/agent/.local/opt/js-debug
             install -d -o agent -g agent -m 755 /home/agent/.dotnet /home/agent/.nuget
             chown -R agent:agent /home/agent/.dotnet /home/agent/.nuget
             install -d -o agent -g agent -m 755 /home/agent/.bun /home/agent/.bun/install /home/agent/.bun/install/cache
             chown -R agent:agent /home/agent/.bun/install/cache
+            /bin/sh /usr/local/lib/teck-devtools/kubernetes-prerequisites.sh --install
           user: "0"
           description: Expand and validate the prebuilt OMP and full development runtimes.
+      startup:
+        - command: /bin/sh /usr/local/lib/teck-devtools/kubernetes-prerequisites.sh
+          user: "0"
+          description: Restore shared KIND and K3s device prerequisites after sandbox restart.
 
   - type: com.docker.sandbox/agent-context@1
     config:

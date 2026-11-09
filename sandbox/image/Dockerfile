@@ -4,7 +4,7 @@ ARG SANDBOX_BASE_IMAGE=docker.io/docker/sandbox-templates:shell-docker@sha256:5f
 FROM ${SANDBOX_BASE_IMAGE}
 
 ARG BUN_VERSION=1.4.4
-ARG OMP_VERSION=18.14.0
+ARG OMP_VERSION=18.18.3
 ARG TYPESCRIPT_VERSION=5.9.3
 ARG TYPESCRIPT_LANGUAGE_SERVER_VERSION=4.4.1
 ARG NEXT_DEVTOOLS_MCP_VERSION=0.4.0
@@ -25,8 +25,11 @@ ARG GOOGLE_CHROME_VERSION=153.0.8010.36-1
 ARG GOOGLE_CHROME_SHA256=9bb44e33031c2f2857cf36b4343051a12f93058e4b781e3c76313df87f6c8d32
 
 USER root
-COPY devtools.json kubernetes-tools.mjs /usr/local/lib/teck-kubernetes/
-RUN node /usr/local/lib/teck-kubernetes/kubernetes-tools.mjs --install
+COPY devtools.json kubernetes-tools.mjs debug-tools.mjs debug-smoke.mjs netcoredbg.LICENSE /usr/local/lib/teck-kubernetes/
+RUN node /usr/local/lib/teck-kubernetes/kubernetes-tools.mjs --install \
+    && node /usr/local/lib/teck-kubernetes/debug-tools.mjs --install \
+    && chown agent:agent /home/agent/.local/opt \
+    && chown -h agent:agent /home/agent/.local/opt/js-debug
 ENV ONNXRUNTIME_NODE_INSTALL=skip \
     ONNXRUNTIME_NODE_INSTALL_CUDA=skip \
     DEBIAN_FRONTEND=noninteractive

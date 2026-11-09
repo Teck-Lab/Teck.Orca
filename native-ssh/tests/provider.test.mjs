@@ -21,7 +21,7 @@ function fixture(t) {
     }
     return '';
   };
-  const options = { project, stateRoot, assetRoot: stateRoot, run, configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {}, syncPolicy: async () => {} };
+  const options = { project, stateRoot, assetRoot: stateRoot, run, resolveKits: () => ({kind:'source-development',args:['fixture-workload','--kit','fixture-credentials']}), configure: async () => calls.push({ program: 'configure', args: [] }), ensureBuilder: async () => {}, syncName: async () => {}, syncPolicy: async () => {}, prepareOffice: async () => calls.push({ program: 'prepare-office', args: [] }), prepareKubernetesHost: async () => calls.push({ program: 'prepare-kubernetes-host', args: [] }) };
   return { project, name, rows, calls, options, stateRoot, run };
 }
 
@@ -50,6 +50,25 @@ test('a ready sandbox is reused without overwriting OMP settings or cloning agai
   await prepareProject(f.options);
   assert.ok(f.calls.some(c => c.program === 'ssh' && c.args.includes(`${f.name}.sbx`)));
   assert.ok(!f.calls.some(c => c.program === 'configure' || c.args.includes('clone') || c.args[0] === 'create'));
+});
+
+test('shared Kubernetes prerequisites run on creation and reuse even when managed KIND is disabled', async t => {
+  const f = fixture(t);
+  await prepareProject(f.options);
+  assert.ok(f.calls.findIndex(c => c.program === 'prepare-kubernetes-host') > f.calls.findIndex(c => c.args[0] === 'run'));
+  assert.ok(f.calls.findIndex(c => c.program === 'prepare-kubernetes-host') < f.calls.findIndex(c => c.program === 'ssh' && c.args[0] === '-T'));
+  f.calls.length = 0;
+  await prepareProject(f.options);
+  assert.equal(f.calls.filter(c => c.program === 'prepare-kubernetes-host').length, 1);
+  assert.ok(!f.calls.some(c => c.args[0] === 'create' || c.program === 'configure'));
+});
+
+test('failed shared device preparation cannot report a new sandbox ready', async t => {
+  const f = fixture(t);
+  await assert.rejects(prepareProject({ ...f.options, prepareKubernetesHost: async () => { throw Error('Invalid kmsg device'); } }), /Invalid kmsg device/);
+  const state = JSON.parse(readFileSync(join(f.stateRoot, f.name, 'state.json')));
+  assert.notEqual(state.phase, 'ready');
+  assert.ok(!f.calls.some(c => c.program === 'ssh' && c.args[0] === '-T'));
 });
 
 test('enabled project starts guest Kubernetes without blocking SSH on bootstrap failure',async t=>{
@@ -131,4 +150,29 @@ test('OMP setup preserves Orca routing and exposes only proxy-managed credential
   assert.ok(!/ORCA_USER_DATA|\/opt\/teck-orcad|manage-daemon|ln .*\/orca\b/.test(install));
   assert.match(install, /omp-recovery\.sh/);
   assert.match(install, /\.omp\/agent/);
+});
+
+test('published creation verifies its immutable set and does not start a source builder', async t => {
+  const f = fixture(t), reference = 'ghcr.io/teck-lab/teck-orca:0.8.0@sha256:' + 'a'.repeat(64);
+  const kit = {kind:'published',reference,version:'0.8.0',digest:'sha256:'+'a'.repeat(64),verifyArgs:['kit','verify',reference,'--certificate-identity','fixture-ci']};
+  const state = await prepareProject({...f.options,resolveKits:()=>kit,ensureBuilder:()=>{throw Error('No local builder allowed')}});
+  const verify = f.calls.findIndex(c=>c.args[0]==='kit'&&c.args[1]==='verify');
+  const create = f.calls.findIndex(c=>c.args[0]==='create');
+  assert.ok(verify>=0&&verify<create);
+  assert.equal(f.calls[create].args.at(-1),reference);
+  assert.equal(f.calls[create].args.includes('--kit'),false);
+  assert.equal(state.kitRelease.digest,kit.digest);
+  f.calls.length=0;
+  await prepareProject({...f.options,resolveKits:()=>{throw Error('Reuse must not resolve replacement kits')}});
+  assert.ok(!f.calls.some(c=>c.args[0]==='kit'||c.args[0]==='create'));
+  assert.equal(JSON.parse(readFileSync(join(f.stateRoot,f.name,'state.json'))).kitRelease.digest,kit.digest);
+});
+
+test('unverified or missing published kits cannot create a sandbox or ownership record', async t => {
+  const f = fixture(t);
+  await assert.rejects(prepareProject({...f.options,resolveKits:()=>{throw Error('No published release')}}),/No published release/);
+  const kit={kind:'published',reference:'fixture@sha256:'+'a'.repeat(64),version:'0.8.0',digest:'sha256:'+'a'.repeat(64),verifyArgs:['kit','verify','fixture']};
+  await assert.rejects(prepareProject({...f.options,resolveKits:()=>kit,run:(p,a,o)=>a[0]==='kit'?Promise.reject(Error('Signature rejected')):f.run(p,a,o)}),/Signature rejected/);
+  assert.ok(!f.calls.some(c=>c.args[0]==='create'));
+  assert.equal(existsSync(join(f.stateRoot,f.name,'state.json')),false);
 });

@@ -33,6 +33,11 @@ try {
   report.status = cli(['status']);
   assert.equal(report.status.runtime.reachable, true);
   assert.equal(report.status.runtime.appVersion, expected.version);
+  report.ompVersion = guest(['omp', '--version']).trim();
+  const runtimeVersions = JSON.parse(readFileSync(join(repositoryRoot, 'runtime/versions.json')));
+  assert.equal(report.ompVersion, 'omp/' + runtimeVersions.omp);
+  report.orchestrationExtension = JSON.parse(guest(['/opt/paseo-omp/bin/bun', '-e',
+    "import {loadExtensions} from '/opt/paseo-omp/lib/node_modules/@oh-my-pi/pi-coding-agent/src/extensibility/extensions/loader.ts';const r=await loadExtensions(['/home/agent/.omp/agent/extensions/orca-orchestration.mjs'],'/home/agent/project');if(r.errors.length||r.extensions.length!==1)throw Error(JSON.stringify(r.errors));const e=r.extensions[0];if(!e.handlers.has('goal_updated')||!e.tools.has('orca_dispatch'))throw Error('Missing native registration');console.log(JSON.stringify({loaded:true,goalLifecycle:true,tools:[...e.tools.keys()]}));"]));
   assert.equal(guest(['/opt/teck-orcad/node', '--version']).trim(), 'v' + expected.nodeVersion);
   const added = cli(['repo', 'add', '--path', '/home/agent/project']);
   const repoId = added.repo?.id ?? added.repoId ?? added.id;

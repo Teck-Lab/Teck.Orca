@@ -32,7 +32,7 @@ modelRoles:
   memory: omniroute/teck-fast-tool
   judge: omniroute/teck-judge
 advisor:
-  enabled: false # Reviews/research are explicit Orca Dispatches; no duplicate WATCHDOG loop.
+  enabled: false # Coordinator/reviewer stay unadvised; implementation-worker opts in via its agent preset.
 goal:
   enabled: true
   statusInFooter: true
@@ -56,7 +56,7 @@ retry:
 providers:
   # web_search is supplied by the MCPHub extension; this is the native provider order.
   webSearchOrder: [searxng]
-  fetch: firecrawl
+  fetch: native # Bare URL reads use self-hosted Firecrawl through the MCPHub extension.
   maxInFlightRequests:
     omniroute: 4
 task:
@@ -67,7 +67,16 @@ github:
   cache:
     enabled: true
 memory:
-  backend: local
+  backend: hindsight
+hindsight:
+  apiUrl: https://hindsight-api.tecklab.dk
+  bankId: teck
+  scoping: per-project-tagged
+  autoRecall: true
+  recallTimeoutMs: 90000
+  autoRetain: true
+  mentalModelAutoSeed: false
+# HINDSIGHT_API_TOKEN comes from the Docker-managed HINDSIGHT_API_KEY placeholder.
 autolearn:
   enabled: true
 

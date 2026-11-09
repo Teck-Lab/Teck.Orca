@@ -16,6 +16,9 @@ test('plugin activation verifies its executable closure without reading SDK arch
   fs.writeFileSync(join(source, 'runtime/reconnect-host.mjs'), '// fixture recovery');
   fs.writeFileSync(join(source, 'runtime/project-state.mjs'), '// fixture project state');
   fs.writeFileSync(join(source, 'runtime/project-transport.mjs'), '// fixture SSH transport');
+  fs.mkdirSync(join(source, 'runtime/agent-office'), { recursive: true });
+  for (const name of ['plugin-status-worker.mjs', 'sandbox-status.mjs', 'sandbox-activity.mjs', 'sandbox-update.mjs', 'sandbox-update-guest.mjs', 'agent-office-manager.mjs', 'office-tunnel.mjs', 'office-forward.mjs', 'office-guest.mjs', 'project-ssh-host.mjs', 'orca-desktop-rpc.mjs', 'agent-office/bundle.json', 'workflow-assets.mjs', 'versions.json'])
+    fs.writeFileSync(join(source, 'runtime', name), '// fixture status asset');
   fs.writeFileSync(join(source, 'runtime/plugin-entry.mjs'), 'export default orca => orca.commands.register("fixture-ready", () => {});');
   fs.writeFileSync(join(source, 'runtime/kits/workload/sdk.tar.gz'), Buffer.alloc(1024));
   const release = installRelease(source, join(temp, 'releases'));
@@ -36,7 +39,8 @@ test('plugin activation verifies its executable closure without reading SDK arch
   finally { fs.readFileSync = read; }
   assert.deepEqual(registered, ['fixture-ready']);
   assert.ok(accessed.some(path => path.endsWith('scripts'+(process.platform === 'win32' ? '\\' : '/')+'lifecycle.mjs')));
-  for (const name of ['runtime/plugin-entry.mjs', 'runtime/reconnect-host.mjs', 'scripts/lifecycle.mjs', 'runtime/project-state.mjs', 'runtime/project-transport.mjs']) {
+  for (const name of ['runtime/plugin-entry.mjs', 'runtime/reconnect-host.mjs', 'scripts/lifecycle.mjs', 'runtime/project-state.mjs', 'runtime/project-transport.mjs',
+    'runtime/plugin-status-worker.mjs', 'runtime/sandbox-status.mjs', 'runtime/sandbox-activity.mjs', 'runtime/sandbox-update.mjs', 'runtime/sandbox-update-guest.mjs', 'runtime/agent-office-manager.mjs', 'runtime/office-tunnel.mjs', 'runtime/office-forward.mjs', 'runtime/office-guest.mjs', 'runtime/project-ssh-host.mjs', 'runtime/orca-desktop-rpc.mjs', 'runtime/agent-office/bundle.json', 'runtime/workflow-assets.mjs', 'runtime/versions.json']) {
     const target = join(release.destination, name), original = read(target);
     fs.writeFileSync(target, '// tampered');
     await assert.rejects(activate({ commands: { register() { throw Error('Must not register'); } } }), /Changed runtime file/);

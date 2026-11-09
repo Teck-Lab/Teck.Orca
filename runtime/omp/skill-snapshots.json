@@ -2,6 +2,10 @@
   "source": "Teck.Paseo import with Orca lifecycle skills",
   "files": [
     {
+      "name": "agent-office/SKILL.md",
+      "sha256": "bee58db8d609194b21e5e9ec9383579b4b9bc6e26081330df5b765d54ee3ae85"
+    },
+    {
       "name": "building-admin-dashboard-customizations/references/data-loading.md",
       "sha256": "8f394a141dc73c95eb83cd76169382006cce704e6d04130424b4f54a2cf6ef08"
     },
@@ -283,11 +287,15 @@
     },
     {
       "name": "orca-cli/references/automations.md",
-      "sha256": "9e4ff221b4cb0ef6351ae4187143cedc20c8d651928c86a81ab13f052f85b770"
+      "sha256": "0c238a007f9d820fb818e465d581f32c97278e7570fa7c1ea9dccf9c205379dd"
     },
     {
       "name": "orca-cli/references/browser.md",
-      "sha256": "009a31a16b1c08b754f03d9372a4409b48b3cdf7a36851ef413616c2bddaa95e"
+      "sha256": "dc6ab1dc2024be30dc1f0e8aae8cd66ae3eadcb9f40d3a755aefd4c0ada4b767"
+    },
+    {
+      "name": "orca-cli/references/plugins.md",
+      "sha256": "935530f778e9148227d1a4853f0bde7e05911d9760d6365a6f4b58fe79c0c6b4"
     },
     {
       "name": "orca-cli/references/publishing.md",
@@ -295,15 +303,15 @@
     },
     {
       "name": "orca-cli/SKILL.md",
-      "sha256": "59b17f69676de725ea4cf7a8af2032101ffc5f393fffd9100c6b260e6b893c31"
+      "sha256": "e4623bdc8d25583be6705267de0bc464964020cc2758d27e4b33dcd900629703"
     },
     {
       "name": "orca-feature-workflow/references/goals-and-milestones.md",
-      "sha256": "83d76458742f703daf1c79be901fd029f12e8d8ba3cd5c40e60c50cdf8e9dcc3"
+      "sha256": "e89d8ddafa2af3e1fab66942e3dfddd8d7f51f634dc51383e7b3a66d8a826a63"
     },
     {
       "name": "orca-feature-workflow/references/review-gates.md",
-      "sha256": "c6b8f24bcebed773f057090b95d90cf8658e59290542d70b2378a29b75e71eb9"
+      "sha256": "053436ebd6a4065c9212e54f507e7b88892fb0ff2be66edf74bd4aa024bafa14"
     },
     {
       "name": "orca-feature-workflow/references/technical-planning.md",
@@ -315,35 +323,59 @@
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "99dd57a4e5a3cb19fbb0b92793964ed8e8ced3446545ade1bf470d7996d4a66c"
+      "sha256": "fbe01f4519364b2f6633d8fe642b1606d66936b16a32c1e0226386a017559469"
+    },
+    {
+      "name": "orca-per-workspace-env/references/docker-ssh.md",
+      "sha256": "0a7403198af7fa0c2102bea7a7e3af9a522f644a757fb128055b19b39b4608b3"
+    },
+    {
+      "name": "orca-per-workspace-env/references/failure-modes.md",
+      "sha256": "086f11e9c610b5fb13cc2b8abc80b7482d5ae45ffeacf8e6a8c7c0331a1aac28"
+    },
+    {
+      "name": "orca-per-workspace-env/references/provider-vercel.md",
+      "sha256": "17e216672a9602a7012ee90aca84e7f182b664b06685f132c4154e062b1a51f5"
+    },
+    {
+      "name": "orca-per-workspace-env/references/ssh-host.md",
+      "sha256": "03340c3f0267fa47389d303f8de01c9f4e3ae3025f7c63382a06e62680880e1f"
+    },
+    {
+      "name": "orca-per-workspace-env/references/windows-scripts.md",
+      "sha256": "548bdca26af67c23a51070da633db12be41cb8da1ecdf0484f8d4f94fb290382"
+    },
+    {
+      "name": "orca-per-workspace-env/SKILL.md",
+      "sha256": "bc0431426ecd2bcb03776fd1f4e58d692593acd6997e54fc84c3f1fb0d1d55ac"
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "c143a4efc2a0483cebba1baaccf7e17bf2d51956bea8d3242f0dedbde5af834e"
+      "sha256": "ea5405399bea6a705cbef80bb752245d68f3e5460934d8201658b6516174c0f3"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",
-      "sha256": "4eb2229faf6179b4a4578840a0f461ce36923c2094f46ec48db7879f27259742"
+      "sha256": "a30cefbfcd637b3a9e19fd7de533b197aeadae84f389c36e04ed88ffbcb536f3"
     },
     {
       "name": "orchestration/references/legacy-contract-migration.md",
-      "sha256": "a4a961937b601bc116ae8d658d13e95f61beed70026521fe4323654f8322ca42"
+      "sha256": "acfda1acdcae246ecec8b72a617cbc5e973d38393c1ddb3ce7f29f618be37cc0"
     },
     {
       "name": "orchestration/references/low-level-topology.md",
-      "sha256": "a4b2aec2291f7856b48b188b803fc101ebd560a76bcf4c3d10706e0847c8f297"
+      "sha256": "17c03e704db686995b243b79e5bbbd4a22cbc4b2205a43123b46ccbeb86246f6"
     },
     {
       "name": "orchestration/references/messaging-and-gates.md",
-      "sha256": "c201fe5da4ce4300e3c5f4d8784c69ff57cfb9c3bccaa1c487be914c1fdf872c"
+      "sha256": "4cd5bfb3706c5060fd9532a13ee8488f1beec4314462a55b7e22452fa94c2ea7"
     },
     {
       "name": "orchestration/references/placement-and-remote.md",
-      "sha256": "52ff2c6cb1c93782a949cdb9457054266e68198441dc4e869d2d2048adf93e40"
+      "sha256": "2b242c48508b4d22d7589048c5144bd5103a97dbc681301cb7ba2fbd18aee9e0"
     },
     {
       "name": "orchestration/references/recovery-and-cleanup.md",
-      "sha256": "9b99dbf4d71863667090af7fe3e5781df1e2af10825e040a15ee2e51f3a32596"
+      "sha256": "85f927621d79b5a91a0b8756b27d016833254ed72ddfaca5cf8b143fd1f5ccad"
     },
     {
       "name": "orchestration/references/worker-contract.md",
@@ -351,7 +383,7 @@
     },
     {
       "name": "orchestration/SKILL.md",
-      "sha256": "6c90f71d8d98899e5dd16e304db42c867f0b5df8a3e1c98eb6c6b694a66d5344"
+      "sha256": "b4a110527c1066e65a0632b93ce7ec758f05d541f662ae61a5595fa5252caef4"
     },
     {
       "name": "payload/reference/ACCESS-CONTROL-ADVANCED.md",

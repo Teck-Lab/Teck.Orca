@@ -1,0 +1,16 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Agent Office observer
+description: OMP observer and MCP bridge; the Orca plugin supplies the configured Office endpoint.
+requires:
+  - dk.tecklab/workflow >= 1
+provides:
+  - dk.tecklab/office@1
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: node /usr/local/lib/teck-office/initialize.mjs
+          user: "1000"
+          description: Register the optional Office MCP binding without replacing user MCP settings.

@@ -1,5 +1,15 @@
 {
-  "servers": {}
+  "servers": {
+    "tailwindcss": {
+      "rootMarkers": [
+        "package.json",
+        "tailwind.config.js",
+        "tailwind.config.ts",
+        "tailwind.config.mjs",
+        "tailwind.config.cjs"
+      ]
+    }
+  }
 }
 
 

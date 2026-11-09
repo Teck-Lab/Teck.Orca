@@ -1,13 +1,14 @@
 {
-  "manifestVersion": 1,
+  "manifestVersion": 2,
   "id": "teck-sbx-recipes",
   "publisher": "teck-lab",
   "name": "Teck OMP Docker Sandbox",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "description": "One persistent Docker Sandbox per project with native SSH, Orca-managed daemon, OMP and optional local KIND. Retains recovery for older sandboxes.",
   "engines": {
-    "orca": ">=1.4.245"
+    "orca": ">=1.4.248"
   },
+  "execution": "trusted-worker",
   "pluginApi": 1,
   "main": "reconnect.mjs",
   "contributes": {
@@ -15,8 +16,23 @@
       {
         "id": "teck.reconnectSandboxes",
         "title": "Teck: Reconnect sandboxes",
-        "context": "global"
+        "when": "global"
+      },
+      {
+        "id": "teck.sandboxStatus",
+        "title": "Teck: Sandbox status",
+        "when": "global"
       }
+    ],
+    "panels": [{ "id": "sandbox", "title": "Teck sandbox", "icon": "cloud", "entry": "ui/sandbox-status.tsx", "ui": "components" }],
+    "statusBarItems": [{ "id": "sandbox", "text": "Teck: Checking sandbox", "icon": "cloud", "command": "teck.sandboxStatus" }],
+    "events": [{ "on": "workspace.changed" }, { "on": "agent.status.changed" }],
+    "hooks": [{ "event": "agent.launch.before" }, { "event": "agent.prompt.before" }],
+    "settings": [
+      { "key": "refreshSeconds", "title": "Sandbox refresh interval (seconds)", "type": "integer", "default": 30, "minimum": 15, "maximum": 300 },
+      { "key": "runtimeDetails", "title": "Check versions and KIND in running sandboxes", "type": "boolean", "default": true },
+      { "key": "showStatusBar", "title": "Show sandbox status in status bar", "type": "boolean", "default": true },
+      { "key": "autoOpenOffice", "title": "Open Agent Office when a project sandbox starts", "type": "boolean", "default": true }
     ],
     "vmRecipes": [
       {
@@ -27,6 +43,15 @@
   "capabilities": [
     {
       "kind": "notifications:show"
+    },
+    {
+      "kind": "workspace:read"
+    },
+    {
+      "kind": "agent:read"
+    },
+    {
+      "kind": "settings:own"
     }
   ]
 }

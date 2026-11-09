@@ -13,7 +13,7 @@ import { supervisorTick } from '../runtime/project-supervisor.mjs';
 import { installProjectStartup, startupSource } from '../scripts/project-startup.mjs';
 import { identity } from '../runtime/omp-session.mjs';
 import { installRelease } from '../scripts/release.mjs';
-import { createProjectLifecycle } from '../runtime/project-recipe.mjs';
+import { assertProjectUnpaired, createProjectLifecycle } from '../runtime/project-recipe.mjs';
 
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'teck-project-test-'));
@@ -264,11 +264,12 @@ test('OMP session identity supports project-wide ownership and keeps worktrees a
   assert.notDeepEqual(a, identity({ ...env, ORCA_WORKTREE_ID: 'repo::/project/b' }, '/project/b'));
 });
 
-test('Orca first use provisions once per project and returns results for distinct workspace instances', async t => {
+test('first use pairs once; additional workspace recipes refuse the saved connection without waking the VM', async t => {
   const f = fixture(t), launched = [], invocations = [];
+  let environments = [];
   const env = { ORCA_CLI_COMMAND: 'mock-orca', ORCA_PROJECT_ID: f.options.projectId, ORCA_VM_INSTANCE_ID: 'workspace-a', ORCA_REPO_URL: f.options.cloneUrl, ORCA_REPO_PATH: f.root };
   const dependencies = { stateRoot: f.root, assetRoot: f.root,
-    run: () => JSON.stringify({ ok: true, result: { app: { running: true, pid: process.pid } } }),
+    run: (_program, args) => JSON.stringify({ ok: true, result: args[0] === 'environment' ? { environments } : { app: { running: true, pid: process.pid } } }),
     launch: async (project, pid) => launched.push([project, pid]),
     provision: async args => { invocations.push(args); return provisionProject({ ...f.options, ...args, run: f.run, sync: () => {}, selectPort: async () => 27001 }); } };
   const firstUse = createProjectLifecycle({ ...dependencies, env });
@@ -276,16 +277,16 @@ test('Orca first use provisions once per project and returns results for distinc
   assert.equal(invocations.length, 0);
   const first = await firstUse('create');
   assert.equal(invocations[0].recreateMissing, true);
+  environments = [{ name: 'Project VM workspace-a', endpoints: [{ endpoint: 'ws://127.0.0.1:27001' }] }];
   const secondUse = createProjectLifecycle({ ...dependencies, env: { ...env, ORCA_VM_INSTANCE_ID: 'workspace-b' } });
-  const second = await secondUse('create');
-  assert.equal(first.userData.sandboxName, second.userData.sandboxName);
-  assert.equal(first.userData.sandboxId, second.userData.sandboxId);
-  assert.equal(first.pairingCode, second.pairingCode);
-  assert.notEqual(first.userData.instanceId, second.userData.instanceId);
+  const before = f.calls.length;
+  await assert.rejects(secondUse('create'), /Project VM workspace-a.*select that saved connection/);
+  await assert.rejects(firstUse('create'), /already has an Orca connection/);
+  assert.equal(f.calls.slice(before).some(([, args]) => args[0] === 'exec'), false, 'Refused pairing must not wake a stopped guest');
   assert.equal(first.userData.connectionMode, 'project-ssh');
   assert.equal(f.calls.filter(([, args]) => args[0] === 'create').length, 1);
   assert.equal(f.calls.filter(([, args]) => args.includes('clone')).length, 1);
-  assert.equal(launched.length, 2);
+  assert.equal(launched.length, 1);
   await firstUse('resume', { recipeResult: first });
   assert.equal(invocations.at(-1).recreateMissing, false);
   assert.equal(invocations.at(-1).expectedSandboxId, first.userData.sandboxId);
@@ -293,6 +294,22 @@ test('Orca first use provisions once per project and returns results for distinc
   await firstUse('suspend', { recipeResult: first }); await firstUse('destroy', { recipeResult: first });
   assert.equal(f.calls.length, 0, 'Worktree sleep/delete must not affect the shared sandbox');
   await assert.rejects(secondUse('resume', { recipeResult: first }), /another project or workspace/);
+});
+
+test('registration checks fail closed and only match the owned loopback endpoint', () => {
+  const env = { ORCA_CLI_COMMAND: 'mock-orca' }, state = { port: 27001 };
+  const check = response => assertProjectUnpaired(state, { env, run: () => JSON.stringify(response) });
+  for (const response of [{ ok: false }, { ok: true, result: {} }]) {
+    assert.throws(() => check(response), /Cannot verify existing Orca connections/);
+  }
+  check({ ok: true, result: { environments: [
+    { endpoints: [{ endpoint: 'ws://example.com:27001' }, { endpoint: 'ws://127.0.0.1:27002' }, { endpoint: 'invalid' }] },
+  ] } });
+  for (const host of ['127.0.0.1', 'localhost', '[::1]']) {
+    assert.throws(() => check({ ok: true, result: { environments: [
+      { name: 'Existing project', endpoints: [{ endpoint: `ws://${host}:27001` }] },
+    ] } }), /Existing project/);
+  }
 });
 
 test('new Orca workspace replaces a deleted sandbox but old workspace resume never does', async t => {

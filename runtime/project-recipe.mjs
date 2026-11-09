@@ -8,6 +8,18 @@ import { launchProjectTransport, redact } from './project-transport.mjs';
 import { orcaExecutable } from './project-supervisor.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+export function assertProjectUnpaired(state, { run = command, env = process.env } = {}) {
+  const response = JSON.parse(run(orcaExecutable(env), ['environment', 'list', '--json']));
+  const environments = response?.result?.environments;
+  if (!response.ok || !Array.isArray(environments)) throw Error('Cannot verify existing Orca connections; refusing to pair the project again');
+  const matches = environments.filter(environment => environment.endpoints?.some(({ endpoint }) => {
+    try {
+      const address = new URL(endpoint);
+      return ['ws:', 'wss:'].includes(address.protocol) && ['127.0.0.1', 'localhost', '[::1]'].includes(address.hostname) && Number(address.port) === state.port;
+    } catch { return false; }
+  }));
+  if (matches.length) throw Error(`This project already has an Orca connection: ${matches.map(item => item.name).join(', ')}. In Run on, select that saved connection for additional workspaces. Teck OMP Project is for the first workspace only; running the recipe again would create a duplicate connection`);
+}
 export function createProjectLifecycle({ env = process.env, assetRoot = root, stateRoot = projectStateRoot(),
   run = command, provision = provisionProject, launch = launchProjectTransport, read = readProject } = {}) {
   return async (mode, payload = {}) => {
@@ -36,7 +48,8 @@ export function createProjectLifecycle({ env = process.env, assetRoot = root, st
     const ownerPid = desktop?.result?.app?.pid;
     if (!desktop.ok || !desktop.result.app.running || !Number.isSafeInteger(ownerPid)) throw Error('Orca desktop must be running to create a project workspace');
     const { state, pairingCode } = await provision({ projectId, displayName, cloneUrl, repoPath, assetRoot, stateRoot, env,
-      recreateMissing: mode === 'create', expectedSandboxId: mode === 'resume' ? previous.sandboxId : undefined });
+      recreateMissing: mode === 'create', expectedSandboxId: mode === 'resume' ? previous.sandboxId : undefined,
+      beforeReuse: mode === 'create' ? state => assertProjectUnpaired(state, { run, env }) : undefined });
     await launch(projectId, ownerPid, { stateRoot });
     // Orca pairs the environment and creates the requested worktree. Do not
     // pre-register a separate environment or project host from a setup script.

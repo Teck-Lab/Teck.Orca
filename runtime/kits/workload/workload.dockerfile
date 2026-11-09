@@ -37,7 +37,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl unzip libicu72 libgssapi-krb5-2 \
     && rm -rf /var/lib/apt/lists/*
-COPY devtools.json install-devtools.mjs kubernetes-tools.mjs /usr/local/lib/teck-devtools/
+COPY devtools.json install-devtools.mjs kubernetes-tools.mjs debug-tools.mjs netcoredbg.LICENSE /usr/local/lib/teck-devtools/
 RUN node /usr/local/lib/teck-devtools/install-devtools.mjs --pack
 
 # Retain the exact full source base: Go/Java/uv/pip, Docker/Compose/Buildx and shell utilities.
@@ -99,10 +99,12 @@ RUN apt-get update \
       ripgrep \
       sudo \
       unzip \
+      util-linux \
     && rm -rf /var/lib/apt/lists/* \
     && install -d -o agent -g agent \
       /home/agent/workspace \
       /home/agent/.local/bin \
+      /home/agent/.local/opt \
       /home/agent/.local/share \
       /home/agent/.local/state \
       /home/agent/.config \
@@ -112,7 +114,8 @@ RUN apt-get update \
     && git lfs install --system
 
 # Full feature toolchain; pins and architecture-specific hashes live in devtools.json.
-COPY devtools.json install-devtools.mjs kubernetes-tools.mjs devtools-smoke.mjs /usr/local/lib/teck-devtools/
+COPY devtools.json install-devtools.mjs kubernetes-tools.mjs devtools-smoke.mjs debug-tools.mjs debug-smoke.mjs netcoredbg.LICENSE /usr/local/lib/teck-devtools/
+COPY kubernetes-prerequisites.sh /usr/local/lib/teck-devtools/
 COPY --from=devtools-build /tmp/teck-devtools-runtime.tar.gz /usr/share/teck-devtools/runtime.tar.gz
 RUN node /usr/local/lib/teck-devtools/install-devtools.mjs --chrome
 

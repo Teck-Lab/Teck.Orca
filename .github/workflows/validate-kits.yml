@@ -1,0 +1,109 @@
+name: Validate sandbox kit images
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: kit-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and smoke (${{ matrix.architecture }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            architecture: arm64
+    services:
+      registry:
+        image: registry:3
+        env:
+          REGISTRY_LOG_LEVEL: warn
+        ports:
+          - 127.0.0.1:5000:5000
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Prepare disk capacity on the disposable hosted runner
+        run: bash scripts/kit-ci-disk.sh
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: docker/setup-buildx-action@v4
+        id: buildx
+        with:
+          driver-opts: network=host
+          buildkitd-config-inline: |
+            [registry."localhost:5000"]
+              http = true
+      - name: Prepare native build and smoke contexts
+        env:
+          ARCH: ${{ matrix.architecture }}
+        run: |
+          test "$(node -p 'process.arch')" = "$(test "$ARCH" = amd64 && echo x64 || echo arm64)"
+          curl --fail --retry 5 --retry-connrefused --retry-delay 2 http://127.0.0.1:5000/v2/
+          node scripts/kit-validation.mjs prepare --root .artifacts/kit-validation --architecture "$ARCH" --commit "$GITHUB_SHA" --run "$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+      - name: Build all components and audit their real filesystems
+        env:
+          BUILDER: ${{ steps.buildx.outputs.name }}
+          ARCH: ${{ matrix.architecture }}
+        run: |
+          root=.artifacts/kit-validation
+          tag=$(node -p "JSON.parse(require('fs').readFileSync('$root/plan.json')).tag")
+          for name in base omp devtools browser kubernetes workflow office omniroute mcphub; do
+            image="localhost:5000/teck-kit-validation/$name:$tag"
+            docker buildx build --builder "$BUILDER" --platform "linux/$ARCH" --provenance=false --sbom=false --push --tag "$image" --metadata-file "$root/metadata/$name.json" --progress plain --file "$root/contexts/$name/$name.yaml" "$root/contexts/$name" 2>&1 | tee "$root/$name-build.log"
+            node scripts/kit-validation.mjs record --root "$root" --name "$name"
+            digest=$(node -p "JSON.parse(require('fs').readFileSync('$root/receipts/$name.json')).digest")
+            printf 'FROM %s@%s\n' "$image" "$digest" | docker buildx build --builder "$BUILDER" --platform "linux/$ARCH" --output type=tar,dest=- --progress plain - | python3 scripts/kit-release-files.py --name "$name" --platform "linux/$ARCH" --digest "$digest" --out "$root/inventories/$name.json"
+            # Dedicated ephemeral builder only; registry retains compressed images.
+            docker buildx prune --builder "$BUILDER" --all --force
+          done
+          node scripts/kit-validation.mjs compose --root "$root"
+      - name: Build the actual Docker v3 set from immutable component refs
+        env:
+          BUILDER: ${{ steps.buildx.outputs.name }}
+          ARCH: ${{ matrix.architecture }}
+        run: |
+          root=.artifacts/kit-validation
+          tag=$(node -p "JSON.parse(require('fs').readFileSync('$root/plan.json')).tag")
+          docker buildx build --builder "$BUILDER" --platform "linux/$ARCH" --provenance=false --sbom=false --push --tag "localhost:5000/teck-kit-validation/set:$tag" --metadata-file "$root/metadata/set.json" --progress plain --file "$root/set/validation.yaml" "$root/set" 2>&1 | tee "$root/set-build.log"
+          node scripts/kit-validation.mjs record --root "$root" --name set
+          docker buildx prune --builder "$BUILDER" --all --force
+      - name: Smoke the composed image natively as the agent without network access
+        env:
+          BUILDER: ${{ steps.buildx.outputs.name }}
+          ARCH: ${{ matrix.architecture }}
+        run: |
+          root=.artifacts/kit-validation
+          node scripts/kit-validation.mjs smoke --root "$root"
+          docker buildx build --builder "$BUILDER" --platform "linux/$ARCH" --output "type=local,dest=$root/smoke-result" --progress plain --file "$root/smoke.dockerfile" "$root" 2>&1 | tee "$root/smoke-build.log"
+      - name: Save build evidence (no image or production release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kit-validation-${{ matrix.architecture }}
+          if-no-files-found: warn
+          path: |
+            .artifacts/kit-validation/plan.json
+            .artifacts/kit-validation/metadata/
+            .artifacts/kit-validation/receipts/
+            .artifacts/kit-validation/contexts/sources.json
+            .artifacts/kit-validation/filesystem-audit.json
+            .artifacts/kit-validation/set/
+            .artifacts/kit-validation/smoke-result/
+            .artifacts/kit-validation/*-build.log

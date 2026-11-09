@@ -31,7 +31,7 @@ try {
 from pathlib import Path
 p=Path('/home/agent/review-fixture'); p.mkdir()
 (p/'clamp.mjs').write_text('export function clamp(value,min,max) { return Math.min(max, Math.max(min,value)); }\\n')
-(p/'clamp.test.mjs').write_text("import {test} from 'node:test';\\nimport assert from 'node:assert/strict';\\nimport {clamp} from './clamp.mjs';\\ntest('inverted ranges reject',()=>assert.throws(()=>clamp(5,10,0),RangeError));\\n")
+(p/'clamp.test.mjs').write_text("import {test} from 'node:test';\\nimport assert from 'node:assert/strict';\\nimport {clamp} from './clamp.mjs';\\ntest('upper boundary',()=>assert.equal(clamp(10,0,10),10));\\n")
 def git(*args): subprocess.run(['git',*args],cwd=p,check=True,capture_output=True)
 git('init','-b','main'); git('config','user.name','Teck disposable review test'); git('config','user.email','review-test@example.invalid'); git('config','commit.gpgsign','false'); git('add','.'); git('commit','-m','test: baseline clamp fixture')
 `;
@@ -52,7 +52,7 @@ git('init','-b','main'); git('config','user.name','Teck disposable review test')
     if (['completed', 'failed'].includes(result.phase)) {
       report.review = result;
       assert.equal(result.ok, true, result.error);
-      assert.deepEqual(result.reviews.map(review => review.verdict), ['request_changes', 'approve', 'approve']);
+      assert.deepEqual(result.reviews.map(review => review.verdict), ['request_changes', 'approve']);
       report.ok = true;
       break;
     }
