@@ -80,7 +80,9 @@ export function auditFileCollisions(inventories) {
     if (!inventory.entries || typeof inventory.entries !== 'object' || Array.isArray(inventory.entries)) fail('Missing filesystem entries');
     seen.add(key);
     for (const [path, entry] of Object.entries(inventory.entries)) {
-      if (!path || path.startsWith('/') || path.includes('\\') || path.split('/').some(p => !p || p === '.' || p === '..')) fail('Unsafe inventory path');
+      // These are POSIX inventory keys, never host extraction paths. In
+      // particular, systemd legitimately uses literal backslashes in filenames.
+      if (!path || path.startsWith('/') || path.split('/').some(p => !p || p === '.' || p === '..')) fail('Unsafe inventory path');
       if (!entry || !['file', 'directory', 'symlink', 'hardlink'].includes(entry.type)) fail('Unsupported inventory entry');
       if (entry.type === 'file' && !digestPattern.test(entry.digest ?? '')) fail('File inventory needs a digest');
       if (entry.type !== 'file' && entry.type !== 'directory' && typeof entry.target !== 'string') fail('Link inventory needs a target');

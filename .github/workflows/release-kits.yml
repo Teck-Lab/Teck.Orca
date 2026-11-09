@@ -65,6 +65,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Prepare disk capacity on the disposable hosted runner
+        run: bash scripts/kit-ci-disk.sh
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -138,6 +140,8 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Prepare disk capacity on the disposable hosted runner
+        run: bash scripts/kit-ci-disk.sh
       - uses: actions/setup-node@v6
         with:
           node-version: 24

@@ -17,8 +17,10 @@ with tarfile.open(fileobj=sys.stdin.buffer, mode='r|*') as archive:
         name = item.name.removeprefix('./').rstrip('/')
         if not name or name == '.':
             continue
-        if name.startswith('/') or '\\' in name or any(part in ['', '.', '..'] for part in name.split('/')):
-            raise ValueError('Unsafe image archive path')
+        # POSIX names may contain literal backslashes (systemd unit escaping).
+        # We never extract these names or interpret them as Windows paths.
+        if name.startswith('/') or any(part in ['', '.', '..'] for part in name.split('/')):
+            raise ValueError('Unsafe image archive path: ' + repr(name))
         if name in entries:
             raise ValueError('Duplicate image archive path: ' + name)
         if len(entries) >= 500000:

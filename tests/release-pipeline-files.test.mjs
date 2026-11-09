@@ -35,7 +35,7 @@ function inventory(entries, action) {
 }
 
 test('streaming inventory hashes bytes and preserves ownership and link identity without extracting files', () => {
-  inventory([{ name: './opt/', type: '5' }, { name: 'opt/tool', content: 'actual image bytes\n' }, { name: 'opt/link', type: '2', target: '/opt/tool' }, { name: 'etc/hosts', content: 'genuine image content\n' }], (result, read) => {
+  inventory([{ name: './opt/', type: '5' }, { name: 'opt/tool', content: 'actual image bytes\n' }, { name: 'opt/link', type: '2', target: '/opt/tool' }, { name: 'etc/hosts', content: 'genuine image content\n' }, { name: 'usr/lib/systemd/system/system-systemd\\x2dmute.slice', content: 'unit' }], (result, read) => {
     assert.equal(result.status, 0, result.stderr);
     const value = read();
     assert.equal(value.platform, 'linux/amd64');
@@ -43,6 +43,7 @@ test('streaming inventory hashes bytes and preserves ownership and link identity
     assert.deepEqual(value.entries['opt/tool'], { type: 'file', mode: 0o644, uid: 1000, gid: 1000, digest: 'sha256:' + createHash('sha256').update('actual image bytes\n').digest('hex') });
     assert.equal(value.entries['opt/link'].target, '/opt/tool');
     assert.equal(value.entries['etc/hosts'].digest,'sha256:'+createHash('sha256').update('genuine image content\n').digest('hex'));
+    assert.equal(value.entries['usr/lib/systemd/system/system-systemd\\x2dmute.slice'].type,'file');
   });
 });
 

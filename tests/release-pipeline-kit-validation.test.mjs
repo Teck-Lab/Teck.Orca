@@ -63,6 +63,20 @@ test('PR builds use native supported runners and loopback registry with read-onl
   assert.match(text,/--output "type=local,dest=\$root\/smoke-result"/);
   assert.doesNotMatch(text,/ghcr.io|cosign|GITHUB_TOKEN|sbx create|docker system prune/);
   assert.ok(!steps.some(s=>s.uses?.includes('login-action')||s.uses?.includes('setup-qemu')));
-  assert.match(text,/test "\$RUNNER_ENVIRONMENT" = github-hosted/);
+  assert.match(text,/bash scripts\/kit-ci-disk.sh/);
+  assert.equal(workflow.jobs.build.services.registry.env.REGISTRY_LOG_LEVEL,'warn');
   assert.match(text,/docker buildx prune --builder "\$BUILDER" --all --force/);
+});
+
+test('both publishing jobs use the same guarded hosted-runner disk preflight before installing Node',()=>{
+  const workflow=YAML.parse(fs.readFileSync(new URL('../.github/workflows/release-kits.yml',import.meta.url),'utf8'));
+  for(const job of ['components','compose']) {
+    const steps=workflow.jobs[job].steps;
+    const disk=steps.findIndex(s=>s.run==='bash scripts/kit-ci-disk.sh');
+    assert.ok(disk>0&&disk<steps.findIndex(s=>s.uses?.startsWith('actions/setup-node@')));
+  }
+  const script=fs.readFileSync(new URL('../scripts/kit-ci-disk.sh',import.meta.url),'utf8');
+  for(const value of ['GITHUB_ACTIONS','RUNNER_ENVIRONMENT','github-hosted','RUNNER_OS','34359738368'])assert.ok(script.includes(value));
+  assert.ok(script.indexOf('exit 1')<script.indexOf('sudo rm -rf --'));
+  assert.match(script,/sudo rm -rf -- \/usr\/share\/dotnet \/usr\/local\/lib\/android \/opt\/ghc \/usr\/local\/\.ghcup \/opt\/hostedtoolcache\n/);
 });

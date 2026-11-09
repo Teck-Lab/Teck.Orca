@@ -38,7 +38,8 @@ were tested. Build logs, actual digests, source checksums, the audit and smoke
 report are uploaded as evidence. No image or catalogue entry is published.
 
 These images need more space than the standard runner's advertised 14 GB.
-The workflow removes only fixed, unused SDK locations on its disposable
+Both validation and publication call `scripts/kit-ci-disk.sh`, which refuses to
+run outside a GitHub-hosted Linux Actions job. It removes only fixed, unused SDK locations on its disposable
 GitHub-hosted Linux VM before setting up Node, then requires 32 GiB free. It
 prunes only its dedicated Buildx builder between components; their compressed
 images remain in the temporary registry. The smoke build exports only its small
