@@ -29,7 +29,7 @@ Validation:
 
 - Full isolated Linux Node 24 Office suite: 553 passed, 2 skipped.
 - Final focused renderer, presentation, scene, meeting, whiteboard and observer
-  suite: 74 passed, including desk bounds, seasonal clipping and grounded trunks
+  suite: 75 passed, including desk bounds, seasonal clipping and grounded trunks
   in both ordinary and taller cloud/meeting windows. These checks and final
   disconnected flip/alarm suppression were validated after the full suite.
 - Plugin suite: 283 passed. Typecheck, production build and generated-asset
@@ -42,3 +42,9 @@ Validation:
 
 No visual browser inspection was performed. No user OMP session or sandbox was
 restarted; an already-open Office page needs a browser refresh to load new assets.
+
+The outdoor follow-up expands the sky/city rendering bounds to cover every
+exposed pixel of the taller panes, removing the unpainted dark strip. A seasonal
+park foreground adds paths, shrubs, benches and warm dusk/night lamps. The final
+focused suite also verifies opaque background coverage at dawn, day, dusk and
+night. These are decorative, browser-rendered details; no weather service is used.
