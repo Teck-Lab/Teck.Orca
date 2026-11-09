@@ -111,10 +111,10 @@ no in-place resize operation. The panel does not expose service tokens or prompt
 Refresh the existing **plugin/** entry after updating desktop. Orca will review
 the added workspace/agent read access and the plugin's own settings access.
 Activation creates no sandbox. Native SSH servers are managed by the matching
-desktop; bundled compatibility daemons now use 1.4.248. OMP 18.16.0 is pinned in
+desktop, with 1.4.254 as the current target; bundled compatibility daemons retain 1.4.248. OMP 18.18.3 is pinned in
 the image; existing sandboxes/processes are not silently replaced or upgraded.
-Normal recipe reuse refreshes the managed orchestration, CLI and VM guides while
-preserving the configured models, credentials and sessions.
+Use the Updates panel to refresh existing sandbox workflow files while preserving
+the configured models, credentials and sessions.
 
 **Updates** offers **Update &lt;project&gt;** for an existing running native sandbox.
 Close OMP sessions first; the action checks actual processes again before applying
@@ -157,7 +157,7 @@ Existing sandboxes need a verified credential route before switching their memor
 backend. Do not use `sbx kit add` on a live project as an update shortcut: it
 recreates the container. New OMP sessions load the updated extension/configuration.
 
-The workload retains OMP 18.16.0, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, kind 0.33.0, kubectl 1.37.1, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.248 and Node 24.22.1. No initialized runtime identity is baked into the image.
+The workload retains OMP 18.18.3, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, kind 0.33.0, kubectl 1.37.1, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.248 and Node 24.22.1. No initialized runtime identity is baked into the image.
 
 Root build/check cover the single plugin and both integrity-pinned runtime stores. Root npm test includes native SSH/provider tests as well as legacy recovery. See [consolidation validation](docs/validation-unified-plugin-2026-10-30.md). Historical smoke scripts below exercise their named legacy paths; provider/GUI acceptance is recorded separately.
 
@@ -340,7 +340,7 @@ replace periodic WATCHDOG loops and per-helper full reviews. See the
 
 The unified plugin 0.6.0 uses the Orca desktop-managed guest daemon over native
 SSH. Compatibility images retain Orca 1.4.248 and Node 24.22.1. All image paths
-pin OMP 18.16.0 and Bun 1.4.4. See the
+pin OMP 18.18.3 and Bun 1.4.4. See the
 [release changes and validation](docs/validation-orca-omp-2026-10-30.md).
 
 ## Planner-owned issue decomposition

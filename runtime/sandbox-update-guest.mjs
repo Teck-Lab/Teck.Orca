@@ -78,6 +78,9 @@ export async function applyUpdate(payload, { forceInstall = false } = {}) {
           { env: { ...process.env, ONNXRUNTIME_NODE_INSTALL_CUDA: 'skip', ONNXRUNTIME_NODE_INSTALL: 'skip' } });
         fs.symlinkSync('/opt/paseo-omp/bin/bun', stage + '/bin/bun');
         if (version(stage) !== payload.omp || command(stage + '/bin/omp', ['--version'], { env: { ...process.env, PATH: stage + '/bin:' + process.env.PATH } }).trim() !== 'omp/' + payload.omp) throw Error('Staged OMP version verification failed');
+        // mkdtemp creates a root-only directory; installed code must remain
+        // traversable by the agent after it becomes the selected runtime.
+        fs.chmodSync(stage, 0o755);
         fs.mkdirSync(dirname(target), { recursive: true }); noSymlinks(target);
         if (fs.existsSync(target)) throw Error('Existing staged OMP runtime requires inspection');
         fs.renameSync(stage, target); stage = null;
@@ -85,7 +88,9 @@ export async function applyUpdate(payload, { forceInstall = false } = {}) {
       selected = target;
     }
     if (ompProcesses()) throw Error('An OMP session opened during preparation. Close it and retry; nothing was activated.');
+    if (selected.startsWith('/opt/teck-omp/releases/')) { noSymlinks(selected); fs.chmodSync(selected, 0o755); }
     if (command(selected + '/bin/omp', ['--version'], { env: { ...process.env, PATH: selected + '/bin:' + process.env.PATH } }).trim() !== 'omp/' + payload.omp) throw Error('Selected OMP version verification failed');
+    if (command('runuser', ['-u', 'agent', '--', '/opt/paseo-omp/bin/bun', selected + '/bin/omp', '--version']).trim() !== 'omp/' + payload.omp) throw Error('Agent cannot execute the selected OMP runtime');
     for (const file of payload.files) {
       const runtime = file.path.startsWith('runtime/');
       const path = runtime ? '/usr/local/lib/teck-orca/' + file.path.slice(8) : '/home/agent/.omp/agent/' + file.path;

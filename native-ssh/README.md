@@ -18,7 +18,7 @@ The provider emits schema version 1 and connection.type=ssh, allowing Orca to cr
 
 ## Runtime and local Kubernetes
 
-Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH and Docker-managed service authentication. The desktop manages the guest Orca server. OMP 18.16.0 and Bun 1.4.4, the existing model roles, planning/execution/review policy and all native helper capabilities remain available. See the [main workflow documentation](../README.md).
+Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH and Docker-managed service authentication. The desktop manages the guest Orca server, with 1.4.254 as the current target. OMP 18.18.3 and Bun 1.4.4, the existing model roles, planning/execution/review policy and all native helper capabilities remain available. See the [main workflow documentation](../README.md).
 
 Defaults are 8 CPU / 16g memory. Teck.Monorepo enables kubernetes=workspace in projects.json. New enabled VMs use the existing 60g Docker / 30g root settings; existing VMs are not resized. Bootstrap installs one persistent single-node KIND cluster with isolated worktree namespaces, dedicated kubeconfig and ownership/UID-safe cleanup. Base startup installs no Argo CD, Kargo, registry or Git server; CNPG, Rollouts and Gateway API/kgateway/TLS remain optional add-ons.
 
