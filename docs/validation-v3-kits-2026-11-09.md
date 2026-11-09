@@ -47,11 +47,20 @@ Buildx image-rootfs tar export was verified against the workflow image. Unlike
 container export it includes no injected Docker runtime device/hostname files;
 the release audit uses this exporter without hiding genuine system paths.
 
+The follow-up registry test pushed all nine built components to a temporary
+loopback-only registry inside `sbx-kit-builder`, recorded their actual digests,
+and built a real v3 `kind: set` through Docker's kit frontend. The resulting
+image was `sha256:caaf5a7c3150a7f247f46b559e045562e3a9913fb1d89357fc150794f7dde0be`.
+The complete compiler/LSP/debugger/browser smoke described above also passed
+against this actual composed set as UID 1000. This validates v3 dependency and
+file composition, beyond the initial COPY-based smoke image. Evidence is in
+`.artifacts/validate-kit-set.log`; the images were not published to GHCR.
+
 ## Release gates still outstanding
 
 The release workflow has not been published/run against a source tag. Therefore
-GHCR publishing, OIDC signing, arm64 builds, the real registry-backed composed
-set and its complete filesystem audit remain unverified live. No real release
+GHCR publishing, OIDC signing, arm64 builds and the release workflow's complete
+filesystem audit remain unverified live. No real release
 lock or installable catalogue entry has been generated.
 
 The assembled smoke image does not prove Docker Sandboxes set installation,

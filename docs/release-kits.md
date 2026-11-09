@@ -22,6 +22,33 @@ used when deliberately preparing that package for installation.
 
 ## Build a candidate
 
+Pull requests and pushes to `main` also run **Validate sandbox kit images**.
+Separate native `ubuntu-24.04` and `ubuntu-24.04-arm` jobs build all nine actual
+v3 descriptors, push only to a registry bound to the disposable runner's
+loopback address, and compose the real v3 set using the resulting digests.
+The same file collision checker used by releases audits every component.
+Neither GHCR access nor signing permissions are available to this workflow.
+
+Each job runs the resulting image as UID 1000 in an offline Buildx smoke stage:
+OMP/Bun and Kubernetes clients start, C# and TypeScript compile, the TypeScript
+language server starts, and Chromium runs the existing browser interaction and
+screenshot probe. This validates image composition and executable compatibility;
+it does not claim a Docker Sandboxes VM, KIND cluster, secrets or SSH lifecycle
+were tested. Build logs, actual digests, source checksums, the audit and smoke
+report are uploaded as evidence. No image or catalogue entry is published.
+
+These images need more space than the standard runner's advertised 14 GB.
+The workflow removes only fixed, unused SDK locations on its disposable
+GitHub-hosted Linux VM before setting up Node, then requires 32 GiB free. It
+prunes only its dedicated Buildx builder between components; their compressed
+images remain in the temporary registry. The smoke build exports only its small
+report, avoiding another full image copy in Docker's local store. If a runner
+image no longer yields enough free space, select a larger Ubuntu runner instead
+of removing more arbitrary files. This cleanup never runs on a developer PC or
+in a project sandbox. Native runner labels are documented for both public and
+private repositories in [GitHub's runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+The local registry follows [Docker's documented CI setup](https://docs.docker.com/build/ci/github-actions/local-registry/).
+
 After the implementation and version changes are merged, create an exact
 `vX.Y.Z` source tag. The tag must match both `package.json` and the root
 `orca-plugin.json`. In GitHub Actions, run **Release sandbox kits** and select

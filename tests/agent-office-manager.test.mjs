@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { createServer } from 'node:http';
 import { createHmac } from 'node:crypto';
 import { once } from 'node:events';
+import { fileURLToPath } from 'node:url';
 import { createOfficeManager, officeTunnelArgs, verifyOfficeBundle } from '../runtime/agent-office-manager.mjs';
 import { configureOfficeGuest } from '../runtime/office-guest.mjs';
 
@@ -51,7 +52,7 @@ test('failed service startup backs off and logs one actionable message',async t=
   time+=16_000;await m.sync([project]);assert.equal(calls,2);assert.equal(logs.length,1);m.dispose();
 });
 test('bundled distribution is from our fork and passes all asset hashes',()=>{
-  const root=new URL('../runtime/agent-office/',import.meta.url);const bundle=verifyOfficeBundle(root.pathname.replace(/^\/([A-Za-z]:)/,'$1'));
+  const root=new URL('../runtime/agent-office/',import.meta.url);const bundle=verifyOfficeBundle(fileURLToPath(root));
   assert.equal(bundle.source,'https://github.com/Teck-Lab/agent-office');assert.ok(bundle.files['cli.js']);
 });
 
