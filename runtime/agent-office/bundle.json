@@ -7,7 +7,7 @@
     "cli.js": "c4d85c4d528ef3f3530aee9e446b179c716d2143895386675ea4c51a9bd2fb5a",
     "package.json": "36b367648e8a8383b9f5f2d15648121bc1fd24d808fa5b78aa8406b4a5ab08bb",
     "term-worker.mjs": "d35ab1587cc561df95f2305384592600383746f073a70e96d8d6530d5e2854ac",
-    "web/assets/app-7F3OAIEX.js": "e2c21cba82a5f8eab402b62b1068f85dc19cc01c84a9c04ced484407d7263519",
+    "web/assets/app-U7VJBEMV.js": "80e71d93bb317313abd408da1425623abcf61d165bcb82113a58daf98faeac82",
     "web/assets/chat-XMYXXJZY.js": "edb21b0f615a312ce11385c68d271a070e220f4575a41728f9fd7b07fd19fbf3",
     "web/assets/chunk-5BDGWZRB.js": "22942512997cfdbac5e6f4b71d7e71eaf208479340de3bbbf64400fb5f47e11e",
     "web/assets/chunk-EL3NJRQO.js": "a9cec08ceb84616ac6108d22fdcd95ad15ff5612c3b89c5092d6144c5e5e10fc",
@@ -30,6 +30,6 @@
     "web/assets/logos/vercel.svg": "f5c1c44ce5004b3324a7fc75eacb88debc4d7e50fc068a47e513d9f198aae9c4",
     "web/assets/settings-4EVELDXH.js": "70fef0e250372126d58a09d455f3043ae296480cf666d26c445516684304523f",
     "web/assets/terminal-6QXASFE7.js": "2f3a0eeff00640819201b96027223373f2d9c78038977df5b71116b9fd20269f",
-    "web/index.html": "d471dff4b92fba1a3fb586f6b085fcff05725d1324347f5e0805b347d503cb02"
+    "web/index.html": "a59083a02c1566d06157b3104cfe41e5934205f4c07cc881554f0406b08bc780"
   }
 }
