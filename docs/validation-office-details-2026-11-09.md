@@ -29,8 +29,9 @@ Validation:
 
 - Full isolated Linux Node 24 Office suite: 553 passed, 2 skipped.
 - Final focused renderer, presentation, scene, meeting, whiteboard and observer
-  suite: 73 passed, including desk bounds and seasonal clipping checks added
-  after the full suite.
+  suite: 74 passed, including desk bounds, seasonal clipping and grounded trunks
+  in both ordinary and taller cloud/meeting windows. These checks and final
+  disconnected flip/alarm suppression were validated after the full suite.
 - Plugin suite: 283 passed. Typecheck, production build and generated-asset
   checks passed.
 - Published the immutable local plugin runtime, reloaded the existing plugin
