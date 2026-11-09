@@ -49,17 +49,26 @@ questions, coordinator-loop for DAG/reuse details, and recovery-and-cleanup when
 a receipt or uncertain lifecycle action requires it. Bundled official snapshots
 are fallback references; verify unsupported flags with the same CLI's help.
 
-From the feature's own Orca terminal, use orca_dispatch(role=executor,
-worktree=new-child) with the objective, issue and acceptance criteria. The tool
-uses public worker-start and the live configured modelRoles.task selector.
-The dispatch tool defaults executors to new-child and rejects current, active,
-new-top-level or an existing checkout for a new editing terminal. Integration
-workers are executors too: they combine accepted child snapshots in their own
-child checkout; review/publication target that resulting checkout. Pass exact
-accepted dependency branches/revisions in dependent workers' briefs so they can
-incorporate prerequisites in their own checkout before implementation. Never
-make the feature checkout a shared editing/integration area.
-Use the feature branch as base. Give orca_dispatch an optional concise title
+From the feature's own Orca terminal, use orca_dispatch(role=executor) with the
+canonical issue URL, objective and acceptance criteria. Without a GitHub issue,
+pass a stable workspace_key and keep it across follow-ups. Bind the owning Run
+first. The adapter uses public worker-start and the configured modelRoles.task.
+
+The first dispatch creates a parent-linked child. Later dispatches for the same
+issue/key reuse that child, even if worktree=new-child was requested or the title
+changed. A released terminal is not a deleted worktree: start a new terminal in
+the same verified idle checkout. Do not create a worktree per Task, attempt,
+review finding or failed test. Active dispatches must be messaged/waited for.
+
+Deliberate independent parallel implementation may use parallel_key plus
+parallel_reason with file ownership and dependency boundaries. Keep that lane
+key stable on retries. Prefer native OMP helpers for small parallel tasks;
+do not manufacture GitHub issues merely to bypass checkout reuse.
+
+Integration uses one stable issue/key and its own child checkout. Review and
+publication target that resulting checkout. Pass accepted dependency revisions
+so workers can incorporate prerequisites in their checkout. The feature checkout
+is never a shared editing/integration area. Use the feature branch as base. Give orca_dispatch an optional concise title
 such as "Verify Billing finalize"; otherwise it uses the objective's first line.
 The adapter automatically adds the issue number and role to the task label,
 generates a readable unique name/display name for a new child, and labels the
@@ -113,14 +122,22 @@ before any retry so an uncertain launch cannot create a duplicate editor.
 Missing runtime authority is a reported blocker, not permission to switch hosts
 or substitute raw Git worktrees.
 
-Follow-up executor reuse requires worktree=id:<exact-child-id> plus that child's
-existing terminal. The coordinator must bind the same owning Run first. The
-extension checks direct parentage to the coordinator worktree, the same project,
-a distinct branch, settled/reclaimable terminal ownership and no active dispatch
-in that checkout. Multiple terminal owners, foreign Runs, released resources or
-uncertain inventory prevent reuse. Create a new child if reuse cannot be proved;
-do not bypass the check with raw worker-start or move active workers/files.
-Orca atomically claims the selected terminal when starting the follow-up.
+Issue/key ownership is persisted on the sandbox and checked against complete
+Orca worktree, task and worker inventories. New coordinator sessions and Runs
+reuse the same child under the same feature. The adapter serializes placement
+across sessions and records pending launches before starting a worker. An
+uncertain receipt cannot authorize another checkout: inspect the exact Dispatch
+and replay its returned retry_request unchanged. A pending record or crashed
+placement lock requires reconciliation, never blind replacement.
+
+Multiple legacy worktrees require an exact worktree=id:<child> after checking
+their changes. The selected canonical child is remembered; this does not delete
+or merge the others. Missing/reparented recorded children block new creation.
+Direct parentage, project and distinct branch are checked on every reuse.
+One settled reclaimable terminal in the current Run may be reclaimed atomically
+by Orca. Otherwise an idle checkout with no live/unverifiable terminals or active
+dispatches may receive a fresh terminal. A live foreign or ambiguous owner must
+be settled first. Do not fall back to raw worker-start or create another child.
 
 ## Executor: native implementation
 

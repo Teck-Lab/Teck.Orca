@@ -6,13 +6,14 @@ description: Coordinate GitHub-tracked implementation and repair on a feature's 
 # Feature workflow
 
 One project shares one persistent sandbox and Orca daemon across its features.
-Each feature's execution workers use parent-linked child worktrees on that same
-runtime. New executor dispatches enforce new-child, including integration work;
-native OMP helpers share their owning executor's checkout. Existing child-terminal
-reuse requires verified settled ownership; the feature checkout cannot host a
-new editing worker. Preserve ORCA_* routing and project identity; use the saved project
-connection for additional features. Do not select the recipe again for a child
-or start a second daemon.
+Each feature keeps one executor child per canonical issue or stable task key.
+Follow-ups and retries reuse that checkout, including after its old terminal was
+released. An active or uncertain worker blocks a replacement. Explicit parallel
+lanes need stable identities, file ownership and dependencies; native helpers
+normally share their owning executor checkout. The feature checkout cannot host
+a new editing worker. Preserve ORCA_* routing and project identity; use the saved
+project connection for additional features. Do not select the recipe again for
+a child or start a second daemon.
 
 ## Route by role and stage
 
@@ -62,7 +63,8 @@ Native helpers keep their OMP lifecycle and return results to their parent; they
 need no separate Orca records. For visible Orca workers use orca_dispatch with an explicit
 objective, acceptance criteria and constraints; it resolves existing model roles.
 Code changes follow the [test-first and coverage contract](references/testing.md).
-Combine accepted child revisions in an integration executor's own child checkout,
+Combine accepted child revisions in one integration executor child checkout,
+reusing its same issue/task key for later integration and correction rounds,
 then send that exact checkout/revision to final review and publication. The
 coordinator does not edit or merge code in its feature checkout.
 

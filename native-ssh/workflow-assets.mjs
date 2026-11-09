@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 export function workflowFiles(ompRoot, launchRoot) {
-  const roots = ['extensions/agent-office.ts', 'extensions/agent-office.mjs', 'extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'extensions/lib/github-plan-scope.mjs',
+  const roots = ['extensions/agent-office.ts', 'extensions/agent-office.mjs', 'extensions/orca-orchestration.mjs', 'extensions/lib/orca-policy.mjs', 'extensions/lib/github-plan-scope.mjs', 'extensions/lib/issue-worktree.mjs',
     'extensions/lib/office-tools.mjs', 'extensions/lib/office-usage.mjs', 'extensions/lib/office-plan.mjs', 'extensions/lib/office-mcp.mjs', 'extensions/lib/office-mcp-server.mjs', 'extensions/lib/agent-office.LICENSE',
     'extensions/omniroute-research.ts', 'extensions/lib/mcphub-client.mjs', 'extensions/lib/mcphub-search.mjs', 'extensions/lib/mcphub-firecrawl.mjs',
     'orchestration.yml', 'RULES.md', 'WATCHDOG.yml', 'agents/technical-planner.md',

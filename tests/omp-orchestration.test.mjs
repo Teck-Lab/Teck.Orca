@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { test, after } from 'node:test';
+import fs from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const routingTests=fs.mkdtempSync(join(tmpdir(),'teck-route-integration-'));after(()=>fs.rmSync(routingTests,{recursive:true,force:true}));
 import { resolveRole, permittedTool, coordinationArgs, coordinationAction, assignment, dispatchLabels, canRenameWorkerTab } from '../runtime/omp/extensions/lib/orca-policy.mjs';
 import activate from '../runtime/omp/extensions/orca-orchestration.mjs';
 import { createPlanningScope } from '../runtime/omp/extensions/lib/github-plan-scope.mjs';
@@ -165,7 +169,7 @@ test('assignment transfers an explicit goal and acceptance boundary without inve
 
 function session(model = 'lead', branch = [], sendResult) {
   const handlers = new Map(), tools = new Map(), calls = [];
-  let boundInput, pane = 'pane', pending = false, workerPages, runReceipt, placementRecord, workerReceipt, terminalList, labelAction;
+  let boundInput, pane = 'pane', pending = false, workerPages, runReceipt, placementRecord, workerReceipt, terminalList, labelAction, worktreeList, worktreePs;
   const timers = [], sent = [];
   let activeTools = ['bash', 'read', 'edit', 'eval', 'task', 'goal', 'todo', 'github__push_files', 'github__issue_write'];
   const schema = new Proxy(() => schema, { get: () => schema });
@@ -180,11 +184,13 @@ function session(model = 'lead', branch = [], sendResult) {
   const ctx = { agent:{kind:'main',id:'main-'+(++sessionSequence),name:'main'},model: { provider: 'gateway', id: model }, models, sessionManager: { getBranch: () => branch },
     setTimeout: fn => timers.push(fn), isIdle: () => !pending, hasPendingMessages: () => pending };
   ctx.models = { resolve: role => role === '@default' ? ctx.model : models.resolve(role) };
-  activate(pi, { environment: { ORCA_PANE_KEY: 'pane', ORCA_WORKTREE_ID: 'worktree' }, run: async args => {
+  activate(pi, { issueWorktreeDirectory:join(routingTests,ctx.agent.id), environment: { ORCA_PANE_KEY: 'pane', ORCA_WORKTREE_ID: 'worktree' }, run: async args => {
     calls.push({ args });
     if (args[0] === 'terminal' && args[1] === 'list') return terminalList ?? {};
     if (args[0] === 'terminal' && ['rename','set-pane-title'].includes(args[1])) return labelAction?.(args) ?? { applied: true };
-    if (args[0] === 'worktree' && args[1] === 'show') return placementRecord?.(args) ?? {};
+    if (args[0] === 'worktree' && args[1] === 'show') return placementRecord?.(args) ?? {worktree:args.includes('id:worktree')?{id:'worktree',branch:'feature',projectId:'project'}:{id:'child',branch:'child',projectId:'project',parentWorktreeId:'worktree'}};
+    if (args[0] === 'worktree' && args[1] === 'list') return worktreeList ?? {worktrees:[],totalCount:0,truncated:false};
+    if (args[0] === 'worktree' && args[1] === 'ps') return worktreePs ?? {worktrees:[],totalCount:0,truncated:false};
     if(['run-create','run-use'].includes(args[1]))return runReceipt??{run:{id:'run_created'}};
     // Orca 1.4.246's default JSON is a concise presentation, not the raw
     // identity-bearing records. Mirror that boundary rather than granting
@@ -196,7 +202,7 @@ function session(model = 'lead', branch = [], sendResult) {
     if (args[1] === 'task-list' && !args.includes('--full')) return { tasks: [{ id: 'task_123', status: 'dispatched', title: 'Worker task' }] };
     if (args[1] === 'worker-list' && workerPages) return workerPages(args);
     if (args[1] === 'worker-list') return { workers: boundInput ? [{ dispatchId: 'ctx_456', taskId: 'task_123', runId: 'run_123',
-      dispatchStatus: 'dispatched', agentTerminalHandle: 'term_123', resource: { worktreeId: 'worktree' } }] : [] };
+      dispatchStatus: 'dispatched', agentTerminalHandle: 'term_123', resource: { worktreeId: 'worktree' } }] : [], page:{hasMore:false} };
     if (args[1] === 'worker-show') return { dispatch: { assigneePaneKey: pane, assigneeHandle: 'term_123', status: 'dispatched', processIncarnation: 'pty:incarnation' },
       terminal: { ptyId: 'pty', incarnationId: 'incarnation' }, observation: { exactWorker: true, status: 'live' } };
     if (args[1] === 'task-list') return { tasks: [{ id: 'task_123', dispatch_id: 'ctx_456', assignee_handle: 'term_123', spec: assignment(boundInput) }] };
@@ -209,6 +215,7 @@ function session(model = 'lead', branch = [], sendResult) {
     setWorkerReceipt: value => { workerReceipt = value; },
     setTerminalList: value => { terminalList = value; },
     setLabelAction: value => { labelAction = value; },
+    setWorktreeList:value=>{worktreeList=value},setWorktreePs:value=>{worktreePs=value},
     setRunReceipt:value=>{runReceipt=value},
     guard: (toolName, input = {}) => handlers.get('tool_call')({ toolName, input },ctx) };
 }
@@ -262,10 +269,11 @@ test('loaded extension requires an active native goal, dispatches configured rol
   assert.equal(s.guard('orca_dispatch', {}).block, true);
   assert.equal(s.guard('edit', {}).block, true);
   s.handlers.get('goal_updated')({ goal: { status: 'active', objective: 'Deliver milestone' } });
-  const input = { role: 'executor', objective: 'Implement #123', acceptance: ['Tests pass'], constraints: 'No publication', worktree: 'new-child', name: 'issue-123' };
+  const input = { role: 'executor', workspace_key:'implement-123', objective: 'Implement #123', acceptance: ['Tests pass'], constraints: 'No publication', worktree: 'new-child', name: 'issue-123' };
   await s.handlers.get('before_agent_start')({ prompt: assignment(input), systemPrompt: [] }, s.ctx);
   assert.equal(s.guard('edit', {}).block, true, 'A copied worker marker cannot grant coordinator editing rights');
   assert.equal(s.pi.getActiveTools().includes('eval'),false,'A blocked unrestricted tool must not be advertised to the coordinator');
+  await s.tools.get('orca').execute('bind',{action:'run_create',objective:'Delivery'},undefined,undefined,s.ctx);
   await s.tools.get('orca_dispatch').execute('test', input, undefined, undefined, s.ctx);
   assert.ok(s.calls.some(call => call.args?.includes('gateway/doer')));
   assert.ok(s.calls.some(call => call.args?.includes('new-child')));
@@ -317,6 +325,7 @@ test('dispatch names new worktrees and labels only the verified worker pane and 
   s.setWorkerReceipt({dispatch:{id:'ctx_test',assigneeHandle:'term_worker',status:'dispatched'},terminal:{handle:'term_worker',worktreeId:'child'},observation:{exactWorker:true,status:'live'}});
   const terminal={handle:'term_worker',worktreeId:'child',tabId:'tab-worker',leafId:'leaf-worker'};
   s.setTerminalList({terminals:[terminal],totalCount:1,truncated:false,visualLayouts:[{worktreeId:'child',root:{type:'group',tabs:[{tabId:'tab-worker',title:'worker-task_123',panes:{type:'terminal',handle:'term_worker'}}]}}]});
+  await s.tools.get('orca').execute('bind',{action:'run_create',objective:'Delivery'},undefined,undefined,s.ctx);
   const result=await s.tools.get('orca_dispatch').execute('named',{role:'executor',issue:'https://github.com/Teck-Lab/Teck.Monorepo/issues/906',objective:'Verify Billing finalize',acceptance:['Tests pass'],constraints:'No publication'},undefined,undefined,s.ctx);
   const start=s.calls.find(c=>c.args?.[1]==='worker-start').args;
   assert.equal(start[start.indexOf('--task-title')+1],'#906 · Executor · Verify Billing finalize');
@@ -326,7 +335,7 @@ test('dispatch names new worktrees and labels only the verified worker pane and 
   assert.equal(actions.length,2);assert.ok(actions.every(c=>c.args.includes('term_worker')&&c.args.includes('#906 · Executor · Verify Billing finalize')));
   assert.equal(result.details.dispatchId,'ctx_test');assert.equal(result.details.naming.pane,'updated');
   s.setLabelAction(args=>{if(args[1]==='set-pane-title')throw Error('No desktop');return{applied:true}});
-  const headless=await s.tools.get('orca_dispatch').execute('headless',{role:'executor',objective:'Headless labels',acceptance:['Tests pass'],constraints:'No publication'},undefined,undefined,s.ctx);
+  const headless=await s.tools.get('orca_dispatch').execute('headless',{role:'executor',workspace_key:'headless',objective:'Headless labels',acceptance:['Tests pass'],constraints:'No publication'},undefined,undefined,s.ctx);
   assert.equal(headless.details.naming.tab,'updated');assert.equal(headless.details.naming.pane,'unavailable');
   assert.equal(headless.details.dispatchId,'ctx_test');assert.equal(headless.isError,undefined);
 });
@@ -361,10 +370,24 @@ test('new executor dispatches default to a child and reject shared-checkout sele
   }
   await assert.rejects(dispatch.execute('bad',{...input,worktree:'new-child',terminal:'term_shared'},undefined,undefined,s.ctx),/reuse|terminal/i);
   assert.equal(s.calls.filter(c=>c.args?.[1]==='worker-start').length,0);
-  await dispatch.execute('default',input,undefined,undefined,s.ctx);
+  await assert.rejects(dispatch.execute('unkeyed',input,undefined,undefined,s.ctx),/issue URL or stable workspace_key/);
+  await s.tools.get('orca').execute('bind',{action:'run_create',objective:'Delivery'},undefined,undefined,s.ctx);
+  await dispatch.execute('default',{...input,workspace_key:'acceptance'},undefined,undefined,s.ctx);
   const start=s.calls.find(c=>c.args?.[1]==='worker-start').args;
   assert.equal(start[start.indexOf('--worktree')+1],'new-child');
   assert.equal(s.guard('write',{path:'xd://orca_dispatch',content:JSON.stringify({...input,worktree:'current'})}).block,true);
+});
+
+test('managed dispatch reopens a released issue child without any new-worktree flags',async()=>{
+  const s=session();await s.handlers.get('session_start')({},s.ctx);createdGoal(s,'Follow-up');
+  await s.tools.get('orca').execute('bind',{action:'run_create',objective:'Delivery'},undefined,undefined,s.ctx);
+  s.setWorktreeList({worktrees:[{id:'child',parentWorktreeId:'worktree',path:'/work/issue-906-executor-previous'}],totalCount:1,truncated:false});
+  s.setWorktreePs({worktrees:[{worktreeId:'child',liveTerminalCount:0,unverifiableTerminalCount:0}],totalCount:1,truncated:false});
+  s.setWorkerReceipt({dispatch:{id:'ctx_test',assigneeHandle:'term_worker',status:'dispatched'},terminal:{handle:'term_worker',worktreeId:'child'},observation:{exactWorker:true,status:'live'}});
+  const result=await s.tools.get('orca_dispatch').execute('followup',{role:'executor',issue:'https://github.com/Teck-Lab/Teck.Monorepo/issues/906',worktree:'new-child',objective:'Fix review findings',acceptance:['Accepted'],constraints:'Existing scope'},undefined,undefined,s.ctx);
+  const start=s.calls.find(c=>c.args?.[1]==='worker-start').args;
+  assert.equal(start[start.indexOf('--worktree')+1],'id:child');assert.equal(start.includes('--terminal'),false);assert.ok(start.includes('--agent'));assert.equal(start.includes('--name'),false);assert.equal(start.includes('--display-name'),false);
+  const spec=JSON.parse(start[start.indexOf('--spec')+1].split('\n')[0].slice('TECK_ORCA_ASSIGNMENT '.length));assert.equal(spec.worktree,'id:child');assert.equal(spec.issue,'https://github.com/Teck-Lab/Teck.Monorepo/issues/906');assert.equal(result.details.dispatchId,'ctx_test');
 });
 
 test('executor reuse needs its own settled terminal in a distinct direct child, with no other active dispatch',async()=>{

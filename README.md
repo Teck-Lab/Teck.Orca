@@ -9,14 +9,16 @@ connection. Workspace cleanup runs an ownership-checked provider no-op, allowing
 Orca to retire the workspace route without stopping or deleting the shared VM.
 Existing workspaces retain their old lifecycle snapshots.
 
-New Orca executors always use separate parent-linked child worktrees. The OMP
-dispatch tool defaults to `new-child` and rejects fresh editing workers in the
-shared feature checkout. Follow-up reuse requires an exact child ID and its
-settled, reclaimable terminal from the same Run, with verified parentage,
-distinct branch and unambiguous ownership. Integration also uses a child;
-final review/publication target that exact resulting checkout. Native OMP
-helpers share their executor's checkout with explicit file ownership. These
-checks govern the managed OMP dispatch path, not arbitrary manual shell commands.
+Each feature keeps one executor child worktree per canonical GitHub issue, or
+stable `workspace_key` for work without an issue. Follow-ups and retries reuse
+that checkout, even across Runs or after its terminal has been released. Active
+or uncertain ownership blocks another executor; legacy duplicates require an
+explicit canonical child choice after reconciling changes. Planned parallel lanes
+need a stable `parallel_key` and a `parallel_reason` with file ownership and
+dependencies. Native OMP helpers continue sharing their owning executor checkout.
+Integration has its own stable issue/task key; final review and publication target
+that resulting child. The coordinator checkout remains isolated from editing.
+These checks govern managed dispatch, not arbitrary manual shell commands.
 
 Dispatch labels default to issue number, role and a short task description, for
 example `#906 · Executor · Verify Billing finalize`. An optional `title` supplies

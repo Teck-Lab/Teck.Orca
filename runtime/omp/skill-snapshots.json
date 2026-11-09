@@ -323,7 +323,7 @@
     },
     {
       "name": "orca-feature-workflow/SKILL.md",
-      "sha256": "e64c314a47cf98b5a9111c6c202022758dcf21fe23f3db4fb6c1dc37060c96a0"
+      "sha256": "fbe01f4519364b2f6633d8fe642b1606d66936b16a32c1e0226386a017559469"
     },
     {
       "name": "orca-per-workspace-env/references/docker-ssh.md",
@@ -351,7 +351,7 @@
     },
     {
       "name": "orca-workers/SKILL.md",
-      "sha256": "797d6f0934aa10a18d57be615dd397648217ea99a34617e5488979b5c1321b85"
+      "sha256": "ea5405399bea6a705cbef80bb752245d68f3e5460934d8201658b6516174c0f3"
     },
     {
       "name": "orchestration/references/coordinator-loop.md",

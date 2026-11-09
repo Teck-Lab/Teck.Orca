@@ -229,8 +229,11 @@ export function dispatchPlacement(input) {
   if (typeof worktree !== 'string' || !worktree || worktree.trim() !== worktree || worktree.includes('\0'))
     throw Error('An exact worktree placement is required');
   if (input.role !== 'executor') return { worktree, reuse: false };
+  if (!input.issue && !input.workspace_key && !input.terminal)
+    throw Error('Executor child ownership requires a canonical issue URL or stable workspace_key; reuse the same key for follow-ups.');
   if (worktree === 'new-child' && !input.terminal) return { worktree, reuse: false };
   if (worktree === 'new-child') throw Error('A new child cannot reuse an existing terminal. Omit terminal for new execution.');
+  if ((input.issue || input.workspace_key) && worktree.startsWith('id:') && worktree.length > 3) return { worktree, reuse: false };
   if (!input.terminal || !worktree.startsWith('id:') || worktree.length <= 3)
     throw Error('New executors, including integration workers, require new-child. Reuse requires the exact id: of an owned child and its settled terminal.');
   return { worktree, reuse: true };
@@ -243,11 +246,11 @@ export function verifyExecutorReuse(input, { parent, child, workers, runId, pare
   if (!parent.projectId || child.projectId !== parent.projectId || !parent.branch || !child.branch || child.branch === parent.branch)
     throw Error('Executor reuse requires a child in the same project on a distinct branch.');
   const occupants = workers.filter(w => w.resource?.worktreeId === child.id);
-  if (occupants.some(w => w.dispatchStatus === 'dispatched')) throw Error('Another dispatch is active in this checkout; wait for settlement or create a new child.');
+  if (occupants.some(w => w.dispatchStatus === 'dispatched')) throw Error('Another dispatch is active in this checkout; wait for settlement, do not create a replacement child.');
   // A legacy checkout with several terminal owners is ambiguous. Never race
   // two different settled terminals back into editing that same checkout.
   if (occupants.some(w => w.runId !== runId || w.agentTerminalHandle !== input.terminal))
-    throw Error('Child reuse has multiple or foreign terminal owners; create a new child instead.');
+    throw Error('Child reuse has multiple or foreign terminal owners; reconcile ownership instead of creating a replacement child.');
   const owner = occupants.find(w => w.agentTerminalHandle === input.terminal);
   if (!owner || !['completed', 'failed'].includes(owner.dispatchStatus) || owner.terminalState !== 'reclaimable' ||
       owner.resource?.ownershipState !== 'owned' || owner.resource.ownerDispatchId !== owner.dispatchId ||

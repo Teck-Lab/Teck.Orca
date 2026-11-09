@@ -5,6 +5,7 @@ import { lstatSync, readFileSync, readlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { assignment, coordinationAction, coordinationActions, messageTypes, permittedTool, resolveRole, workerRoles, isPlanningWrite, isPlanningTool, implementationTool, dispatchPlacement, verifyExecutorReuse, dispatchLabels, canRenameWorkerTab, isOfficeTool } from './lib/orca-policy.mjs';
 import { createPlanningScope } from './lib/github-plan-scope.mjs';
+import { issueWorktree, executionKey } from './lib/issue-worktree.mjs';
 
 const execute = promisify(execFile);
 // OMP rebinds the extension per native agent in the same process. Only actual
@@ -22,7 +23,7 @@ An Orca executor is the assignment owner: after creating its exact native goal, 
 Use native wait and agent:// reads/messages to follow actual progress. A task receipt is not proof of execution. Helpers may delegate further within their inherited role boundaries; they do not recursively need another implementation-worker.
 An Orca reviewer leads one final review. For code/deployment changes, start correctness-reviewer and security-auditor native helpers in parallel on the same stable snapshot, then independently validate/deduplicate their findings and issue one verdict. A documentation-only review may use one correctness helper and record why a security pass is inapplicable. All review helpers stay read-only; never run duplicate full reviews just to count agents.
 Assign canonical execution issues/sub-issues to Orca executors with bounded goals. Every role may use native helpers for its scoped work; helpers do not replace the tracked primary executor.
-New Orca executors, including integration workers, always use worktree=new-child (the default). Never run parallel executor terminals in the feature checkout. Reuse requires an exact id:<child> and its settled reclaimable terminal from this coordinator's bound Run; the extension verifies parentage, a distinct branch and sole terminal ownership. Ambiguous/released/active reuse fails closed. Integrate accepted child snapshots in a separate integration child, then review and publish that exact resulting checkout. Native helpers keep sharing their owning executor's checkout with file ownership.
+Use one executor child worktree per canonical issue (or stable workspace_key without GitHub) within the feature. Follow-ups, repairs, verification and retries reuse it; changing the title or Run does not justify a new checkout. The adapter resolves existing issue ownership before launch, reclaims a settled current-Run terminal or starts a new terminal in the same verified idle child after release. Active, uncertain or ambiguous ownership blocks another executor instead of creating a replacement. Legacy duplicates require an explicit child choice after reconciliation. Separate parallel lanes require a stable parallel_key and parallel_reason describing file ownership and dependencies; prefer native helpers for smaller parallel work. Reuse the same integration issue/key across integration and review-fix rounds. Never edit the coordinator feature checkout. Native helpers share their executor checkout with file ownership.
 Give each dispatch a concise title describing its work. The adapter adds issue/role labels and a readable unique child name automatically, then labels only the verified worker pane. A naming warning never authorizes launching a replacement worker.
 Native OMP owns helper lifecycle; the parent owns scope, acceptance and the final result.
 Use native wait and agent:// reads/messages for helper results and follow-ups. Settle or cancel owned helpers before final parent settlement.
@@ -456,10 +457,13 @@ export default function activate(pi, dependencies = {}) {
     return { ...result, naming };
   }
   pi.registerTool({ name: 'orca_dispatch', label: 'Dispatch Orca goal', approval: 'write', strict: true,
-    description: 'Assign an acceptance-bounded native OMP goal using existing model roles. New executors, including integration workers, use new-child; exact settled child-terminal reuse is checked. Start ready tasks only; inspect uncertain receipts before retry.',
+    description: 'Assign an acceptance-bounded goal. Executors reuse one child per issue/task in this feature, including follow-ups after terminal release. Active or uncertain ownership blocks duplication. Explicit parallel lanes need file ownership and dependency reasons.',
     parameters: z.object({ role: z.enum(['executor', 'planner', 'researcher', 'reviewer', 'publisher']), objective: z.string().describe('Observable deliverable only. Keep lifecycle/reporting instructions in constraints, not the native goal objective.'),
       issue: z.string().optional(), acceptance: z.array(z.string()).min(1), constraints: z.string(),
-      worktree: z.string().optional().describe('Executors default to new-child. Reuse needs exact id:<child> plus its settled terminal. Other roles require an explicit snapshot checkout.'),
+      worktree: z.string().optional().describe('Issue executors automatically reuse their child, even when new-child is requested. Exact id selects a legacy child for adoption; terminal is optional after release. Other roles require an explicit snapshot checkout.'),
+      workspace_key: z.string().optional().describe('Stable task identifier when no GitHub issue exists. Reuse it across retries and follow-ups.'),
+      parallel_key: z.string().optional().describe('Stable lane name only for deliberately planned independent parallel implementation, never a retry counter.'),
+      parallel_reason: z.string().optional().describe('Why a separate parallel checkout is needed; name file ownership boundaries and dependencies.'),
       title: z.string().optional().describe('Short description for the GUI, e.g. Verify Billing finalize. Issue number and role are added automatically.'),
       name: z.string().optional().describe('Optional readable slug for a new child worktree; defaults to issue, role and task title with a unique suffix.'), run: z.string().optional(), deps: z.array(z.string()).optional(),
       token_budget: z.number().int().positive().optional(),
@@ -467,13 +471,21 @@ export default function activate(pi, dependencies = {}) {
     async execute(_id, input, signal, _update, ctx) {
       requireParent(ctx);
       if (role !== 'coordinator' || goal?.status !== 'active') throw Error('An active coordinator goal is required');
-      const placement = dispatchPlacement(input);
+      let placement = dispatchPlacement(input), routing;
       if (placement.reuse) {
         if (executorReusePending) throw Error('Another child reuse is in progress; reconcile its dispatch receipt before retrying.');
         executorReusePending = true;
       }
       try {
-        if (placement.reuse) {
+        if (executionKey(input)) {
+          routing = await issueWorktree({ input, parentId: environment.ORCA_WORKTREE_ID, runId: coordinatorRunId, run, signal, directory: dependencies.issueWorktreeDirectory });
+          if (routing.replayArgs) {
+            const result = await run(routing.replayArgs, signal);await routing.record(result);return reply(result);
+          }
+          input = { ...input, worktree: routing.worktree, terminal: routing.terminal, run: routing.run };
+          placement = { worktree: routing.worktree, reuse: false };
+        }
+        if (placement.reuse && !routing) {
           if (!coordinatorRunId || input.run && input.run !== coordinatorRunId) throw Error('Bind the owning Orca Run before child reuse; the requested Run must match.');
           const parentId = environment.ORCA_WORKTREE_ID;
           if (!parentId) throw Error('The coordinator worktree identity is required for child reuse.');
@@ -494,9 +506,12 @@ export default function activate(pi, dependencies = {}) {
         if (input.run) args.push('--run', input.run);
         if (input.deps?.length) args.push('--deps', JSON.stringify(input.deps));
         if (input.retry_request) args.push('--retry-request', input.retry_request);
+        routing?.begin(args);
         const result = await run(args, signal);
-        return reply(await labelDispatchedWorker(result, labels.title, signal));
-      } finally { if (placement.reuse) executorReusePending = false; }
+        let placementWarning;
+        try { await routing?.record(result); } catch { placementWarning = 'Dispatch receipt retained; issue ownership confirmation failed. Inspect this dispatch before retrying.'; }
+        return reply({ ...await labelDispatchedWorker(result, labels.title, signal), ...(placementWarning ? { placementWarning } : {}) });
+      } finally { routing?.close(); executorReusePending = false; }
     },
   });
   pi.registerTool({ name: 'git_inspect', label: 'Inspect review snapshot', approval: 'read', strict: true,
