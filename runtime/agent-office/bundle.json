@@ -4,16 +4,16 @@
   "commit": "169b5490b8cf42f4e89e079ae2ae6b3b96d15137",
   "files": {
     "LICENSE": "c388db48dcbcc40f64648e701efaf1f268134486f3c8980f45f142d24541d97b",
-    "cli.js": "d24778442b5b04e1ec4c1070387def786927cba2d08ac45c614d11596866fc17",
+    "cli.js": "c76f9c2614f1d0509c5bdccbe3bf5ef21234974cc3cd6f71af33ba50751a1a1a",
     "package.json": "36b367648e8a8383b9f5f2d15648121bc1fd24d808fa5b78aa8406b4a5ab08bb",
     "term-worker.mjs": "d35ab1587cc561df95f2305384592600383746f073a70e96d8d6530d5e2854ac",
-    "web/assets/app-ROVWBHLG.js": "a73483f70b81e27730a7e64e58dff6d62626791cb7d23739f42880203a5f783b",
-    "web/assets/chat-DQBQIAX4.js": "875379f0b2171bab63df484ec5e3d78a889e88d0c548fbed31bfe208919f9242",
+    "web/assets/app-AYFI7MEJ.js": "a6ac9f3b08e7be6b01f8b3134318a6fb3f16fd310aafccf15618afefb6d30894",
+    "web/assets/chat-O2ICCHJD.js": "80d94fd00ada9b3bf6acd90a75fc3cb8e8ae33724e731e45854bffb347e48755",
+    "web/assets/chunk-53CCVUHC.js": "eb3db596554432aad3627852d6880a8e375e718491b261d005d4f453ae65f68b",
     "web/assets/chunk-5BDGWZRB.js": "22942512997cfdbac5e6f4b71d7e71eaf208479340de3bbbf64400fb5f47e11e",
+    "web/assets/chunk-6PE3C7VY.js": "7b3b85f1866ed5a0e84a5bda713902e2e52b369dc8e2d8f477f4ac5d6471bb5f",
     "web/assets/chunk-NSGWS2AA.js": "31e8e3c23b4be9e905b621757af31427d3369d0a70e135924cb6d7a6a4038403",
-    "web/assets/chunk-O7VVTL7J.js": "dac7d49b0cbfb8bd10018fa8f04dbe8125159861943687164f680b244b77d85f",
-    "web/assets/chunk-TR2JXWVX.js": "1156ebacbe1bf069f54636677268328878e4112251b07e3ec7e32b2c92d8043c",
-    "web/assets/hire-O44ZYHK3.js": "9386c9fd0110342301512da8508a390e5e8ce540707582f9296c6124f95d421d",
+    "web/assets/hire-Z7IEBIUW.js": "df2c8cd5a158372dc84cbc8ebf322f4f274f2b13a8d91a0a60ada4c767aa52d3",
     "web/assets/logos/boat.svg": "740484883941bc7f77584d022613cdac8316c77289d20f5615183ece27ab0efb",
     "web/assets/logos/claude.svg": "81eefc33f569d93e925b4618b6f385688f99af10c13150e61a9a7f41ee720efe",
     "web/assets/logos/codex.svg": "cb1f7f7ce50d3698ad94102e07db370e8381effa83aa2e3c3f5d94683a7638bd",
@@ -28,8 +28,8 @@
     "web/assets/logos/qwen.svg": "b1ffe49f510885ad3bbfd4911a01cc6dc763a01052301715a637985199ce6b76",
     "web/assets/logos/railway.svg": "c4c548d0834e631bfbd432883b2ce315a8b260f0950e0865bc63799c3e8adc66",
     "web/assets/logos/vercel.svg": "f5c1c44ce5004b3324a7fc75eacb88debc4d7e50fc068a47e513d9f198aae9c4",
-    "web/assets/settings-POGMDVFW.js": "cd822de18b31d819efa19f8b6f65a09543aa8060da3a803981cffceb1c2d39bb",
+    "web/assets/settings-CM6ZU5IG.js": "9cfe49086b05711e036e5807c577e0bbc4502ec7828cbaa07b1da11e9de03286",
     "web/assets/terminal-6QXASFE7.js": "2f3a0eeff00640819201b96027223373f2d9c78038977df5b71116b9fd20269f",
-    "web/index.html": "208885ab6a299def9745ffdf7618f952e89fe25d4ea589b3c7fa8ca8a0f68dfb"
+    "web/index.html": "aa40f0b93fc383e14a33ed3536c0b5b30a741efcbe7d6155da0aa21209580512"
   }
 }

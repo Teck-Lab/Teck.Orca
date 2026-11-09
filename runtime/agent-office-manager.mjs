@@ -133,12 +133,13 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
           const guestPort=randomInt(20000,60000);
           const config={version:1,sourceId:p.id,url:`http://127.0.0.1:${guestPort}/api/ingest`,token:sources[p.id].token};
           const extension=fs.readFileSync(new URL('./omp/extensions/agent-office.mjs',import.meta.url)).toString('base64');
+          const roleGuard=fs.readFileSync(new URL('./omp/extensions/orca-orchestration.mjs',import.meta.url)).toString('base64');
           const entry=fs.readFileSync(new URL('./omp/extensions/agent-office.ts',import.meta.url)).toString('base64');
-          const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','agent-office.LICENSE'].map(name=>
+          const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE'].map(name=>
             [name,fs.readFileSync(new URL('./omp/extensions/lib/'+name,import.meta.url)).toString('base64')]));
           const current=JSON.parse(await run('sbx',['ls','--json']));
           if(!current.some(r=>r.id===p.id&&r.name===p.name&&r.status==='running'))continue;
-          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,entry,mcpAssets}));
+          await input('sbx',['exec','-i','-u','root',p.name,'node','-e',configureOfficeGuest],JSON.stringify({config,extension,roleGuard,entry,mcpAssets}));
           if(disposed)return;
           const child=spawnTunnel(p.name,server.port,guestPort); const item={child};tunnels.set(p.id,item);
           let diagnostics='', exitReason='still running';child.stderr?.on('data',b=>{diagnostics=(diagnostics+b).slice(-2048)});

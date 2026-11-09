@@ -359,3 +359,18 @@ The vendored YAML 2.9.1 package includes reproducible linear-time scalar patches
 for the four CodeQL ReDoS findings. `npm run check` verifies all vendor hashes
 offline; `npm run vendor:yaml` is explicit dependency maintenance. See the
 [security validation](docs/validation-yaml-security-2026-10-30.md).
+## OMP goal/task whiteboard
+
+Agent Office has a pixel whiteboard to the left of the elevator, aligned with
+the TV. Click it, use **Whiteboard**, or press **B** to see the selected
+orchestrator's native goal, todo phases, progress, blockers and connected Orca
+assignments with GitHub issue links. Concurrent orchestrators have separate
+boards. Goal completion, todo completion and worker activity remain distinct.
+
+This read-only view sends sanitized, bounded goal/task titles and blocker
+notes through the existing authenticated observer connection. It does not
+transmit prompts or tool contents. New OMP sessions use the updated observer;
+already running sessions adopt it on their normal reload. Large plans show an
+explicit preview notice. See
+[validation](docs/validation-office-whiteboard-2026-11-09.md).
+
