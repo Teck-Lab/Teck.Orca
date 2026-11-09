@@ -29,7 +29,7 @@ Validation:
 
 - Full isolated Linux Node 24 Office suite: 553 passed, 2 skipped.
 - Final focused renderer, presentation, scene, meeting, whiteboard and observer
-  suite: 75 passed, including desk bounds, seasonal clipping and grounded trunks
+  suite: 79 passed, including desk bounds, seasonal clipping and grounded trunks
   in both ordinary and taller cloud/meeting windows. These checks and final
   disconnected flip/alarm suppression were validated after the full suite.
 - Plugin suite: 283 passed. Typecheck, production build and generated-asset
@@ -48,3 +48,13 @@ exposed pixel of the taller panes, removing the unpainted dark strip. A seasonal
 park foreground adds paths, shrubs, benches and warm dusk/night lamps. The final
 focused suite also verifies opaque background coverage at dawn, day, dusk and
 night. These are decorative, browser-rendered details; no weather service is used.
+
+Outdoor life adds at most one pedestrian and one cyclist across the panorama,
+with intervals between visits. A small fountain is placed in a visible window
+opening; nearby trees and furniture leave space for it. Water ripples animate
+with the scene clock and remain frozen in winter. Wet pavement and lamp
+reflections follow the existing decorative rain setting. Motion-off keeps wet
+scenery visible without rain animation, lightning or moving passers. The Ambient
+life setting also pauses the new fountain/puddle animation and foot traffic.
+Focused tests cover density, direction, path bounds, fountain footprint, frozen
+winter water, wet/dry reflection gating and static rainy scenery.
