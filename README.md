@@ -19,6 +19,20 @@ a verified worker pane and may replace an unshared generic worker tab title;
 custom/shared tabs are preserved. Naming is bounded and never replaces the
 dispatch receipt or authorizes launching another worker if desktop routing fails.
 
+The plugin installs Agent Office's bundled stdio MCP server in OMP automatically,
+preserving any existing Office MCP connection and other server settings. All roles
+can use its five tools under the shared `agent-office` skill: meaningful status
+changes, peer checks before shared edits, milestone shouts, verified-win
+celebrations and a rare optional table flip. Native handlers retain text scrubbing
+and cooldowns. Only their intentional public structured signals are relayed by the
+observer; peer snapshots use the authenticated project tunnel. No extra server URL
+or token is needed. Office availability is never a work or acceptance gate.
+
+OMP token counts use cumulative own-assistant usage, including normalized cache
+usage, with separate parent/helper ledgers and replay-safe office totals. They
+exclude helper aggregates and inherited fork history. The OMP icon uses the
+official pi mark on monitor/TV screens and the top-right agent legend.
+
 ## Setup and GUI workflow
 
 Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH, a Docker login and configured Docker-managed OmniRoute/MCPHub/GitHub/Hindsight service credentials. Tokens stay in Docker's credential store.
