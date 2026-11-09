@@ -287,15 +287,15 @@
     },
     {
       "name": "orca-cli/references/automations.md",
-      "sha256": "ac329d36ec0efc6f2d2a5e230be7882a04405d09cbc2ca6eb1844d54893e9d60"
+      "sha256": "0c238a007f9d820fb818e465d581f32c97278e7570fa7c1ea9dccf9c205379dd"
     },
     {
       "name": "orca-cli/references/browser.md",
-      "sha256": "53f1a64ed14b453946820755850de901aac719f08f77bc0211cd76dec374f0c2"
+      "sha256": "dc6ab1dc2024be30dc1f0e8aae8cd66ae3eadcb9f40d3a755aefd4c0ada4b767"
     },
     {
       "name": "orca-cli/references/plugins.md",
-      "sha256": "5b41300cfa478d2dedcc9c291e7ea7f59d818ad021a8969f683e3642220b9af1"
+      "sha256": "935530f778e9148227d1a4853f0bde7e05911d9760d6365a6f4b58fe79c0c6b4"
     },
     {
       "name": "orca-cli/references/publishing.md",
@@ -303,7 +303,7 @@
     },
     {
       "name": "orca-cli/SKILL.md",
-      "sha256": "94e641fe2f037968b62f756ffdf2a316f766072ca018eba95fabece1509aed9b"
+      "sha256": "e4623bdc8d25583be6705267de0bc464964020cc2758d27e4b33dcd900629703"
     },
     {
       "name": "orca-feature-workflow/references/goals-and-milestones.md",
@@ -335,7 +335,7 @@
     },
     {
       "name": "orca-per-workspace-env/references/provider-vercel.md",
-      "sha256": "7f26dcd14cb4877afb52a19592409d3c7a3647da9739adcfbb9e0bf4737faf61"
+      "sha256": "17e216672a9602a7012ee90aca84e7f182b664b06685f132c4154e062b1a51f5"
     },
     {
       "name": "orca-per-workspace-env/references/ssh-host.md",
@@ -371,7 +371,7 @@
     },
     {
       "name": "orchestration/references/placement-and-remote.md",
-      "sha256": "a8b1206b9077fde85563dbf72702b640dbd0ab1032f4ade707e4fff69739e90b"
+      "sha256": "2b242c48508b4d22d7589048c5144bd5103a97dbc681301cb7ba2fbd18aee9e0"
     },
     {
       "name": "orchestration/references/recovery-and-cleanup.md",
@@ -383,7 +383,7 @@
     },
     {
       "name": "orchestration/SKILL.md",
-      "sha256": "11bbc0eee808840dbaec7d16fcd3010bf6441d9a97d30c12831ba643af1a26ab"
+      "sha256": "b4a110527c1066e65a0632b93ce7ec758f05d541f662ae61a5595fa5252caef4"
     },
     {
       "name": "payload/reference/ACCESS-CONTROL-ADVANCED.md",

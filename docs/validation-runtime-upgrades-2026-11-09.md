@@ -22,12 +22,18 @@ do not construct the old questions-array payload. The current worker presets and
 Orca/native-helper role restrictions remain in force.
 
 Orca's native SSH server is updated by its managing desktop, not by replacing a
-guest binary behind the deployment manager. At validation time the desktop and
-guest still reported 1.4.248, and the user chose to update Windows themselves.
-The native target is prepared for 1.4.254; apply the managed server update after
-the desktop update. No forced restart or desktop installation was performed.
+guest binary behind the deployment manager. After the user updated Windows,
+Orca automatically upgraded the connected sandbox to 1.4.254. A supported managed
+update request returned already-current. The managed status and guest CLI both
+report 1.4.254, with the former 1.4.248 version available for rollback. No forced
+restart or desktop installation was performed by the plugin. All five original
+worktree IDs, paths and branches were verified unchanged; the regular persistent
+connection remains the only saved environment. Bundled CLI, orchestration and
+VM guides were refreshed from the installed 1.4.254 CLI.
 The retained legacy compatibility daemon bundle remains at 1.4.248; it is not
 the daemon used by this native SSH sandbox.
+
+All 267 plugin tests and generated-asset checks passed after updating the pins.
 
 Sources: https://github.com/stablyai/orca/releases/tag/v1.4.254 and
 https://github.com/can1357/oh-my-pi/releases/tag/v18.18.3.
