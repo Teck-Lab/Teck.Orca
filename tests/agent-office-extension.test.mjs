@@ -118,6 +118,43 @@ test('placement follows the verified role contract after startup, never the mode
   main.run('agent_start');assert.equal(main.events.at(-1).orchestration,null);assert.equal(main.events.at(-1).placement,'cloud');
 });
 
+test('a fresh idle coordinator waits for role initialization before its first office announcement', () => {
+  const branch = [], timers = [], ctx = context('fresh-idle-coordinator');
+  ctx.sessionManager.getBranch = () => branch;
+  ctx.setTimeout = callback => { timers.push(callback); };
+  const a = adapter(ctx);
+  a.run('session_start');
+  assert.equal(a.events.length, 0, 'do not classify a new terminal before the role guard starts');
+  // The role guard is registered after the observer, exactly as in OMP startup.
+  branch.push({ type: 'custom', customType: 'teck-orca-contract', data: { version: 1, role: 'coordinator' } });
+  timers.shift()();
+  assert.equal(a.events.length, 1);
+  assert.equal(a.events[0].kind, 'session_start');
+  assert.equal(a.events[0].orchestration.role, 'coordinator');
+  assert.equal(a.events[0].placement, 'office');
+});
+
+test('deferred startup keeps dispatched workers in cloud and cannot revive a switched-away session', () => {
+  const timers = [], branch = [], ctx = context('fresh-dispatch');
+  ctx.sessionManager.getBranch = () => branch;
+  ctx.setTimeout = callback => { timers.push(callback); };
+  const a = adapter(ctx); a.run('session_start');
+  branch.push({ type: 'custom', customType: 'teck-orca-contract', data: { version: 1, role: 'executor',
+    authority: { runId: 'run-1', taskId: 'task-1', dispatchId: 'dispatch-1' } } });
+  timers.shift()();
+  assert.equal(a.events[0].placement, 'cloud');
+  assert.equal(a.events[0].orchestration.role, 'executor');
+  a.run('session_switch', {}, ctx);
+  const next = context('next-session'); next.setTimeout = ctx.setTimeout;
+  next.sessionManager.getBranch = () => [{ type: 'custom', customType: 'teck-orca-contract', data: { version: 1, role: 'coordinator' } }];
+  a.run('session_switch', {}, next);
+  const before = a.events.length;
+  timers.shift()(); assert.equal(a.events.length, before, 'ignore a stale startup timer');
+  timers.shift()();
+  assert.equal(a.events.at(-1).placement, 'office');
+  assert.equal(a.events.at(-2).kind, 'session_end');
+});
+
 test('unbound/malformed worker claims do not become a verified office role',()=>{
   const ctx=context('unbound');
   for(const data of [{version:1,role:'executor'},{version:2,role:'coordinator'},{version:1,role:'executor',authority:{runId:'run',taskId:'task',dispatchId:'../bad'}}]){

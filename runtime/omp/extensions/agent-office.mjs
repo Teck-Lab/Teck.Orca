@@ -93,7 +93,7 @@ export function createOfficeReporter({ readConfig = () => JSON.parse(readFileSyn
 export default function activate(pi, dependencies = {}) {
   const reporter = dependencies.reporter ?? createOfficeReporter(dependencies);
   const usage = createOfficeUsage();
-  let identity, session; const tools = new Map();
+  let identity, session, startupGeneration = 0; const tools = new Map();
   function ensure(ctx) {
     const nextSession = ctx.sessionManager.getSessionId();
     const agent = ctx.agent ?? { kind: 'main', id: 'Main', name: 'main' };
@@ -113,7 +113,14 @@ export default function activate(pi, dependencies = {}) {
   const on = (name, handler) => pi.on(name, (event, ctx) => {
     try { handler(event, ctx); } catch { /* Best-effort observer; never affect a model turn. */ }
   });
-  for (const name of ['session_start','session_switch','session_branch','session_tree']) on(name, (_e, ctx) => ensure(ctx));
+  for (const name of ['session_start','session_switch','session_branch','session_tree']) on(name, (_e, ctx) => {
+    // Ambient observers load before the explicitly loaded role guard. Wait for
+    // its lifecycle handler to append the contract, even if no prompt follows.
+    const generation = ++startupGeneration;
+    const announce = () => { try { if (generation === startupGeneration) ensure(ctx); } catch { /* Observer only. */ } };
+    if (typeof ctx.setTimeout === 'function') ctx.setTimeout(announce, 0);
+    else announce();
+  });
   on('before_agent_start', (_e, ctx) => emit('prompt', ctx));
   on('agent_start', (_e, ctx) => emit('thinking', ctx));
   on('tool_execution_start', (e, ctx) => {
@@ -145,6 +152,7 @@ export default function activate(pi, dependencies = {}) {
   });
   // A helper can finish one turn and remain available. Only actual shutdown removes its seat.
   pi.on('session_shutdown', async (_e, ctx) => {
+    ++startupGeneration;
     try {
       ensure(ctx); reporter.publish({ ...identity, kind: identity.parentId ? 'subagent_end' : 'session_end' });
       if (registry.get(ctx.agent?.id)?.workerId === identity.workerId) registry.delete(ctx.agent.id);

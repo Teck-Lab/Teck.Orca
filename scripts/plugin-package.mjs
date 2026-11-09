@@ -34,6 +34,9 @@ export function validatePackage(root, expected) {
       const stat = lstatSync(join(root, path));
       if (++entries > 2000) throw new Error('Plugin exceeds Orca\'s 2000-entry limit');
       if (stat.isSymbolicLink()) throw new Error(`Plugin symlink is forbidden: ${path}`);
+      // Orca 1.4.254 can recreate its SDK directory while a dev folder is
+      // watched. It is ignored by Orca's content identity, not shipped assets.
+      if (!relative && name === '.orca' && stat.isDirectory()) continue;
       if (stat.isDirectory()) visit(path);
       else if (stat.isFile()) {
         bytes += stat.size;
