@@ -1,0 +1,218 @@
+name: Release sandbox kits
+
+# Choose an existing vX.Y.Z tag in the Actions UI. Ordinary pushes and PRs never publish.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: sandbox-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Validate release identity
+        id: plan
+        run: |
+          node scripts/kit-release.mjs plan --out .artifacts/release/plan.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const plan=JSON.parse(fs.readFileSync('.artifacts/release/plan.json','utf8'));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,`version=${plan.version}\nmatrix=${JSON.stringify({name:plan.components})}\n`);
+          NODE
+      - name: Validate source and generated package in isolation
+        run: npm run validate
+      - name: Stage reproducible component contexts
+        run: node scripts/kit-source.mjs --out .artifacts/release/contexts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-plan
+          path: |
+            .artifacts/release/plan.json
+            .artifacts/release/contexts/sources.json
+          if-no-files-found: error
+
+  components:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v4.1.3
+      - name: Stage component context
+        run: node scripts/kit-source.mjs --out .artifacts/release/contexts
+      - name: Build and publish component
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .artifacts/release/contexts/${{ matrix.name }}
+          file: .artifacts/release/contexts/${{ matrix.name }}/${{ matrix.name }}.yaml
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/teck-lab/teck-orca/${{ matrix.name }}:${{ needs.plan.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/Teck-Lab/Teck.Orca
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ needs.plan.outputs.version }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha,scope=kit-${{ matrix.name }}
+          cache-to: type=gha,scope=kit-${{ matrix.name }},mode=max
+      - name: Sign and verify immutable component
+        env:
+          IMAGE: ghcr.io/teck-lab/teck-orca/${{ matrix.name }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          IDENTITY: https://github.com/Teck-Lab/Teck.Orca/.github/workflows/release-kits.yml@${{ github.ref }}
+        run: |
+          cosign sign --yes "$IMAGE@$DIGEST"
+          cosign verify --certificate-identity "$IDENTITY" --certificate-oidc-issuer https://token.actions.githubusercontent.com "$IMAGE@$DIGEST" > /dev/null
+      - name: Record Buildx digest and inspect both filesystems
+        env:
+          NAME: ${{ matrix.name }}
+          VERSION: ${{ needs.plan.outputs.version }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          BUILD_METADATA: ${{ steps.build.outputs.metadata }}
+        run: |
+          mkdir -p .artifacts/release/receipts .artifacts/release/inventories
+          node scripts/kit-release.mjs record --name "$NAME" --version "$VERSION" --commit "$GITHUB_SHA" --out ".artifacts/release/receipts/$NAME.json"
+          for arch in amd64 arm64; do
+            image="ghcr.io/teck-lab/teck-orca/$NAME@$DIGEST"
+            # Export the image itself: docker create/export injects runtime /dev
+            # and /etc files that do not belong to the kit and cause false collisions.
+            printf 'FROM %s\n' "$image" | docker buildx build --platform "linux/$arch" --output type=tar,dest=- --progress plain - | python3 scripts/kit-release-files.py --name "$NAME" --platform "linux/$arch" --digest "$DIGEST" --out ".artifacts/release/inventories/$NAME-$arch.json"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kit-${{ matrix.name }}
+          path: |
+            .artifacts/release/receipts/
+            .artifacts/release/inventories/
+          if-no-files-found: error
+
+  compose:
+    needs: [plan, components]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: kit-*
+          path: .artifacts/release
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-plan
+          path: .artifacts/release/source
+      - name: Reject component file collisions and compose pinned set
+        run: |
+          node scripts/kit-release.mjs audit --receipts .artifacts/release/receipts --inventories .artifacts/release/inventories --out .artifacts/release/filesystem-audit.json
+          node scripts/kit-release.mjs compose --receipts .artifacts/release/receipts --out .artifacts/release/set/teck-orca.yaml
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v4.1.3
+      - name: Verify all component signatures before composition
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {components,validateReceipts} from './scripts/kit-release.mjs';
+          const receipts=components.map(name=>JSON.parse(fs.readFileSync(`.artifacts/release/receipts/${name}.json`,'utf8')));
+          validateReceipts(receipts);
+          for(const r of receipts) execFileSync('cosign',['verify','--certificate-identity',`https://github.com/Teck-Lab/Teck.Orca/.github/workflows/release-kits.yml@${process.env.GITHUB_REF}`,'--certificate-oidc-issuer','https://token.actions.githubusercontent.com',`${r.ref}@${r.digest}`],{stdio:['ignore','ignore','inherit']});
+          NODE
+      - name: Build and publish composed workload
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .artifacts/release/set
+          file: .artifacts/release/set/teck-orca.yaml
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/teck-lab/teck-orca:${{ needs.plan.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/Teck-Lab/Teck.Orca
+            org.opencontainers.image.revision=${{ github.sha }}
+          provenance: mode=max
+          sbom: true
+      - name: Sign and verify composed workload
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          IDENTITY: https://github.com/Teck-Lab/Teck.Orca/.github/workflows/release-kits.yml@${{ github.ref }}
+        run: |
+          cosign sign --yes "ghcr.io/teck-lab/teck-orca@$DIGEST"
+          cosign verify --certificate-identity "$IDENTITY" --certificate-oidc-issuer https://token.actions.githubusercontent.com "ghcr.io/teck-lab/teck-orca@$DIGEST" > /dev/null
+      - name: Record real set digest and create portable plugin candidate
+        env:
+          VERSION: ${{ needs.plan.outputs.version }}
+          BUILD_METADATA: ${{ steps.build.outputs.metadata }}
+        run: |
+          node scripts/kit-release.mjs record --name set --version "$VERSION" --commit "$GITHUB_SHA" --out .artifacts/release/set.json
+          node scripts/kit-release.mjs lock --receipts .artifacts/release/receipts --set .artifacts/release/set.json --audit .artifacts/release/filesystem-audit.json --out .artifacts/release/kit-release.json
+          node scripts/package-portable-plugin.mjs --output .artifacts/release/plugin --kit-release .artifacts/release/kit-release.json
+      - name: Save release candidate for isolated sandbox validation and catalogue promotion
+        uses: actions/upload-artifact@v4
+        with:
+          name: teck-orca-${{ needs.plan.outputs.version }}-candidate
+          path: |
+            .artifacts/release/plugin/
+            .artifacts/release/kit-release.json
+            .artifacts/release/set.json
+            .artifacts/release/set/
+            .artifacts/release/receipts/
+            .artifacts/release/filesystem-audit.json
+            .artifacts/release/source/
+          if-no-files-found: error

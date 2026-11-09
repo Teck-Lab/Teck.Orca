@@ -32,6 +32,7 @@ export function createLifecycle({ env = process.env, assetRoot = root, stateRoot
       if (existing) throw Error(`Project sandbox already registered. In Run on choose "${existing.label}" to create another workspace on its existing connection.`);
     }
     const state = await provision({ project, assetRoot, stateRoot, run, log,
+      sourceDevelopment: env.TECK_ORCA_SOURCE_KITS === '1',
       recreateMissing: mode === 'create', expectedSandboxId: mode === 'resume' ? previous.sandboxId : undefined });
     return { schemaVersion: 1, connection: sshConnection(state), userData: { version: 1,
       projectId: id, projectName: project.name, instanceId, sandboxName: name, sandboxId: state.sandboxId, cloneUrl, connectionMode: 'native-ssh' } };

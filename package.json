@@ -1,12 +1,13 @@
 {
   "name": "teck-orca",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
+    "validate": "node scripts/validate-source.mjs",
     "build": "node scripts/refresh-assets.mjs && node scripts/build-recipe.mjs",
     "check": "node scripts/vendor-yaml.mjs --check && node scripts/build-recipe.mjs --check",
     "bundle:skills": "node scripts/bundle-orca-skills.mjs",

@@ -1,0 +1,22 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: KIND and K3s test prerequisites
+description: KIND, kubectl and restart-safe shared device prerequisites for container-based Kubernetes tests.
+requires:
+  - dk.tecklab/base >= 1
+provides:
+  - kind@0.33.0
+  - kubectl@1.35.8
+  - dk.tecklab/kubernetes-prerequisites@1
+capabilities:
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: /bin/sh /usr/local/lib/teck-devtools/kubernetes-prerequisites.sh --install
+          user: "0"
+          description: Initialize KIND and K3s device prerequisites.
+      startup:
+        - command: /bin/sh /usr/local/lib/teck-devtools/kubernetes-prerequisites.sh
+          user: "0"
+          description: Restore device prerequisites idempotently after restart.

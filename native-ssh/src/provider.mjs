@@ -6,6 +6,7 @@ import { command, directory, quote, readJson, withLock, writeJson } from './syst
 import { configureSandbox, ensureNamingHook, ensureWorkflowPolicy, nativeEnvironment } from './configuration.mjs';
 import {configureKubernetes} from './kubernetes.mjs';
 import {ensureKubernetesPrerequisites} from './kubernetes-prerequisites.mjs';
+import {selectKitRelease} from './kit-release.mjs';
 
 export const stateDirectory = () => join(homedir(), '.teck-orca-native-ssh');
 export const projectRoot = '/home/agent/project';
@@ -60,7 +61,8 @@ export async function ensureKitBuilder({ run = command, lockRoot = join(homedir(
 }
 
 export async function prepareProject({ project, assetRoot, stateRoot = stateDirectory(), run = command,
-  configure = configureSandbox, ensureBuilder = ensureKitBuilder, syncName = ensureNamingHook, syncPolicy = ensureWorkflowPolicy, prepareKubernetesHost=ensureKubernetesPrerequisites, startCluster=configureKubernetes, log = () => {}, recreateMissing = true, expectedSandboxId }) {
+  configure = configureSandbox, ensureBuilder = ensureKitBuilder, resolveKits = selectKitRelease, sourceDevelopment = false,
+  syncName = ensureNamingHook, syncPolicy = ensureWorkflowPolicy, prepareKubernetesHost=ensureKubernetesPrerequisites, startCluster=configureKubernetes, log = () => {}, recreateMissing = true, expectedSandboxId }) {
   validateProject(project);
   if (!assetRoot) throw Error('Plugin assets are required');
   const name = sandboxName(project.id), folder = join(stateRoot, name), path = join(folder, 'state.json');
@@ -83,14 +85,17 @@ export async function prepareProject({ project, assetRoot, stateRoot = stateDire
     }
     if (!current) {
       if (!recreateMissing) throw Error('The original project sandbox is missing; create a new workspace to start fresh');
-      await ensureBuilder({ run });
+      const kit = resolveKits(assetRoot, { sourceDevelopment });
+      if (kit.kind === 'published') await run('sbx', kit.verifyArgs);
+      else if (kit.kind === 'source-development') await ensureBuilder({ run });
+      else throw Error('Unknown sandbox kit selection');
       state = { version: 1, projectId: project.id, displayName: project.name, cloneUrl: project.cloneUrl,
-        sandboxName: name, projectRoot, cpus: project.cpus, memory: project.memory, phase: 'creating', sandboxId: null };
+        sandboxName: name, projectRoot, cpus: project.cpus, memory: project.memory, phase: 'creating', sandboxId: null,
+        ...(kit.kind === 'published' ? { kitRelease: { version: kit.version, reference: kit.reference, digest: kit.digest } } : {}) };
       writeJson(path, state);
       const env = Object.entries(nativeEnvironment(project)).flatMap(([key, value]) => ['--env', `${key}=${value}`]);
       await run('sbx', ['create', '--no-progress', '--name', name, '--cpus', String(project.cpus), '--memory', project.memory,
-        '--skills', 'off', ...env, join(assetRoot, 'assets/kits/workload'), '--kit', join(assetRoot, 'assets/kits/omniroute'),
-        '--kit', join(assetRoot, 'assets/kits/mcphub')],project.kubernetes==='workspace'?{env:{DOCKER_SANDBOXES_DOCKER_SIZE:'60g',DOCKER_SANDBOXES_ROOT_SIZE:'30g'}}:{});
+        '--skills', 'off', ...env, ...(kit.kind === 'published' ? [kit.reference] : kit.args)],project.kubernetes==='workspace'?{env:{DOCKER_SANDBOXES_DOCKER_SIZE:'60g',DOCKER_SANDBOXES_ROOT_SIZE:'30g'}}:{});
       const created = (await inventory(run)).find(row => row.name === name);
       if (!created) throw Error('Cannot verify the created sandbox; retained state for inspection');
       state = { ...state, sandboxId: created.id, phase: 'provisioning' };

@@ -5,7 +5,7 @@ import {quote} from './system.mjs';
 // Also upgrades an existing owned sandbox without recopying its OMP profile,
 // starting KIND, changing Docker, or touching a project checkout.
 export async function ensureKubernetesPrerequisites({name,assetRoot,run}){
-  const script=readFileSync(join(assetRoot,'assets/kits/workload/kubernetes-prerequisites.sh'),'utf8').replaceAll('\r\n','\n');
+  const script=readFileSync(join(assetRoot,'assets/kubernetes-prerequisites.sh'),'utf8').replaceAll('\r\n','\n');
   const destination='/usr/local/lib/teck-devtools/kubernetes-prerequisites.sh';
   await run('sbx',['exec','-i','-u','root',name,'sh','-s'],{input:[
     'set -eu',

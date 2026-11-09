@@ -18,7 +18,11 @@ process.stdin.on('end',()=>{
  const put=(p,data,mode,uid=1000,gid=1000)=>{regular(p);regular(path.dirname(p));fs.mkdirSync(path.dirname(p),{recursive:true});if(fs.existsSync(p)&&fs.readFileSync(p,'utf8')===data)return;const t=p+'.office-'+process.pid;fs.writeFileSync(t,data,{mode,flag:'wx'});fs.chownSync(t,uid,gid);fs.renameSync(t,p)};
  put('/etc/teck-orca/office.json',JSON.stringify(p.config)+'\n',0o640,0,1000);
  if(p.forwarder)put('/usr/local/lib/teck-orca/office-forward.mjs',Buffer.from(p.forwarder,'base64').toString(),0o644,0,0);
- const allowed=new Set(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE']);
+ const allowed=new Set(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE','orca-policy.mjs','github-plan-scope.mjs','issue-worktree.mjs']);
+ // Refuse an incomplete guard before updating any of its dependencies. The
+ // observer stages this guard for future OMP loads, so its import closure must
+ // travel with it even when the normal sandbox updater has been deferred.
+ if(p.roleGuard)for(const name of ['orca-policy.mjs','github-plan-scope.mjs','issue-worktree.mjs','office-tools.mjs'])if(typeof p.mcpAssets?.[name]!=='string')throw Error('Office role guard dependency is missing: '+name);
  for(const [name,encoded]of Object.entries(p.mcpAssets||{})){if(!allowed.has(name))throw Error('Unknown office asset');put('/home/agent/.omp/agent/extensions/lib/'+name,Buffer.from(encoded,'base64').toString(),0o600)}
  const mcpPath='/home/agent/.omp/agent/mcp.json';regular(mcpPath);
  const current=fs.existsSync(mcpPath)?JSON.parse(fs.readFileSync(mcpPath,'utf8')):{};

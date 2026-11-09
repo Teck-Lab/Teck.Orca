@@ -1,0 +1,35 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: workload
+displayName: Teck project base
+description: One long-running Docker Sandbox per Orca project, with shared OS dependencies.
+provides:
+  - dk.tecklab/base@1
+capabilities:
+  - type: com.docker.sandbox/sbx@1
+  - type: com.docker.sandbox/long-running@1
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - api.nuget.org:443
+          - data.nuget.org:443
+          - globalcdn.nuget.org:443
+          - quay.io:443
+          - "*.quay.io:443"
+          - dl.k8s.io:443
+          - cdn.dl.k8s.io:443
+          - registry.k8s.io:443
+          - builds.dotnet.microsoft.com:443
+          - aka.ms:443
+          - playwright.download.prss.microsoft.com:443
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - command: install -d -o agent -g agent -m 700 /home/agent/.local/state/teck-orca /home/agent/.local/share/teck-orca
+          user: "0"
+          description: Initialize private project runtime state.
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      filename: AGENTS.md
+      contentFile: context.md

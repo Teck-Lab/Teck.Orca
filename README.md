@@ -44,25 +44,57 @@ official pi mark on monitor/TV screens and the top-right agent legend.
 
 ## Setup and GUI workflow
 
-Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.48+, OpenSSH, a Docker login and configured Docker-managed OmniRoute/MCPHub/GitHub/Hindsight service credentials. Tokens stay in Docker's credential store.
+Requires Orca 1.4.248+, host Node 22+, Docker Sandboxes 0.51+, OpenSSH, a Docker login and configured Docker-managed OmniRoute/MCPHub/GitHub/Hindsight service credentials. Tokens stay in Docker's credential store.
 
-```powershell
-sbx setup ssh
-npm run build
-npm test
-npm run check
-npm run setup
-```
+The portable release includes its host runtime and integrity-pinned native SSH
+runtime. After a release is published, add this repository's catalogue in Orca
+Settings > Plugins, install **Teck OMP Docker Sandbox**, and approve its fingerprint.
+Installation needs no repository checkout or `npm run setup`. Activation
+materializes the bundled runtime into the user's versioned cache; it creates no
+sandbox, connection or workspace. Docker's SSH integration and credentials must
+already be configured on the machine.
 
-Install or refresh **plugin/** in Orca Settings > Plugins and approve the updated fingerprint. It is the only installable package; the repository root contains large runtime binaries. Setup installs the pinned native SSH runtime and older-sandbox recovery runtime, creating no project VM, connection or workspace.
+**Release status:** `orca-catalog.json` is intentionally empty until the first
+portable package and signed kit set have been published and verified. The
+catalogue must reference the actual committed package, never an uncommitted
+candidate. See [release and promotion](docs/release-kits.md).
 
-Create a workspace from the local project, enable Per-Workspace Environments if required by Orca, and choose **Teck OMP Project** in **Run on**. Orca creates the sandbox only if absent, configures OMP, clones once, registers native SSH and creates the linked worktree. Choose that same recipe again for concurrent workspaces; they share the VM and retain independent sessions/checkouts. No pre-provisioning command or manual SSH-host registration is needed.
+Create a workspace from the local project, enable Per-Workspace Environments if
+required by Orca, and choose **Create project sandbox** in **Run on** for the
+first workspace. Orca creates the sandbox only if absent, configures OMP, clones
+once, and registers the persistent **<project> sandbox** SSH target. Choose that
+saved target for every additional workspace. They share the project sandbox and
+retain independent sessions/checkouts; the first-use recipe is not the reusable
+connection. No pre-provisioning or manual SSH-host registration is needed.
+
+For maintainers, `npm run validate` builds and tests a disposable source copy
+without changing the installed plugin. The existing `npm run build`, `npm test`,
+`npm run check` and `npm run setup` workflow remains available. It generates and
+installs the local `plugin/` package and its versioned runtimes. Building into an
+installed `plugin/` can reload it, so release validation instead uses
+`scripts/package-portable-plugin.mjs --output <isolated-folder> --kit-release
+<published-lock.json>`. Never install the repository root as a plugin.
+
+New sandbox provisioning requires the real signed kit lock. An explicit
+`TECK_ORCA_SOURCE_KITS=1` override retains the previous monolithic builder for
+source development only; it is not a fallback in portable releases. See the
+[component layout](kits/README.md) and [validation evidence](docs/validation-v3-kits-2026-11-09.md).
 
 ## Updating from either previous plugin
 
-The main plugin keeps its identity, teck-lab.teck-sbx-recipes, now version 0.6.1. Native SSH is integrated into it; native-ssh/ is internal source and has no separate plugin/package/setup.
+The main plugin keeps its identity, `teck-lab.teck-sbx-recipes`. Version 0.8.0
+adds portable packaging and the signed Docker Sandboxes v3 kit set. Native SSH
+is integrated into it; `native-ssh/` is internal source and has no separate
+plugin entry. Update the existing plugin through the catalogue once that release
+is published, or refresh its local package when using the source workflow.
 
-If **Teck OMP Native SSH Preview** is installed, remove that old plugin entry after refreshing plugin/. Keep its VM, saved workspaces and ownership records. The native recipe ID, sandbox names, ~/.teck-orca-native-ssh ownership/release roots and native-ssh/projects.json configuration are retained. New recipe runs reuse the existing native VM; old workspaces keep their immutable snapshots.
+If **Teck OMP Native SSH Preview** is installed, remove that old plugin entry
+after updating the main plugin. Keep its VM, saved workspaces and ownership
+records. The native recipe ID, sandbox names, `~/.teck-orca-native-ssh`
+ownership/release roots and project defaults are retained. Existing workspaces
+keep their immutable lifecycle snapshots; additional workspaces use the saved
+project sandbox SSH target. Installing new kit images does not recreate or
+silently upgrade an existing sandbox.
 
 Older bundled-daemon project/feature sandboxes retain their data and **Teck: Reconnect sandboxes** recovery command. Their compatibility recipes remain available to saved snapshots and are no longer offered for new workspaces. No checkout/profile/data migration is performed. On Windows setup retains the older project transport's hidden login companion; native SSH connections use Orca's own relay and daemon management.
 
@@ -87,7 +119,7 @@ Existing OMP sessions must be reopened/resumed to load the observer. Pixtuoid is
 from new images and cleaned up in owned running sandboxes when the plugin connects.
 See [native runtime details](native-ssh/README.md).
 
-Plugin 0.7.0 requires Orca 1.4.248. Open **Teck sandbox** in the right sidebar,
+The plugin requires Orca 1.4.248 or newer. Open **Teck sandbox** in the right sidebar,
 use **Teck: Sandbox status** in the command palette, or click the Teck status-bar
 indicator. **Overview** shows verified connection, CPU/memory, Orca/OMP versions,
 KIND node readiness and separate root and Docker/KIND disks. Each storage meter
@@ -113,7 +145,7 @@ sandboxes are skipped. No check provisions a VM, starts Kubernetes or restarts a
 agent. CPU/memory are read-only because the installed Docker Sandboxes CLI offers
 no in-place resize operation. The panel does not expose service tokens or prompts.
 
-Refresh the existing **plugin/** entry after updating desktop. Orca will review
+Update the existing plugin entry after updating desktop. Orca will review
 the added workspace/agent read access and the plugin's own settings access.
 Activation creates no sandbox. Native SSH servers are managed by the matching
 desktop, with 1.4.254 as the current target; bundled compatibility daemons retain 1.4.248. OMP 18.18.3 is pinned in

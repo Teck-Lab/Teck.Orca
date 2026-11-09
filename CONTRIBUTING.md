@@ -23,7 +23,7 @@ and session persistence disabled; it creates no issues or Orca workers. Results
 are saved under `.artifacts/smoke/`. It tests policy interpretation, not full
 GitHub-to-PR delivery.
 
-Edit the native provider in `native-ssh/src/`, the retained recovery lifecycle in `scripts/lifecycle.mjs` and shared source assets in `runtime`. Run `npm run build`, `npm test` and `npm run check`. Recipe commands and the doctor mirror are generated and should not be edited manually. No dependency installation is required for these checks.
+Edit the native provider in `native-ssh/src/`, the retained recovery lifecycle in `scripts/lifecycle.mjs` and shared source assets in `runtime`. Run `npm run validate`: it generates assets, recipes and the plugin in an isolated temporary source copy, then runs the full check and test suites there. The watched development plugin remains untouched. Add `-- --keep` to retain the copy for diagnosis. Recipe commands and the doctor mirror are generated and should not be edited manually. Use `npm run build` only when deliberately preparing the development package for installation; it writes the live development folder. No dependency installation is required for these checks.
 
 Panel sources and real Orca SDK tests live in `ui/`; build copies them into the
 installable `plugin/` package. `npm run test:plugin` uses Orca 1.4.248+ to test and

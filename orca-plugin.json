@@ -3,7 +3,7 @@
   "id": "teck-sbx-recipes",
   "publisher": "teck-lab",
   "name": "Teck OMP Docker Sandbox",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "One persistent Docker Sandbox per project with native SSH, Orca-managed daemon, OMP and optional local KIND. Retains recovery for older sandboxes.",
   "engines": {
     "orca": ">=1.4.248"

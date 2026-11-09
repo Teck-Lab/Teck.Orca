@@ -1,0 +1,10 @@
+# syntax=docker/sandbox-kit:3
+schemaVersion: "3"
+kind: mixin
+displayName: Teck browser tools
+description: Headless Chromium, Google Chrome and agent-browser with sandbox CA trust.
+requires:
+  - dk.tecklab/base >= 1
+provides:
+  - agent-browser@0.38.1
+  - playwright@1.61.1

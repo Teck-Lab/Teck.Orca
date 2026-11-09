@@ -141,7 +141,8 @@ export function createOfficeManager({ root = join(homedir(),'.teck-orca','office
           const forwarder=fs.readFileSync(new URL('./office-forward.mjs',import.meta.url)).toString('base64');
           const entry=fs.readFileSync(new URL('./omp/extensions/agent-office.ts',import.meta.url)).toString('base64');
           const officeSkill=fs.readFileSync(new URL('./omp/skills/agent-office/SKILL.md',import.meta.url)).toString('base64');
-          const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE'].map(name=>
+          const mcpAssets=Object.fromEntries(['office-mcp.mjs','office-mcp-server.mjs','office-tools.mjs','office-usage.mjs','office-plan.mjs','agent-office.LICENSE',
+            'orca-policy.mjs','github-plan-scope.mjs','issue-worktree.mjs'].map(name=>
             [name,fs.readFileSync(new URL('./omp/extensions/lib/'+name,import.meta.url)).toString('base64')]));
           const current=JSON.parse(await run('sbx',['ls','--json']));
           if(!current.some(r=>r.id===p.id&&r.name===p.name&&r.status==='running'))continue;
