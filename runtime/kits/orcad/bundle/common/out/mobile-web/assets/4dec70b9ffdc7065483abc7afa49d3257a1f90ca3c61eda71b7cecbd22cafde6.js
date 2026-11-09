@@ -1,0 +1,2 @@
+globalThis.process ??= { env: { NODE_ENV: 'production', EXPO_OS: 'web' }, platform: 'web', version: '', nextTick: (fn) => setTimeout(fn, 0) };globalThis.__zod_globalConfig ??= {}; globalThis.__zod_globalConfig.jitless = true;
+var e="[hostId]/session/[worktreeId]";function o(t){return`/h/${encodeURIComponent(t)}`}function a(t){return{pathname:`/h/${t.name}`,params:t.params}}export{e as a,o as b,a as c};
