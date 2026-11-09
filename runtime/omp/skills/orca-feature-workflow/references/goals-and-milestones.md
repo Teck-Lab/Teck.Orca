@@ -25,7 +25,7 @@ native goals; native helpers support their owner without replacing that record.
 Use orca_dispatch with role, objective, issue URL where applicable, observable
 acceptance criteria, constraints and explicit worktree placement. It resolves
 task/slow/advisor from OMP's live configuration; planner/researcher use slow and publisher uses task. The wrapper
-adds the assignment contract to Orca's Task spec. Native OMP task/eval helpers are
+adds the assignment contract to Orca's Task spec. Native OMP task/wait helpers are
 allowed for every role, including researchers and reviewers, without separate
 Orca records. Use existing model roles and let OMP own helper lifecycle. Dispatch
 as much independently ready work as the user's concurrency budget and actual
@@ -53,8 +53,11 @@ canonical GitHub plan edits while the coordinator pauses its own edits to that
 plan; native research/planning helpers remain read-only. Helpers use their native
 OMP agent preset and task brief, not the parent's Orca identity or exact native
 goal. They return results to the parent, which retains final acceptance and
-Orca settlement. Native task/eval execution is permitted; role boundaries are
-behavioral instructions rather than isolation from delegated code execution.
+Orca settlement. Native task/wait execution is permitted for every role;
+arbitrary eval is executor-only. Runtime tool guards preserve verified role
+boundaries through nested helpers, including read-only LSP actions and advisor
+tools. These guards are workflow controls on trusted tools, not an OS security
+sandbox for arbitrary code or a substitute for repository/provider authorization.
 
 Only complete a goal once every assigned criterion has current evidence. A
 review assignment is complete when its report/verdict is ready, including

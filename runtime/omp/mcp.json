@@ -15,6 +15,12 @@
       "headers": { "Authorization": "Bearer ${MCPHUB_API_KEY}" },
       "timeout": 120000
     },
+    "firecrawl": {
+      "type": "http",
+      "url": "https://mcp.tecklab.dk/mcp/firecrawl",
+      "headers": { "Authorization": "Bearer ${MCPHUB_API_KEY}" },
+      "timeout": 120000
+    },
     "searxng": {
       "type": "http",
       "url": "https://mcp.tecklab.dk/mcp/searxng",

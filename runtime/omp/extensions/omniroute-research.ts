@@ -1,7 +1,7 @@
 import type { ExtensionAPI, ExtensionContext } from "@oh-my-pi/pi-coding-agent";
 
 import { searchThroughMCPHub } from "./lib/mcphub-search.mjs";
-const FETCH_PROVIDER = "firecrawl";
+import { fetchThroughMCPHub } from "./lib/mcphub-firecrawl.mjs";
 
 interface FetchResponse {
   provider?: string;
@@ -11,65 +11,6 @@ interface FetchResponse {
     title?: string | null;
     description?: string | null;
   } | null;
-}
-
-type FetchLike = typeof fetch;
-type Environment = Record<string, string | undefined>;
-
-function researchConfig(environment: Environment): { baseUrl: string; apiKey: string } {
-  const baseUrl = environment.OMNIROUTE_BASE_URL?.trim().replace(/\/+$/, "");
-  const apiKey = environment.OMNIROUTE_API_KEY?.trim();
-  if (!baseUrl || !apiKey) {
-    throw new Error("OmniRoute research requires OMNIROUTE_BASE_URL and OMNIROUTE_API_KEY");
-  }
-  return { baseUrl, apiKey };
-}
-
-async function omniRouteRequest<T>(
-  path: string,
-  body: Record<string, unknown>,
-  fetchImpl: FetchLike,
-  environment: Environment,
-  signal?: AbortSignal,
-): Promise<T> {
-  const { baseUrl, apiKey } = researchConfig(environment);
-  const response = await fetchImpl(`${baseUrl}${path}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (!response.ok) {
-    const detail = (await response.text()).trim();
-    throw new Error(`OmniRoute ${path} failed (${response.status})${detail ? `: ${detail}` : ""}`);
-  }
-  return (await response.json()) as T;
-}
-
-export async function fetchThroughOmniRoute(
-  url: string,
-  options: {
-    fetch?: FetchLike;
-    environment?: Environment;
-    signal?: AbortSignal;
-  } = {},
-): Promise<FetchResponse> {
-  return await omniRouteRequest<FetchResponse>(
-    "/web/fetch",
-    {
-      url,
-      provider: FETCH_PROVIDER,
-      format: "markdown",
-      include_metadata: true,
-    },
-    options.fetch ?? fetch,
-    options.environment ?? process.env,
-    options.signal,
-  );
 }
 
 function isBareWebUrl(path: string): boolean {
@@ -133,7 +74,7 @@ export default function omniRouteResearchExtension(pi: ExtensionAPI): void {
     name: "read",
     label: "Read",
     description:
-      "Read local files and internal resources with native OMP behavior. Bare HTTP(S) URLs are fetched as Markdown through OmniRoute Firecrawl.",
+      "Read local files and internal resources with native OMP behavior. Bare HTTP(S) URLs are fetched as Markdown through self-hosted Firecrawl on MCPHub.",
     approval: "read",
     strict: true,
     parameters: z.object({
@@ -142,16 +83,16 @@ export default function omniRouteResearchExtension(pi: ExtensionAPI): void {
     async execute(_toolCallId, params, signal, _onUpdate, context) {
       if (!isBareWebUrl(params.path)) return await invokeNativeRead(context, params.path, signal);
       try {
-        const result = await fetchThroughOmniRoute(params.path, { signal });
-        if (!result.content?.trim()) throw new Error("OmniRoute Firecrawl returned no content");
+        const result: FetchResponse = await fetchThroughMCPHub(params.path, { signal });
+        if (!result.content?.trim()) throw new Error("MCPHub Firecrawl returned no content");
         const notes = [
           `URL: ${result.url ?? params.path}`,
-          `Reader: OmniRoute/${result.provider ?? FETCH_PROVIDER}`,
+          `Reader: ${result.provider ?? 'mcphub/firecrawl'}`,
         ];
         if (result.metadata?.title) notes.push(`Title: ${result.metadata.title}`);
         return {
           content: [{ type: "text", text: `${notes.join("\n")}\n\n${result.content}` }],
-          details: { kind: "url", provider: result.provider ?? FETCH_PROVIDER },
+          details: { kind: "url", provider: result.provider ?? 'mcphub/firecrawl' },
         };
       } catch (error) {
         return {

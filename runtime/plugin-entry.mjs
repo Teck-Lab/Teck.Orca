@@ -1,11 +1,13 @@
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { startProjectTransports } from './project-transport.mjs';
+import { activateStatus } from './plugin-status-worker.mjs';
+let status;
 // The build emits a small, integrity-checked entry that imports this module.
 export default function activate(orca) {
-  // Also restore project listeners whenever this on-demand plugin is activated.
-  // The login supervisor covers cold desktop startup without invoking a command.
-  void startProjectTransports(process.ppid, { log: message => orca.log(message) }).catch(error => orca.log(error.message));
+  status = activateStatus(orca);
+  // Resident status collection must not start recovery listeners. The login
+  // supervisor and the explicit reconnect command retain that responsibility.
   orca.commands.register('teck.reconnectSandboxes', async () => {
     const projects = await startProjectTransports(process.ppid, { log: message => orca.log(message) });
     const child = fork(fileURLToPath(new URL('./reconnect-host.mjs', import.meta.url)), [String(process.ppid)], {
@@ -35,3 +37,4 @@ export default function activate(orca) {
     return { recovered: listening.length, blocked: blocked.length, projects };
   });
 }
+export function deactivate() { status?.dispose(); status = undefined; }

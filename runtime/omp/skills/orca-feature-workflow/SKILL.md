@@ -7,7 +7,10 @@ description: Coordinate GitHub-tracked implementation and repair on a feature's 
 
 One project shares one persistent sandbox and Orca daemon across its features.
 Each feature's execution workers use parent-linked child worktrees on that same
-runtime. Preserve ORCA_* routing and project identity; use the saved project
+runtime. New executor dispatches enforce new-child, including integration work;
+native OMP helpers share their owning executor's checkout. Existing child-terminal
+reuse requires verified settled ownership; the feature checkout cannot host a
+new editing worker. Preserve ORCA_* routing and project identity; use the saved project
 connection for additional features. Do not select the recipe again for a child
 or start a second daemon.
 
@@ -37,7 +40,7 @@ A single issue remains sufficient for a contained change, including its tests.
 Risk changes verification depth; it does not itself require sub-issues.
 
 The coordinator plans from GitHub metadata and helper/worker evidence. Use native
-OMP task/eval helpers or an Orca researcher on the configured slow role for source
+OMP task/wait helpers or an Orca researcher on the configured slow role for source
 investigation and design questions; follow the [research contract](references/technical-planning.md).
 Every role may delegate natively as needed. For GitHub plan writing, assign
 `orca_dispatch(role=planner,issue=<canonical parent URL>)` on the existing slow
@@ -47,8 +50,11 @@ and read-back evidence. Keep one plan writer at a time and project code read-onl
 For missed blockers, follow the affected-scope reassessment loop in the issue-structure reference.
 
 Assign canonical execution issues/sub-issues to Orca executors on the configured
-task role, with bounded native goals. Executors may use native helpers for any
-scoped implementation work and retain acceptance ownership.
+task role, with bounded native goals. Each executor starts implementation through
+the native implementation-worker preset: one focused helper or a bounded parallel
+wave of independent file owners. Helpers supply RED/implementation/GREEN evidence;
+the executor retains integration and acceptance ownership. Other roles also use
+native task/wait helpers; arbitrary eval remains executor-only.
 Record issue -> Orca Task -> Dispatch -> worktree;
 create/reuse one Run and dispatch ready work against actual dependencies. Direct
 implementation needs no synthetic GitHub sub-issue or second orchestration layer.
@@ -56,6 +62,9 @@ Native helpers keep their OMP lifecycle and return results to their parent; they
 need no separate Orca records. For visible Orca workers use orca_dispatch with an explicit
 objective, acceptance criteria and constraints; it resolves existing model roles.
 Code changes follow the [test-first and coverage contract](references/testing.md).
+Combine accepted child revisions in an integration executor's own child checkout,
+then send that exact checkout/revision to final review and publication. The
+coordinator does not edit or merge code in its feature checkout.
 
 Use one final independent review by default, including multi-deliverable features.
 Add an early targeted review only for a concrete high-risk boundary or a required

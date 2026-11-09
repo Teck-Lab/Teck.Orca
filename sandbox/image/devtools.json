@@ -65,5 +65,18 @@
   "chrome": {
     "version": "153.0.8010.36-1",
     "sha256": "9bb44e33031c2f2857cf36b4343051a12f93058e4b781e3c76313df87f6c8d32"
+  },
+  "debug": {
+    "netcoredbg": {
+      "version": "3.2.0-1092",
+      "sha256": {
+        "x64": "080eb3b2d2152465f599d3b33d1ee6e747794e11cc0a3773ec689f5e5f2c5afa",
+        "arm64": "065ff49badec8a695dbea2de6ab6a330c774a191e426a217ab8cc05250627ccb"
+      }
+    },
+    "jsDebug": {
+      "version": "1.140.0",
+      "sha256": "27dab92937ec1ab35821ae955aac867544fe06a1b6307229049f2d789af10968"
+    }
   }
 }

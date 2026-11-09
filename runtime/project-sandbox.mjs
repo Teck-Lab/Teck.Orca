@@ -9,7 +9,7 @@ import { ensureKitBuilder } from './kit-builder.mjs';
 // suspend/destroy callbacks, published Docker ports, or desktop store writes.
 export async function provisionProject({ projectId, displayName, cloneUrl, repoPath, assetRoot,
   stateRoot = projectStateRoot(), env = process.env, run = command, sync = syncConfiguration, selectPort = choosePublishedPort,
-  recreateMissing = false, expectedSandboxId, ensureBuilder = ensureKitBuilder }) {
+  recreateMissing = false, expectedSandboxId, ensureBuilder = ensureKitBuilder, beforeReuse = async () => {} }) {
   const name = projectSandboxName(projectId);
   cloneUrl = validateCloneUrl(cloneUrl);
   if (!displayName || !assetRoot || !repoPath) throw Error('Project display name, local repository and runtime assets are required');
@@ -31,6 +31,9 @@ export async function provisionProject({ projectId, displayName, cloneUrl, repoP
       state = null;
     }
     if (present && state?.sandboxId && rows.find(row => row.name === name)?.id !== state.sandboxId) throw Error('Sandbox provider identity changed; refusing to adopt a replacement');
+    // Verify registration under the ownership lock, before waking the guest or
+    // issuing another pairing offer. Fresh replacements have a new identity.
+    if (present) await beforeReuse(state);
     let creating = false;
     try {
       if (!present) {
@@ -41,7 +44,7 @@ export async function provisionProject({ projectId, displayName, cloneUrl, repoP
           projectRoot: REMOTE_PROJECT, transport: 'docker-ssh', phase: 'creating', port: await selectPort() };
         writeProject(state, stateRoot);
         creating = true;
-        const environment = Object.entries(runtimeEnvironment({ projectId, sandboxName: name })).flatMap(([key, value]) => ['--env', `${key}=${value}`]);
+        const environment = Object.entries(runtimeEnvironment({ projectId, sandboxName: name, displayName })).flatMap(([key, value]) => ['--env', `${key}=${value}`]);
         run('sbx', ['create', '--no-progress', '--name', name, '--cpus', String(cpus), '--memory', memory, '--skills', 'off', ...environment,
           join(assetRoot, 'runtime/kits/workload'), '--kit', join(assetRoot, 'runtime/kits/omniroute'),
           '--kit', join(assetRoot, 'runtime/kits/mcphub'), '--kit', join(assetRoot, 'runtime/kits/orcad')], { progress: true });
@@ -49,7 +52,7 @@ export async function provisionProject({ projectId, displayName, cloneUrl, repoP
         state.sandboxId = inventory.find(row => row.name === name)?.id;
         if (!state.sandboxId) throw Error('Cannot verify newly created sandbox identity');
         writeProject(state, stateRoot);
-        sync(name, assetRoot, run, { projectId, sandboxName: name });
+        sync(name, assetRoot, run, { projectId, sandboxName: name, displayName });
         for (const key of ['user.name', 'user.email']) {
           let value;
           try { value = run('git', ['-C', repoPath, 'config', key]).trim(); } catch { continue; }

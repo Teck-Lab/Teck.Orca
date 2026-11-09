@@ -40,6 +40,14 @@ const compounds = {
 };
 const readActions = new Set(['list', 'get', 'list_comments', 'list_sub_issues', 'get_parent_issue', 'search_advanced',
   'list_fields', 'list_items', 'get_field_value', 'filter_items', 'get_metrics', 'get_overdue', 'get_upcoming', 'get_readme']);
+const readOnlyLspActions = new Set(['diagnostics','definition','type_definition','implementation','references','hover','symbols','status','capabilities']);
+const structuralWrite = input => ['rewrite','replacement','replace','replacements'].some(key=>Object.hasOwn(input,key));
+export function implementationTool(name,input={}){
+  if(['edit','bash','debug','eval','ast_edit'].includes(name))return true;
+  if(name==='write')return !input.path?.startsWith('agent://');
+  if(name==='lsp')return !readOnlyLspActions.has(String(input.action??'').toLowerCase())||input.apply===true;
+  return name==='ast_grep'&&structuralWrite(input);
+}
 export function mcpName(name) {
   if (!/(?:^|[\/_-])github(?:-projects)?(?:[\/_-]|$)/.test(name)) return null;
   return name.replace(/^.*github(?:-projects)?[\/_-]+/, '');
@@ -47,9 +55,14 @@ export function mcpName(name) {
 export const isPlanningWrite = name => planningWrites.has(mcpName(name));
 export const isPlanningTool = name => planning.has(mcpName(name));
 export function permittedTool(role, name, input = {}) {
+  // Knowledge capture is separate from repository editing/publication authority.
+  if (['recall', 'retain', 'reflect', 'learn'].includes(name)) return true;
   // Native OMP delegation is available to every role. The parent remains
   // accountable for the helper's scope, permissions and returned evidence.
-  if (['task', 'eval', 'wait'].includes(name)) return true;
+  if (['task', 'wait'].includes(name)) return true;
+  // eval exposes arbitrary Bun/JS and can bypass read-only/coordinator tool
+  // restrictions. Native task/wait still provide delegation for every role.
+  if (name === 'eval') return role === 'executor';
   if (['read', 'write'].includes(name) && /^agent:\/\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_./-]+)?$/.test(input.path ?? '') && !input.path.includes('..')) return true;
   if (name === 'ask') return role === 'coordinator';
   if (['goal', 'todo', 'orca', 'orca_dispatch'].includes(name)) return name !== 'orca_dispatch' || role === 'coordinator';
@@ -66,6 +79,10 @@ export function permittedTool(role, name, input = {}) {
     } catch { return false; }
   }
   if (name === 'git_inspect') return ['reviewer', 'publisher', 'executor'].includes(role);
+  if(['planner','researcher','reviewer','publisher'].includes(role)){
+    if(name==='lsp')return readOnlyLspActions.has(String(input.action??'').toLowerCase())&&input.apply!==true;
+    if(name==='ast_grep'&&structuralWrite(input))return false;
+  }
   const tool = mcpName(name);
   if (tool) {
     if (tool === 'pull_request_read') return role !== 'coordinator' || ['get', 'get_status', 'get_reviews', 'get_comments', 'get_review_comments', 'get_check_runs'].includes(input.method);
@@ -170,13 +187,77 @@ export function coordinationAction(input, role) {
   }
   return coordinationArgs(args, role);
 }
+const genericWorkerName = value => /^(?:worker[-_ ])?task[-_ ][a-z0-9]+$/i.test(value) || /^worker(?:[-_ ][a-z0-9]+)?$/i.test(value);
+export function dispatchLabels(input, suffix) {
+  const clean = value => typeof value === 'string' ? value.split(/[\r\n\u2028\u2029]/)[0].replace(/[\p{Cc}\p{Cf}]/gu, ' ').replace(/\s+/gu, ' ').trim() : '';
+  const slug = value => clean(value).normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const role = { executor: 'Executor', planner: 'Planner', researcher: 'Researcher', reviewer: 'Reviewer', publisher: 'Publisher' }[input.role] ?? 'Worker';
+  const issue = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/issues\/([1-9]\d{0,19})$/.exec(input.issue ?? '')?.[1];
+  let scope = clean(input.title) || clean(input.objective);
+  if (!scope || genericWorkerName(scope)) scope = 'Assigned work';
+  const title = [...`${issue ? `#${issue} · ` : ''}${role} · ${scope}`].slice(0, 80).join('').trimEnd();
+  const custom = slug(input.name);
+  if (custom && !genericWorkerName(clean(input.name))) return { title, name: custom.slice(0, 64).replace(/-+$/g, '') };
+  if (!/^[a-f0-9]{8}$/.test(suffix)) throw Error('A dispatch name needs its unique suffix');
+  const prefix = `${issue ? `issue-${issue}-` : ''}${role.toLowerCase()}-`;
+  const shortScope = (slug(scope) || 'work').slice(0, 64 - prefix.length - suffix.length - 1).replace(/-+$/g, '');
+  return { title, name: `${prefix}${shortScope}-${suffix}` };
+}
+
+export function canRenameWorkerTab(list, handle, worktreeId) {
+  if (list.truncated !== false || !Array.isArray(list.terminals) || list.totalCount !== list.terminals.length) return false;
+  const terminal = list.terminals.find(t => t.handle === handle && t.worktreeId === worktreeId);
+  if (!terminal?.tabId || list.terminals.filter(t => t.tabId === terminal.tabId).length !== 1) return false;
+  const seen = new Set();
+  function find(node) {
+    if (!node || typeof node !== 'object' || seen.has(node) || seen.size > 512) return;
+    seen.add(node);
+    if (node.type === 'group') return node.tabs?.find(t => t.tabId === terminal.tabId);
+    if (node.type === 'split') return find(node.first) ?? find(node.second);
+  }
+  const tab = find(list.visualLayouts?.find(l => l.worktreeId === worktreeId)?.root);
+  return !!tab && genericWorkerName(tab.title ?? '') && tab.panes?.type === 'terminal' && tab.panes.handle === handle;
+}
+
+export function dispatchPlacement(input) {
+  const worktree = input.worktree ?? (input.role === 'executor' ? 'new-child' : undefined);
+  if (typeof worktree !== 'string' || !worktree || worktree.trim() !== worktree || worktree.includes('\0'))
+    throw Error('An exact worktree placement is required');
+  if (input.role !== 'executor') return { worktree, reuse: false };
+  if (worktree === 'new-child' && !input.terminal) return { worktree, reuse: false };
+  if (worktree === 'new-child') throw Error('A new child cannot reuse an existing terminal. Omit terminal for new execution.');
+  if (!input.terminal || !worktree.startsWith('id:') || worktree.length <= 3)
+    throw Error('New executors, including integration workers, require new-child. Reuse requires the exact id: of an owned child and its settled terminal.');
+  return { worktree, reuse: true };
+}
+
+export function verifyExecutorReuse(input, { parent, child, workers, runId, parentId }) {
+  if (!runId || input.run && input.run !== runId) throw Error('Bind the owning Orca Run before child reuse; a different Run cannot reuse this worker.');
+  if (!parentId || parent?.id !== parentId || child?.id !== input.worktree.slice(3) || child.id === parentId || child.parentWorktreeId !== parentId)
+    throw Error('Executor reuse requires the exact direct child of this coordinator worktree; parent/child identity could not be verified.');
+  if (!parent.projectId || child.projectId !== parent.projectId || !parent.branch || !child.branch || child.branch === parent.branch)
+    throw Error('Executor reuse requires a child in the same project on a distinct branch.');
+  const occupants = workers.filter(w => w.resource?.worktreeId === child.id);
+  if (occupants.some(w => w.dispatchStatus === 'dispatched')) throw Error('Another dispatch is active in this checkout; wait for settlement or create a new child.');
+  // A legacy checkout with several terminal owners is ambiguous. Never race
+  // two different settled terminals back into editing that same checkout.
+  if (occupants.some(w => w.runId !== runId || w.agentTerminalHandle !== input.terminal))
+    throw Error('Child reuse has multiple or foreign terminal owners; create a new child instead.');
+  const owner = occupants.find(w => w.agentTerminalHandle === input.terminal);
+  if (!owner || !['completed', 'failed'].includes(owner.dispatchStatus) || owner.terminalState !== 'reclaimable' ||
+      owner.resource?.ownershipState !== 'owned' || owner.resource.ownerDispatchId !== owner.dispatchId ||
+      owner.resource.terminalHandle !== input.terminal || owner.resource.releaseState !== 'not_requested')
+    throw Error('Reuse requires an owned, settled, reclaimable child terminal with no release in progress.');
+}
+
 export function assignment(input) {
   if (!workerRoles[input.role] || !input.objective?.trim() || !input.acceptance?.length || input.acceptance.some(a => !a.trim())) throw Error('Worker role, objective and acceptance criteria are required');
   if (input.role === 'planner' && !/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/issues\/[1-9][0-9]*$/.test(input.issue ?? ''))
     throw Error('A planner requires its authorized parent GitHub issue URL');
   return `TECK_ORCA_ASSIGNMENT ${JSON.stringify(input)}\n\n` +
     'Use the native OMP goal tool to create this assignment objective before work. Keep its acceptance criteria in native todos. ' +
-    'Follow the live Orca Task/Dispatch preamble. Own this assignment; native OMP helpers are allowed as needed, without separate Orca Dispatches. Do not create a competing PR. ' +
+    'Follow the live Orca Task/Dispatch preamble. Own this assignment; native OMP helpers use no separate Orca Dispatches. Do not create a competing PR. ' +
+    (input.role==='executor'?'Delegate actual implementation and scoped RED/GREEN tests to implementation-worker first. Use one focused helper or a bounded parallel file-disjoint wave; parent owns integration and acceptance verification. ':input.role==='reviewer'?'For code/deployment changes, use correctness-reviewer and security-auditor native tasks in parallel on the stable snapshot, validate their findings and deliver one consolidated verdict. For documentation-only work, record why a security pass is inapplicable. ':'Use scoped native task/wait helpers for independent research where useful. ') +
     'Complete the native goal only with evidence for every criterion, then send worker_done and idle. ' +
     'A review goal completes when its explicit verdict/report is ready, including request_changes; it does not accept implementation. ' +
     'If blocked, ask the coordinator and leave the goal incomplete while awaiting a reply. For terminal failure, record blockers, drop the native goal without completing it, report failed and idle. ' +

@@ -23,10 +23,10 @@ maxNotesPerUpdate: 1
 advisors:
   - name: Supervisor
     enabled: true
-    reviewMode: agent-end
+    reviewMode: turn
     reviewInterval: 3
     syncBacklog: "off"
-    model: omniroute/teck-advisor:medium
+    # Follow modelRoles.advisor; implementation-worker opts into this one roster.
     tools: [read, grep, glob]
     instructions: |
       Stay within the current request. Intervene only on concrete drift, repeated

@@ -3,7 +3,7 @@ name: technical-planner
 description: Read-only technical investigation for the assigned Orca planner or execution owner. Return evidence, proposed decomposition or focused reassessment of a missed blocker; canonical GitHub writes belong to the tracked planner.
 model: "@slow"
 thinking-level: high
-tools: read, find, grep, glob, web_search, task, eval
+tools: read, find, grep, glob, web_search, task, wait
 advisor: false
 prewalk: false
 ---

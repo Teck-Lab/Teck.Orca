@@ -1,11 +1,20 @@
 import { spawn } from 'node:child_process';
-import { rmSync } from 'node:fs';
+import { rmSync, existsSync, readFileSync } from 'node:fs';
 import { reviewLaunchArgs, orchestrationLaunchArgs } from './omp-launch-policy.mjs';
 import { preserveProjectName } from './project-name.mjs';
 import { bootId, identity, recordPath, readRecord, writeRecord, recoveryMode,
   interactiveLaunch, explicitSession, reusableArgs, resumeArgs, claimPane } from './omp-session.mjs';
 
 const recoveryOnly = process.argv[2] === '--teck-restore-pane';
+if (existsSync('/etc/teck-orca/update.lock')) {
+  process.stderr.write('Teck: sandbox maintenance is in progress. Reopen OMP after the update finishes.\n'); process.exit(1);
+}
+let ompPrefix = '/opt/paseo-omp';
+if (existsSync('/etc/teck-orca/omp-runtime.json')) {
+  const config = JSON.parse(readFileSync('/etc/teck-orca/omp-runtime.json', 'utf8'));
+  if (!/^\/opt\/(?:paseo-omp|teck-omp\/releases\/\d+\.\d+\.\d+)$/.test(config.prefix)) throw Error('Invalid managed OMP runtime');
+  ompPrefix = config.prefix;
+}
 let args = process.argv.slice(recoveryOnly ? 3 : 2);
 const owner = identity();
 const path = owner ? recordPath(owner) : null;
@@ -38,7 +47,7 @@ if (tracked) {
   args.push('--extension', '/usr/local/lib/teck-orca/omp-session-extension.ts');
 }
 const policyArgs = interactiveLaunch(args) ? orchestrationLaunchArgs(reviewLaunchArgs(args)) : reviewLaunchArgs(args);
-const child = spawn('/opt/paseo-omp/bin/omp', policyArgs, { stdio: 'inherit', env: {
+const child = spawn(ompPrefix + '/bin/omp', policyArgs, { stdio: 'inherit', env: {
   ...process.env, ...(tracked ? { TECK_ORCA_OMP_RECORD: path, TECK_ORCA_OMP_TOKEN: token } : {}),
 } });
 // Ctrl-C from the terminal already reaches the child process group. Do not

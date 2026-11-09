@@ -8,12 +8,11 @@ These are dedicated, independent, read-only reviews of completed changes.
 ## Select the review path
 
 The coordinator only dispatches and reconciles evidence; it never reads the code
-or runs checks itself. Use an independent native OMP reviewer or
-orca_dispatch(role=reviewer) on the existing checkout;
+or runs checks itself. Use orca_dispatch(role=reviewer) on the existing checkout;
 the independent reviewer inspects code, acceptance criteria and test evidence.
 Use one independent final review before publication for both single issues and
 features with execution sub-issues. Review the implementation owner's stable
-checkout, or the integrated feature checkout when work was delegated. Issue or
+checkout, or the exact integrated child checkout when work was delegated. Issue or
 worker count alone does not require child reviews or a second full code audit.
 
 Add an early targeted review only for a concrete risk: an authentication or
@@ -60,6 +59,39 @@ The final reviewer must be independent of the implementation owner, own the
 verdict and inspect the stable snapshot; its helpers do not replace that gate.
 OMP owns native helper lifecycle, while an Orca reviewer uses the settlement
 contract below. Do not create an Orca Dispatch solely for a native helper.
+
+## Native correctness and security passes
+
+For code and deployment changes, the independent Orca reviewer starts
+correctness-reviewer and security-auditor with native task in parallel against
+the same stable snapshot. Give both the complete scope, base/head or fingerprint,
+changed-file list, relevant acceptance criteria and direct evidence paths. The
+correctness pass follows changed values into their receiving code and tests;
+the security pass traces attacker-controlled paths and trust/tenant boundaries.
+For documentation-only work, one correctness helper is enough when the lead
+records why a security pass is inapplicable. Do not manufacture a full-team
+fan-out for a tiny diff or run an extra review merely to count reviewers.
+
+The lead independently checks the specialist findings against the source,
+deduplicates overlaps, reconciles disagreements and supplies one final verdict.
+Helpers and their nested research remain read-only: native task/wait and
+agent:// messages are allowed, arbitrary eval/shell/edit/publication are not.
+LSP navigation is allowed; rename/apply/code-action/format operations are not.
+Use the existing advisor model role for both managed review specialists; their
+own advisors are disabled, so reviews do not recursively spawn watchdogs.
+
+This adopts OMP's documented stable-diff, changed-line evidence, priority and
+confidence review pattern through managed native tasks. It does not invoke the
+interactive /review chooser or create a second /review pass after the lead's
+review. Native /review PR-URL mode uses authenticated gh, so it is not our
+GitHub App MCP publication/read path: obtain remote review snapshots through
+the App MCP and pass that exact evidence to the reviewer instead.
+
+The security-auditor task works with our existing API-key-backed OmniRoute
+models. OMP's separate /security scan subsystem requires a stored OAuth login;
+environment/API keys are insufficient. Keep that subsystem disabled under the
+current route. Do not switch to a personal account, invent a native scan ID or
+claim native /security/SARIF artifacts from this ordinary specialist review.
 
 Reviewers follow the injected Dispatch contract, send `worker_done` with the
 review result, then idle. The coordinator accepts the delivered review report
@@ -129,8 +161,10 @@ on the Orca review Task and the relevant GitHub execution issue or parent plan.
 ## Final parent publication gate
 
 After an executor/integration worker integrates the delivered change or required
-sub-issues and runs combined acceptance checks, dispatch the independent reviewer
-in the parent checkout. The reviewer checks the complete
+sub-issues in its own child checkout and runs combined acceptance checks, dispatch
+the independent reviewer in that exact integrated checkout. Never start a new
+editing terminal in the coordinator's parent checkout. Record the integration
+worktree/branch/revision and pass that same snapshot to publication. The reviewer checks the complete
 parent delta against the verified PR base, all issue/plan criteria, applicable
 targeted review outcomes and combined validation. This is the sole default code
 review gate for both single issues and multi-deliverable features. Use prior

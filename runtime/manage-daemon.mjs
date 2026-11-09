@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, openSync, closeSync, readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
+import { preserveProjectName } from './project-name.mjs';
 
 const directory = '/home/agent/.local/state/teck-orca';
 const metadataPath = `${directory}/daemon.json`;
@@ -53,7 +54,13 @@ while (Date.now() < deadline) {
     throw new Error(`Feature Orca daemon exited before readiness: ${detail}`);
   }
   const ready = readReady();
-  if (ready) { process.stdout.write(JSON.stringify(ready) + '\n'); process.exit(0); }
+  if (ready) {
+    try {
+      await preserveProjectName({ register: true, cli: ['/opt/teck-orcad/node', '/opt/teck-orcad/server/out/cli/index.js'],
+        env: { ...process.env, ORCA_USER_DATA: '/home/agent/.local/share/teck-orca/orca', ORCA_USER_DATA_PATH: '/home/agent/.local/share/teck-orca/orca' } });
+    } catch { process.stderr.write('Teck: could not preserve the project display name; check Orca project metadata.\n'); }
+    process.stdout.write(JSON.stringify(ready) + '\n'); process.exit(0);
+  }
   await delay(200);
 }
 throw new Error('Feature Orca daemon did not become ready within 120 seconds; inspect its private daemon.log');
