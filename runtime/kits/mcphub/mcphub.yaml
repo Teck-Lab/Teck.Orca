@@ -2,7 +2,7 @@
 schemaVersion: "3"
 kind: mixin
 displayName: MCPHub access
-description: Proxy-managed MCPHub credential and endpoint.
+description: Proxy-managed MCPHub and native Hindsight credentials and endpoints.
 
 capabilities:
   - type: com.docker.sandbox/network-policy@1
@@ -10,6 +10,7 @@ capabilities:
       runtime:
         allow:
           - mcp.tecklab.dk:443
+          - hindsight-api.tecklab.dk:443
 
   - type: com.docker.sandbox/credential@1
     config:
@@ -20,5 +21,17 @@ capabilities:
         proxyManaged: true
         inject:
           - domain: mcp.tecklab.dk
+            header: Authorization
+            format: "Bearer %s"
+
+  - type: com.docker.sandbox/credential@1
+    config:
+      service: hindsight
+      phase: runtime
+      apiKey:
+        name: HINDSIGHT_API_KEY
+        proxyManaged: true
+        inject:
+          - domain: hindsight-api.tecklab.dk
             header: Authorization
             format: "Bearer %s"
