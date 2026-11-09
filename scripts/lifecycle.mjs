@@ -160,6 +160,7 @@ export function runtimeEnvironment(identity = {}) {
     ORCA_USER_DATA_PATH: '/home/agent/.local/share/teck-orca/orca',
     PATH: '/usr/local/bin:/opt/paseo-omp/bin:/home/agent/.local/bin:/usr/local/share/npm-global/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin',
     OMNIROUTE_API_KEY: 'proxy-managed', MCPHUB_API_KEY: 'proxy-managed',
+    HINDSIGHT_API_KEY: 'proxy-managed', HINDSIGHT_API_TOKEN: 'proxy-managed',
     OMNIROUTE_BASE_URL: 'https://omniroute.tecklab.dk/v1',
     OMNIROUTE_MODEL: 'teck-orchestrator', OMNIROUTE_RESEARCH_ENABLED: '1',
     MNEMOPI_DATA_DIR: '/home/agent/.local/share/teck-orca/memory',
@@ -170,6 +171,7 @@ export function runtimeEnvironment(identity = {}) {
     AGENT_BROWSER_IGNORE_HTTPS_ERRORS: 'false', AGENT_BROWSER_CONTENT_BOUNDARIES: 'true',
     NODE_EXTRA_CA_CERTS: '/etc/ssl/certs/ca-certificates.crt',
     ...(identity.projectId ? { TECK_ORCA_PROJECT_ID: identity.projectId, TECK_ORCA_SANDBOX_NAME: identity.sandboxName } : {}),
+    ...(identity.displayName ? { TECK_ORCA_PROJECT_NAME: identity.displayName } : {}),
     ...(identity.featureId ? { TECK_ORCA_FEATURE_ID: identity.featureId } : {}),
   };
 }
@@ -185,6 +187,7 @@ export function syncConfiguration(name, assetRoot = root, run = command, identit
     const wrapper = '#!/bin/sh\n. /etc/teck-orca/environment.sh\nexec node /usr/local/lib/teck-orca/omp-launch.mjs "$@"\n';
     const recovery = '# Teck-owned fallback for a cold-restored interactive Orca pane.\n' +
       'case $- in *i*)\n  . /etc/teck-orca/environment.sh\n' +
+      '  node /usr/local/lib/teck-orca/project-name.mjs --pane\n' +
       '  node /usr/local/lib/teck-orca/omp-launch.mjs --teck-restore-pane\n;; esac\n';
     const install = [
       'set -eu',

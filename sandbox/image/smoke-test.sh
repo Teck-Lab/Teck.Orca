@@ -1,13 +1,16 @@
 #!/usr/bin/env sh
 set -eu
 
-test "$(dotnet --version)" = "10.0.300"
+test "$(dotnet --version)" = "10.0.401"
 test "$(bun --version)" = "1.4.4"
-test "$(omp --version)" = "omp/18.14.0"
+test "$(omp --version)" = "omp/18.16.0"
 test "$(typescript-language-server --version)" = "4.4.1"
 test "$(tsc --version)" = "Version 5.9.3"
 test "$(npm list --global --depth=0 --json | jq -r '.dependencies["next-devtools-mcp"].version')" = "0.4.0"
 test -x "$(command -v next-devtools-mcp)"
+test -x "$(command -v netcoredbg)"
+test -f /home/agent/.local/opt/js-debug/src/dapDebugServer.js
+bun /usr/local/lib/teck-kubernetes/debug-smoke.mjs
 test "$(google-chrome-stable --version | awk '{print $3}')" = "153.0.8010.36"
 test "$(biome --version)" = "Version: 2.5.14"
 test "$(npm list --global --depth=0 --json | jq -r '.dependencies["@biomejs/biome"].version')" = "2.5.14"

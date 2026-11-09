@@ -34,11 +34,11 @@ export function checkPrerequisites(run = command) {
       if (file.includes('..') || file.startsWith('/') || file.includes('\\') || !item.parts.every(part => part.startsWith(file + '.gz.b64.') && existsSync(join(root, part)))) throw Error('Incomplete daemon transport assets');
     }
   });
-  check('OmniRoute and MCPHub service credentials', () => {
+  check('OmniRoute, MCPHub and Hindsight service credentials', () => {
     // Never print secret ls output: custom-secret metadata can include partially masked values.
     const data = JSON.parse(run('sbx', ['secret', 'ls', '--global', '--json']));
     const names = new Set((data.secrets ?? []).filter((entry) => entry.type === 'service').map((entry) => entry.name));
-    const missing = ['omniroute', 'mcphub'].filter((name) => !names.has(name));
+    const missing = ['omniroute', 'mcphub', 'hindsight'].filter((name) => !names.has(name));
     if (missing.length) throw new Error(`Configure with sbx secret set: ${missing.join(', ')}`);
   });
   return { ok: checks.every((check) => check.ok), checks };

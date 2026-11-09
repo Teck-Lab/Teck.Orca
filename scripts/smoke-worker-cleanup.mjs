@@ -64,7 +64,7 @@ try {
   const added = cli(['repo', 'add', '--path', REMOTE_PROJECT]);
   const repoId = added.repo?.id ?? added.id ?? added.repoId;
   assert.ok(repoId);
-  const parent = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'cleanup-test-feature', '--no-parent', '--setup', 'skip', '--agent', 'omp']);
+  const parent = cli(['worktree', 'create', '--repo', `id:${repoId}`, '--name', 'cleanup-test-feature', '--no-parent', '--setup', 'skip', '--agent', 'omp', '--surface', 'terminal']);
   report.parent = parent.worktree.id;
   const terminals = cli(['terminal', 'list', '--worktree', `id:${report.parent}`]);
   const coordinator = terminals.terminals.find(item => item.agentIdentity === 'omp');

@@ -15,7 +15,8 @@ if (!checkOnly) assert.match(name, /^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/);
 const paths = ['runtime/omp/RULES.md', 'runtime/omp/skills/orca-feature-workflow/SKILL.md',
   'runtime/omp/skills/github-execution-planning/SKILL.md',
   'runtime/omp/skills/github-execution-planning/references/issue-structure.md',
-  'runtime/omp/skills/orca-feature-workflow/references/review-gates.md'];
+  'runtime/omp/skills/orca-feature-workflow/references/review-gates.md',
+  'runtime/omp/skills/orca-feature-workflow/references/testing.md'];
 const policy = paths.map(path => `FILE: ${path}\n${readFileSync(join(repositoryRoot, path), 'utf8')}`).join('\n\n');
 const cases = [
   { id: 'contained', request: 'Fix an incorrect rounding boundary in a pricing calculation, update its regression tests and document the behavior. Four files will change. One owner can deliver and validate it together.', expected: ['single', false, false, false, false] },
@@ -33,7 +34,7 @@ const prompt = `Apply the supplied policy to each scenario. This is a read-only 
 Return only a JSON array in input order. Each entry must have:
 id, mode (single, feature, or assigned), createExecutionSubissues (boolean),
 wholeIssueBlocked (boolean), needsDependencyLink (boolean), reuseIssueAsParent (boolean),
-defaultReviewPath (final, child-and-final, or follow-dispatch), and reason (one sentence).
+defaultReviewPath (final or follow-dispatch), and reason (one sentence).
 wholeIssueBlocked means evidence establishes that no in-scope progress can currently proceed;
 an undiagnosed first tool failure does not establish that condition.
 SCENARIOS: ${JSON.stringify(scenarios)}`;
@@ -65,6 +66,6 @@ for (let i = 0; i < cases.length; i++) {
   assert.equal(actual.id, expected.id);
   assert.deepEqual([actual.mode, actual.createExecutionSubissues, actual.wholeIssueBlocked,
     actual.needsDependencyLink, actual.reuseIssueAsParent], expected.expected, `${expected.id}: ${actual.reason}`);
-  assert.equal(actual.defaultReviewPath, actual.mode === 'feature' ? 'child-and-final' : actual.mode === 'assigned' ? 'follow-dispatch' : 'final');
+  assert.equal(actual.defaultReviewPath, actual.mode === 'assigned' ? 'follow-dispatch' : 'final');
 }
 console.log(`OMP interpreted all ${cases.length} workflow scenarios correctly. Evidence: ${root}`);

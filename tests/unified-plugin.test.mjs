@@ -13,7 +13,10 @@ test('one main plugin offers native SSH and retains the existing preview VM iden
   assert.equal(manifest.id, 'teck-sbx-recipes');
   assert.equal(manifest.publisher, 'teck-lab');
   assert.deepEqual(manifest.contributes.vmRecipes, [{ path: 'recipes/native-ssh-project.json' }]);
-  assert.deepEqual(manifest.contributes.commands.map(c => c.id), ['teck.reconnectSandboxes']);
+  assert.deepEqual(manifest.contributes.commands.map(c => c.id), ['teck.reconnectSandboxes', 'teck.sandboxStatus']);
+  assert.equal(manifest.engines.orca, '>=1.4.248');
+  assert.equal(manifest.contributes.panels[0].entry, 'ui/sandbox-status.tsx');
+  assert.equal(manifest.contributes.statusBarItems[0].command, 'teck.sandboxStatus');
   const recipe = JSON.parse(readFileSync(join(repositoryRoot, 'plugin/recipes/native-ssh-project.json')));
   assert.equal(recipe.id, 'teck-native-ssh-project');
   assert.equal(recipe.name, 'Teck OMP Project');
