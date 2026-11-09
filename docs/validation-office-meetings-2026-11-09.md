@@ -48,3 +48,7 @@ they need their normal `/reload` or a new terminal to load the new observer hook
 No user worker was dispatched, cancelled, released or moved to test the room. No
 browser/computer automation or screenshots were used. Changes target only the two
 Teck-Lab fork PRs.
+
+Visual follow-up: the meeting table reuses the existing OMP office chair renderer.
+Warm plaster/wood partitions replace the glass outline, and the room bottom stays
+inside the smallest office floor (198 art pixels), preventing the protruding wall.
