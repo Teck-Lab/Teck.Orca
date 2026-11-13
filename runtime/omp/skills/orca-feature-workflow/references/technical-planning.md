@@ -36,6 +36,12 @@ coverage approach, relevant risks and exact unresolved questions. A narrow looku
 needs only the supported behavior, its source and its consequence. Never invent
 executed tests, coverage or implementation results from research.
 
+For feature plans, use [layered testing](testing.md) to map acceptance criteria
+to unit, service integration, system/browser E2E and deployment checks as
+applicable. Identify the assembled-feature test owner, environment lifecycle and
+parallel data isolation. Keep scoped unit/integration work with its executor;
+avoid making every child spin up or repeat the whole feature's E2E suite.
+
 ## Planner creates the canonical execution plan
 
 The coordinator explicitly delegates plan writing and pauses its own edits to

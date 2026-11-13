@@ -1,11 +1,11 @@
 {
   "source": "Installed Orca CLI: skills get --full --json",
-  "orcaVersion": "1.4.254",
+  "orcaVersion": "1.4.258",
   "files": [
     {
       "skill": "orca-cli",
       "path": "SKILL.md",
-      "sha256": "e4623bdc8d25583be6705267de0bc464964020cc2758d27e4b33dcd900629703"
+      "sha256": "a5536a342549b47db5c8e93ca21c24681c102f3b4d8b59cc4312423538718ca5"
     },
     {
       "skill": "orca-cli",
@@ -15,7 +15,7 @@
     {
       "skill": "orca-cli",
       "path": "references/browser.md",
-      "sha256": "dc6ab1dc2024be30dc1f0e8aae8cd66ae3eadcb9f40d3a755aefd4c0ada4b767"
+      "sha256": "c2b0f7744e2f18bb2573ac786ae954db79be38c04f8fadb2a49cc424c08d56e7"
     },
     {
       "skill": "orca-cli",
@@ -25,12 +25,12 @@
     {
       "skill": "orchestration",
       "path": "SKILL.md",
-      "sha256": "b4a110527c1066e65a0632b93ce7ec758f05d541f662ae61a5595fa5252caef4"
+      "sha256": "3031d4a8a7a27b2cd802d71b320dd2920e239c46760a25bfb9a97508f54b2ee9"
     },
     {
       "skill": "orchestration",
       "path": "references/coordinator-loop.md",
-      "sha256": "a30cefbfcd637b3a9e19fd7de533b197aeadae84f389c36e04ed88ffbcb536f3"
+      "sha256": "d2009678d76d73a1f58b3f25939b15f4a6f81b9a409b2573d1219f827e145bcc"
     },
     {
       "skill": "orchestration",
@@ -40,12 +40,12 @@
     {
       "skill": "orchestration",
       "path": "references/messaging-and-gates.md",
-      "sha256": "4cd5bfb3706c5060fd9532a13ee8488f1beec4314462a55b7e22452fa94c2ea7"
+      "sha256": "5f0a0391f5f7dadc5180efde6b10c89c8ab99060dfdef41e070708b4e2b04e9c"
     },
     {
       "skill": "orchestration",
       "path": "references/placement-and-remote.md",
-      "sha256": "2b242c48508b4d22d7589048c5144bd5103a97dbc681301cb7ba2fbd18aee9e0"
+      "sha256": "2c770268c41fd6c083c6347c3d79ddd9d8125e36850ce8de9e205e335d037987"
     },
     {
       "skill": "orchestration",
@@ -55,7 +55,7 @@
     {
       "skill": "orca-per-workspace-env",
       "path": "SKILL.md",
-      "sha256": "bc0431426ecd2bcb03776fd1f4e58d692593acd6997e54fc84c3f1fb0d1d55ac"
+      "sha256": "a388e6e0463c8e6283e75531c013a0041bccc8ccf10b34e8bc968532a3572bb4"
     },
     {
       "skill": "orca-per-workspace-env",

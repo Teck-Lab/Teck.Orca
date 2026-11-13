@@ -7,6 +7,49 @@ guidance only for the boundary or command being used.
 
 ## Before implementation
 
+### Plan tests in layers
+
+For a feature, map its acceptance criteria to the applicable layers before
+dispatching implementation. Prefer this progression through small vertical
+slices, rather than deferring all integration work until every unit is written:
+
+| Layer | Evidence | Guidance |
+| --- | --- | --- |
+| Unit | Fast decisions, validation, calculations and state transitions without infrastructure | `dotnet-unit-testing` for .NET; existing frontend test framework for UI logic |
+| Service integration | Actual API/handler behavior and committed database or broker effects | Testcontainers owns real dependencies; WebApplicationFactory hosts HTTP tests where needed; no Aspire startup in new tests at this layer |
+| Application E2E | Real gateway, authentication and service-to-service wiring, including browser user journeys | Aspire owns the assembled stack; Playwright tests the UI and API tests cover non-browser journeys |
+| Kubernetes deployment/E2E | Application running as pods using actual manifests, operators and cluster routing | Aspire-managed KIND, deployed candidate images and API/browser assertions against the cluster |
+
+Implement logic with focused unit RED/GREEN, add integration RED/GREEN as each
+real boundary is introduced, then verify the assembled user journey with E2E.
+A persistence or wiring bug may need integration as its smallest reproducer;
+do not manufacture a mock-only unit regression that cannot expose the defect.
+Pure logic changes need not invent a browser journey. For user-facing feature
+work, define the E2E acceptance scenario up front and run it before acceptance.
+
+The planner records each relevant layer, owner and acceptance scenario. Executors
+own their scoped unit/integration tests. Assign one integration owner for the
+assembled feature's system/E2E checks against the exact candidate revision;
+parallel workers must not each launch an identical full stack or reset shared
+data. Reviewers verify the evidence and investigate gaps instead of repeating
+unchanged successful runs. Ad-hoc browser exploration supplements, but does not
+replace, a checked-in repeatable regression test.
+
+Use the target repository's existing harness. For a new Aspire/.NET repository,
+use xUnit and Testcontainers for focused integration, with WebApplicationFactory
+when HTTP hosting is needed. Reserve Aspire for assembled application E2E and
+the Kubernetes lane; do not add an Aspire startup alternative to new service
+integration tests. Aspire owns E2E startup;
+the test framework owns assertions. For the selected new Nx/Aspire design, keep
+Bun and prefer TypeScript @nx/playwright for browser journeys, with C# backend
+tests. Load the browser skill's Nx/Bun/Aspire reference for startup ownership,
+affected selection and caching. Aspire-managed KIND is an optional deployment
+test lane, not a prerequisite for every feature iteration. Keep repository paths
+and names out of this reusable policy.
+Reuse a suite fixture with isolated per-test state, run affected tests during
+implementation, and broaden once the candidate is assembled. See the Aspire
+testing reference in `dotnet-integration-testing` for ownership and isolation.
+
 Translate acceptance criteria into observable behaviors and focused test cases.
 Every new feature or behavior needs automated tests, including the important
 success, rejection and boundary paths relevant to that change. A bug fix needs

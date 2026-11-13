@@ -5,7 +5,16 @@ description: Helps with running tasks in an Nx workspace. USE WHEN the user want
 
 You can run tasks with Nx in the following way.
 
-Keep in mind that you might have to prefix things with npx/pnpx/yarn if the user doesn't have nx installed globally. Look at the package.json or lockfile to determine which package manager is in use.
+Use the package manager selected in package.json and the lockfile. In Bun
+workspaces, use the installed Nx through bunx nx or the existing bun run script;
+restore pinned dependencies first. Do not switch package managers or introduce
+a second lockfile. Bare nx examples below are command shapes, not a requirement
+for a global installation.
+
+For Aspire-backed browser tests, read the
+[Nx/Bun/Aspire testing reference](../browser-end-to-end-testing/references/nx-bun-aspire.md).
+It defines startup ownership, backend affected dependencies, cache policy and
+bounded full-stack concurrency.
 
 For more details on any command, run it with `--help` (e.g. `nx run-many --help`, `nx affected --help`).
 

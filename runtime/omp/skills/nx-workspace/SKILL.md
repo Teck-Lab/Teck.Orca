@@ -7,7 +7,9 @@ description: "Explore and understand Nx workspaces. USE WHEN answering questions
 
 This skill provides read-only exploration of Nx workspaces. Use it to understand workspace structure, project configuration, available targets, and dependencies.
 
-Keep in mind that you might have to prefix commands with `npx`/`pnpx`/`yarn` if nx isn't installed globally. Check the lockfile to determine the package manager in use.
+Check package.json and the lockfile for the selected package manager. In Bun
+workspaces, prefix installed Nx commands with `bunx` or use the existing
+`bun run` script. Do not migrate package managers to follow a command example.
 
 ## Listing Projects
 

@@ -11,7 +11,7 @@ export function ompProcesses() {
   }).length;
 }
 export function validManagedPath(path) {
-  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:(?:orca-policy|github-plan-scope|issue-worktree|mcphub-client|mcphub-search|mcphub-firecrawl|office-tools|office-usage|office-plan|office-mcp|office-mcp-server)\.mjs|agent-office\.LICENSE))|skills\/(?:agent-office|orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
+  return /^(?:RULES\.md|WATCHDOG\.yml|orchestration\.yml|orca-guides\.json|aspire-skills\.(?:json|LICENSE)|agents\/(?:technical-planner|implementation-worker|correctness-reviewer|security-auditor)\.md|extensions\/(?:agent-office\.(?:mjs|ts)|orca-orchestration\.mjs|omniroute-research\.ts|lib\/(?:(?:orca-policy|github-plan-scope|issue-worktree|mcphub-client|mcphub-search|mcphub-firecrawl|office-tools|office-usage|office-plan|office-mcp|office-mcp-server)\.mjs|agent-office\.LICENSE))|skills\/(?:agent-office|orca-feature-workflow|orca-workers|github-execution-planning|github-publication|orca-cli|orchestration|orca-per-workspace-env|dotnet-unit-testing|dotnet-integration-testing|dotnet-test-execution|dotnet-test-quality|browser-end-to-end-testing|nx-run-tasks|nx-workspace|aspire|aspire-init|aspireify|aspire-orchestration|aspire-monitoring|aspire-deployment|aspire-project-v2-migration|aspire-terminals)\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+|runtime\/omp-launch(?:-policy)?\.mjs)$/.test(path) && !path.split('/').some(s => s === '.' || s === '..');
 }
 export function withMaintenanceFence(script) {
   const header = '#!/bin/sh\n';
@@ -82,7 +82,7 @@ export async function applyUpdate(payload, { forceInstall = false } = {}) {
       if (version(target) !== payload.omp) {
         fs.mkdirSync('/opt/teck-omp', { recursive: true }); noSymlinks('/opt/teck-omp');
         stage = fs.mkdtempSync('/opt/teck-omp/staging-');
-        command('npm', ['install', '--global', '--prefix', stage, '--no-audit', '--no-fund', '--omit=optional', '@oh-my-pi/pi-coding-agent@' + payload.omp],
+        command('npm', ['install', '--global', '--prefix', stage, '--no-audit', '--no-fund', '--include=optional', '@oh-my-pi/pi-coding-agent@' + payload.omp],
           { env: { ...process.env, ONNXRUNTIME_NODE_INSTALL_CUDA: 'skip', ONNXRUNTIME_NODE_INSTALL: 'skip' } });
         fs.symlinkSync('/opt/paseo-omp/bin/bun', stage + '/bin/bun');
         if (version(stage) !== payload.omp || command(stage + '/bin/omp', ['--version'], { env: { ...process.env, PATH: stage + '/bin:' + process.env.PATH } }).trim() !== 'omp/' + payload.omp) throw Error('Staged OMP version verification failed');

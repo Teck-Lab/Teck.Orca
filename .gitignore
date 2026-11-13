@@ -1,4 +1,5 @@
 node_modules/
+!runtime/kits/orcad/bundle/**/node_modules/
 .artifacts/
 .orca/
 .env

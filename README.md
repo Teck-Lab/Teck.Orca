@@ -148,7 +148,7 @@ no in-place resize operation. The panel does not expose service tokens or prompt
 Update the existing plugin entry after updating desktop. Orca will review
 the added workspace/agent read access and the plugin's own settings access.
 Activation creates no sandbox. Native SSH servers are managed by the matching
-desktop, with 1.4.254 as the current target; bundled compatibility daemons retain 1.4.248. OMP 18.18.3 is pinned in
+desktop, with 1.4.258 as the current target; bundled compatibility daemons also use 1.4.258. OMP 18.20.0 is pinned in
 the image; existing sandboxes/processes are not silently replaced or upgraded.
 Use the Updates panel to refresh existing sandbox workflow files while preserving
 the configured models, credentials and sessions.
@@ -194,7 +194,7 @@ Existing sandboxes need a verified credential route before switching their memor
 backend. Do not use `sbx kit add` on a live project as an update shortcut: it
 recreates the container. New OMP sessions load the updated extension/configuration.
 
-The workload retains OMP 18.18.3, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, kind 0.33.0, kubectl 1.37.1, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.248 and Node 24.22.1. No initialized runtime identity is baked into the image.
+The workload retains OMP 18.20.0, Bun 1.4.4, Node/npm, .NET SDK 10.0.401, TypeScript 5.9.3, C++/Python/pip/uv/Go/Java, Docker Engine/Compose/Buildx, kind 0.33.0, kubectl 1.37.1, Git/Git LFS/GPG/GitHub CLI, Next.js DevTools MCP, Biome, 15 language servers, Chromium, Playwright and agent-browser. Linux amd64 includes pinned Google Chrome; ARM uses native Chromium through Chrome-compatible commands. Orca manages the native SSH guest server matching the desktop; the retained compatibility image pins Orca 1.4.258 and Node 24.22.1. No initialized runtime identity is baked into the image.
 
 Root build/check cover the single plugin and both integrity-pinned runtime stores. Root npm test includes native SSH/provider tests as well as legacy recovery. See [consolidation validation](docs/validation-unified-plugin-2026-10-30.md). Historical smoke scripts below exercise their named legacy paths; provider/GUI acceptance is recorded separately.
 
@@ -278,7 +278,7 @@ Ordinary builds stay offline. New feature sandboxes receive the updated catalog.
 
 Refresh the packaged CLI/orchestration guides deliberately with `npm run bundle:skills`, then build and setup. Normal builds use the checked-in snapshots and do not need a running Orca instance. Live execution-host guides take precedence when available.
 
-The bundled official Orca CLI and orchestration guides are refreshed from 1.4.237. For direct OMP launches, use `orca agent launch --agent omp --surface terminal --model <role-model> --json` with the intended worktree selector. Supervised `orchestration worker-start` has no `--surface` flag; follow its receipt and use `worker-read --source auto`.
+The bundled official Orca CLI and orchestration guides are refreshed from 1.4.258. For direct OMP launches, use `orca agent launch --agent omp --surface terminal --model <role-model> --json` with the intended worktree selector. Supervised `orchestration worker-start` has no `--surface` flag; follow its receipt and use `worker-read --source auto`.
 
 OMP runs in sandbox-backed Orca terminals. Orca's managed SSH daemon supplies filesystem, Git, terminal and orchestration services. This plugin does not translate Paseo's OMP JSONL RPC into Orca's structured UI protocol.
 
@@ -376,8 +376,8 @@ replace periodic WATCHDOG loops and per-helper full reviews. See the
 [runtime workflow](runtime/omp/skills/orca-feature-workflow/references/goals-and-milestones.md).
 
 The unified plugin 0.6.0 uses the Orca desktop-managed guest daemon over native
-SSH. Compatibility images retain Orca 1.4.248 and Node 24.22.1. All image paths
-pin OMP 18.18.3 and Bun 1.4.4. See the
+SSH. Compatibility images retain Orca 1.4.258 and Node 24.22.1. All image paths
+pin OMP 18.20.0 and Bun 1.4.4. See the
 [release changes and validation](docs/validation-orca-omp-2026-10-30.md).
 
 ## Planner-owned issue decomposition

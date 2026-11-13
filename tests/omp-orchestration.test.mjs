@@ -390,6 +390,26 @@ test('managed dispatch reopens a released issue child without any new-worktree f
   const spec=JSON.parse(start[start.indexOf('--spec')+1].split('\n')[0].slice('TECK_ORCA_ASSIGNMENT '.length));assert.equal(spec.worktree,'id:child');assert.equal(spec.issue,'https://github.com/Teck-Lab/Teck.Monorepo/issues/906');assert.equal(result.details.dispatchId,'ctx_test');
 });
 
+test('explicit legacy child without a terminal reaches ownership checks and restarts only that checkout',async()=>{
+  const s=session();await s.handlers.get('session_start')({},s.ctx);createdGoal(s,'Resume preserved integration');
+  await s.tools.get('orca').execute('bind',{action:'run_create',objective:'Delivery'},undefined,undefined,s.ctx);
+  const children=['child','legacy-two','legacy-three'].map(id=>({id,parentWorktreeId:'worktree',projectId:'project',branch:id,path:'/work/issue-873-'+id}));
+  s.setWorktreeList({worktrees:children,totalCount:3,truncated:false});
+  s.setWorktreePs({worktrees:children.map(w=>({worktreeId:w.id,liveTerminalCount:0,unverifiableTerminalCount:0})),totalCount:3,truncated:false});
+  s.setWorkerReceipt({dispatch:{id:'ctx_test',assigneeHandle:'term_worker',status:'dispatched'},terminal:{handle:'term_worker',worktreeId:'child'},observation:{exactWorker:true,status:'live'}});
+  const dispatch=s.tools.get('orca_dispatch'),input={role:'executor',issue:'https://github.com/Teck-Lab/Teck.Monorepo/issues/873',objective:'Resume preserved integration',acceptance:['Verified'],constraints:'Preserve checkout'};
+  await assert.rejects(dispatch.execute('ambiguous',input,undefined,undefined,s.ctx),/Multiple legacy/);
+  await assert.rejects(dispatch.execute('released',{...input,worktree:'id:child',terminal:'term_released'},undefined,undefined,s.ctx),/omit terminal/);
+  s.setWorktreePs({worktrees:children.map(w=>({worktreeId:w.id,liveTerminalCount:0,unverifiableTerminalCount:w.id==='child'?1:0})),totalCount:3,truncated:false});
+  await assert.rejects(dispatch.execute('uncertain',{...input,worktree:'id:child'},undefined,undefined,s.ctx),/ownership is uncertain/);
+  assert.equal(s.calls.filter(c=>c.args?.[1]==='worker-start').length,0);
+  s.setWorktreePs({worktrees:children.map(w=>({worktreeId:w.id,liveTerminalCount:0,unverifiableTerminalCount:0})),totalCount:3,truncated:false});
+  await dispatch.execute('explicit',{...input,worktree:'id:child'},undefined,undefined,s.ctx);
+  const starts=s.calls.filter(c=>c.args?.[1]==='worker-start');assert.equal(starts.length,1);
+  const args=starts[0].args;assert.equal(args[args.indexOf('--worktree')+1],'id:child');
+  assert.ok(args.includes('--agent'));for(const flag of ['--terminal','--name','--display-name'])assert.equal(args.includes(flag),false);
+});
+
 test('executor reuse needs its own settled terminal in a distinct direct child, with no other active dispatch',async()=>{
   const s=session();await s.handlers.get('session_start')({},s.ctx);createdGoal(s,'Follow-up');
   s.setRunReceipt({run:{id:'run_own'}});

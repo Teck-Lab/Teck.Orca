@@ -1,0 +1,190 @@
+{
+  "repository": "microsoft/aspire-skills",
+  "commit": "1117facb04b403dd2fc15f048bc0e63fc67c502f",
+  "files": [
+    {
+      "path": "aspire-skills.LICENSE",
+      "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+    },
+    {
+      "path": "skills/aspire-deployment/references/aws.md",
+      "sha256": "7892c04f1b3b7cffcb070c9334dbfe294d346efcaabdc0bb5402d742f443b50e"
+    },
+    {
+      "path": "skills/aspire-deployment/references/azure.md",
+      "sha256": "ad28d5d3a48084cad4ec403dd4f4a6b0a93998bfb73218f3624d0e5a69baf12c"
+    },
+    {
+      "path": "skills/aspire-deployment/references/cicd.md",
+      "sha256": "14734e8baff415834414885919db56830abdeadc0086e62e81c56b7856c5fd36"
+    },
+    {
+      "path": "skills/aspire-deployment/references/docker-compose.md",
+      "sha256": "928c00a52ed97cff3e93344f631a971c55799d521a5b74bb6f2c52d39cec1b1b"
+    },
+    {
+      "path": "skills/aspire-deployment/references/github-actions-azure-csharp.yml",
+      "sha256": "edd51e0076ba1a0c6d2cbf79e101d0c9b025a43ce2d1ceef0accb68a168bd719"
+    },
+    {
+      "path": "skills/aspire-deployment/references/github-actions-azure-typescript.yml",
+      "sha256": "ed159b42af22cd5f005fe3a92de59fffcb4516bb678f2b236db3748dd6bb7d11"
+    },
+    {
+      "path": "skills/aspire-deployment/references/javascript.md",
+      "sha256": "032832652c021aec9bf8443de8363cb8bcee83d740e4678ab02bcf8c151bbb1e"
+    },
+    {
+      "path": "skills/aspire-deployment/references/kubernetes.md",
+      "sha256": "e079ecef3bcb2ab1ec68e08714f19e275c23c98bb95cc3dd590713dd64ee00b9"
+    },
+    {
+      "path": "skills/aspire-deployment/references/preflight.md",
+      "sha256": "a1138a34814f3bafb59cdbd8112653974ff21a9ee18651b00d293af3af8e1c64"
+    },
+    {
+      "path": "skills/aspire-deployment/SKILL.md",
+      "sha256": "540e6691e1ae6960e39935339dae60531ed30384c567a8e1d6898092d4a1fd18"
+    },
+    {
+      "path": "skills/aspire-init/references/init-workflow.md",
+      "sha256": "0a6ecf67295871575ee1a2fe7698d1d203d26cb13df848431740fe24eba4dd5c"
+    },
+    {
+      "path": "skills/aspire-init/references/templates.md",
+      "sha256": "6312f06cecc7298cd9afe9663d779fcf78148a35b16df5d562b200ea6b9af6f9"
+    },
+    {
+      "path": "skills/aspire-init/SKILL.md",
+      "sha256": "e94d229ec1eca13d6579723b3bc3c15420049638550077b316d2ac2167f39f9a"
+    },
+    {
+      "path": "skills/aspire-monitoring/references/diagnostics-bridge.md",
+      "sha256": "e71edc5d64ae6e6c710b94cd1f75c83ec7644d527123067ecb1682b4907cf890"
+    },
+    {
+      "path": "skills/aspire-monitoring/references/monitoring.md",
+      "sha256": "f133f931e86633e14b21111b8432b794717dcba48a825ca86ccc1a78963b7bec"
+    },
+    {
+      "path": "skills/aspire-monitoring/references/playwright-handoff.md",
+      "sha256": "915db809d8b5f5e44ffd5a5e4a2eb18ffb37ff8f4e4a4d496f53146909d54a7d"
+    },
+    {
+      "path": "skills/aspire-monitoring/SKILL.md",
+      "sha256": "5c7567f7d9d51209891d9484f6eed6f568328e1e0c2f649dc384833d10f9ec44"
+    },
+    {
+      "path": "skills/aspire-orchestration/references/agent-workflows.md",
+      "sha256": "bc6e9231379137a944da2d371a8281d0bb9bc092475fa467aeff9387f243745f"
+    },
+    {
+      "path": "skills/aspire-orchestration/references/app-commands.md",
+      "sha256": "a5bee858ffff175bf0b8e9c7e0d207dda8aa61c93f664fdafcbffba336c453cf"
+    },
+    {
+      "path": "skills/aspire-orchestration/references/detection.md",
+      "sha256": "fd63573b98c9cf360a27be7e352ff04eb3891523f977e044a9550f952bcb61ce"
+    },
+    {
+      "path": "skills/aspire-orchestration/references/resource-management.md",
+      "sha256": "5739cc030088aa1610c8bef1c3208ee80baf5dced9dabda43b354e7f69c8e872"
+    },
+    {
+      "path": "skills/aspire-orchestration/references/safety-guardrails.md",
+      "sha256": "96df969c3f354bf3bc38d46fa535c43c3da70f502c60679da0e429e3db8c0d82"
+    },
+    {
+      "path": "skills/aspire-orchestration/SKILL.md",
+      "sha256": "9573687702e978e12109468369b6c5d9c54285d0f56b5b547e929e48ea2832c1"
+    },
+    {
+      "path": "skills/aspire-project-v2-migration/references/compatibility-and-validation.md",
+      "sha256": "2710d7706b8f10b7a570ef3765cdc42da680deb3d5b6eaefd6d5c7ef93e3824e"
+    },
+    {
+      "path": "skills/aspire-project-v2-migration/references/migration-patterns.md",
+      "sha256": "f6dc53200d282f8530bae6a87efdc30d3ca23a318fcb4a9e0e62491835ce5131"
+    },
+    {
+      "path": "skills/aspire-project-v2-migration/SKILL.md",
+      "sha256": "6a70d44f0b235d9aac0ecd3d3d9239ca9c70fca0fc8fe37416023881671e9166"
+    },
+    {
+      "path": "skills/aspire-terminals/references/apphost-terminals.md",
+      "sha256": "2f42e7d67c79b3c27e31a9bf6b62ef0bfe73cf22da537f91f68459855ba1f5a0"
+    },
+    {
+      "path": "skills/aspire-terminals/references/automation-and-cli.md",
+      "sha256": "280a78d8ea3f1f845b347f18a6244a30229740a6c85973b1cd6ee42b3b45a8d9"
+    },
+    {
+      "path": "skills/aspire-terminals/references/resource-terminals.md",
+      "sha256": "bb9e12c00a3c818c581e53dc59d9c059072f203c7340cc6e74fad0fc36b9e7c1"
+    },
+    {
+      "path": "skills/aspire-terminals/references/tapes.md",
+      "sha256": "872733fd3305f29c5d6c35a777e632503f539f62a795ce5ed9297c886119bf9e"
+    },
+    {
+      "path": "skills/aspire-terminals/SKILL.md",
+      "sha256": "fe93d9895c0a94d1d5db48bd207d4d2d20f4ada3a4057ef9d2cc1d89a1ffdcb3"
+    },
+    {
+      "path": "skills/aspire/references/aspire-13-3-breaking-changes.md",
+      "sha256": "557bc82cca31f7a84fbebebaed8f4fbb4eca44fddde5108aa8430d5afada9188"
+    },
+    {
+      "path": "skills/aspire/references/aspire-13-5-breaking-changes.md",
+      "sha256": "feef8c8375a922960c725e83c8459c9f05ef5b41a1fb64abb2277faced9b41ee"
+    },
+    {
+      "path": "skills/aspire/SKILL.md",
+      "sha256": "4e72386a86c69abda592776fc5c5191cbf445c5e5e3b9c9f1bb2f162f6b307c2"
+    },
+    {
+      "path": "skills/aspireify/references/apphost-wiring.md",
+      "sha256": "e96b5501ffe7ebe6497f59a9d0f07632918e9d5907b624b0b5690e2fc6beeb93"
+    },
+    {
+      "path": "skills/aspireify/references/csharp-authoring.md",
+      "sha256": "5de9554b6690ca53feb83fa838dc4c913cd9bb8852631c79faeaa165028a7c76"
+    },
+    {
+      "path": "skills/aspireify/references/docker-compose.md",
+      "sha256": "79e733a4955610b5d22c774d2d8d1dca7eecc9acb423c91542bb3d83beb34686"
+    },
+    {
+      "path": "skills/aspireify/references/full-solution-apphosts.md",
+      "sha256": "3d6e838f618dd81c2e67065ba4a1c08dc6082e778b75908bae58bb180a5c42a6"
+    },
+    {
+      "path": "skills/aspireify/references/javascript-apps.md",
+      "sha256": "5403d5c7308f907755bc2d42c0e2d81b0fc5fc2bf11d15a4a02d234a14bcf693"
+    },
+    {
+      "path": "skills/aspireify/references/opentelemetry.md",
+      "sha256": "b2e596a1caecac9883c7540df6f9a7e017be3c54ce8f0c6572b20d89c4343f80"
+    },
+    {
+      "path": "skills/aspireify/references/scan-and-propose.md",
+      "sha256": "7016faf3c95fa41f69eb16a520a348243d394f2e092b3e2a72ee7fce444b9193"
+    },
+    {
+      "path": "skills/aspireify/references/service-defaults.md",
+      "sha256": "3358181641ecfbb9d8021a2bff181575e29a8eb95c120771808cf507a8bf23f6"
+    },
+    {
+      "path": "skills/aspireify/references/typescript-authoring.md",
+      "sha256": "1d99d0a064c151b7aae55044ad38886d0bb090d61bb81e586d40b39dd666eb9f"
+    },
+    {
+      "path": "skills/aspireify/references/validation.md",
+      "sha256": "688e71fd1ac17ae4b4f6e58a22e3002e5cfa8079e63fdc1e84d16293666ff9ad"
+    },
+    {
+      "path": "skills/aspireify/SKILL.md",
+      "sha256": "70beed83e20871af5098af0b8596560aa15a36404b051b648bf5ba41b5a0dfa4"
+    }
+  ]
+}

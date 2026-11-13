@@ -1,6 +1,6 @@
 ---
 name: dotnet-integration-testing
-description: Write and debug .NET integration tests with WebApplicationFactory and Testcontainers, including database migrations, isolation, messaging, container readiness, and cleanup. Use when correctness depends on real infrastructure or application composition.
+description: Write and debug focused .NET service integration tests with WebApplicationFactory and Testcontainers for real persistence, API/auth and messaging. Route assembled application journeys to Aspire-backed E2E testing.
 ---
 
 # .NET integration testing
@@ -17,6 +17,17 @@ image pull, unready service or missing dependency is not that RED. Preserve
 comparable line/branch coverage and reuse fixtures for focused iterations.
 
 ## Define the boundary
+
+Use Testcontainers to own the real database, broker and other containerized
+dependencies in new service integration tests. WebApplicationFactory can host
+the service under test; direct handler/database tests need no HTTP host. Do not
+start an Aspire AppHost for this layer or add a container when the tested boundary
+has no external dependency. Preserve existing harnesses unless migration is in scope.
+
+Assembled multi-service, gateway and full application journeys belong to the E2E
+layer, where Aspire owns startup. Read [Aspire E2E fixtures](references/aspire-testing.md)
+for that harness. For full frontend journeys, also load
+[browser-end-to-end-testing](../browser-end-to-end-testing/SKILL.md).
 
 - Use a real database for SQL translation, constraints, transactions, migrations,
   and concurrency behavior. EF InMemory and SQLite do not establish PostgreSQL
@@ -42,7 +53,7 @@ comparable line/branch coverage and reuse fixtures for focused iterations.
   resource reaper enabled unless a documented environment requirement forbids it.
 - Dispose resources even after initialization or assertions fail. Collect
   relevant container logs before disposal when diagnosing startup failures.
-- In Orca feature sandboxes, use Docker Engine inside that feature sandbox.
+- In Orca project sandboxes, use Docker Engine inside that project sandbox.
   Test there as the non-root agent. Do not mount the desktop Docker socket or
   disable TLS/resource cleanup to make a test pass. Distinguish blocked image
   pulls and missing Docker permissions from application failures.

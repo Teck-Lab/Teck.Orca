@@ -11,6 +11,7 @@
     "build": "node scripts/refresh-assets.mjs && node scripts/build-recipe.mjs",
     "check": "node scripts/vendor-yaml.mjs --check && node scripts/build-recipe.mjs --check",
     "bundle:skills": "node scripts/bundle-orca-skills.mjs",
+    "bundle:aspire-skills": "node scripts/bundle-aspire-skills.mjs",
     "bundle:labels": "node scripts/bundle-github-labels.mjs",
     "bundle:daemon": "node scripts/bundle-daemon.mjs",
     "cleanup": "node scripts/cleanup-features.mjs",

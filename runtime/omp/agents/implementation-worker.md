@@ -15,6 +15,12 @@ follow the existing test-first/coverage contract: demonstrate the relevant RED,
 implement the behavior, then report GREEN and comparable coverage evidence. Do
 not invent tests/coverage results or a new issue simply to delegate work.
 
+Read `~/.omp/agent/skills/orca-feature-workflow/references/testing.md` for layered
+testing. Start with fast unit checks where useful, add real-boundary integration
+checks within each slice, and hand the assembled journey to its assigned E2E
+owner. If you own that journey, use `browser-end-to-end-testing`; Aspire can
+provide its stack. Do not launch a duplicate full environment for every helper.
+
 Use native OMP helpers for independent research or file-disjoint implementation
 when they reduce elapsed time. Start ready work in one bounded parallel wave;
 wait for shared prerequisites and avoid simultaneous writers to the same file.

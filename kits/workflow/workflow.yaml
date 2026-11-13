@@ -5,7 +5,7 @@ displayName: Teck OMP workflow
 description: Canonical models, roles, worktree policy, skills and session launch helpers.
 requires:
   - dk.tecklab/base >= 1
-  - omp >= 18.18.3
+  - omp >= 18.20.0
 provides:
   - dk.tecklab/workflow@1
 capabilities:

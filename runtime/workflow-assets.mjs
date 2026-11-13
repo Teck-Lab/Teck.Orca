@@ -9,7 +9,11 @@ export function workflowFiles(ompRoot, launchRoot) {
     'orchestration.yml', 'RULES.md', 'WATCHDOG.yml', 'agents/technical-planner.md',
     'agents/implementation-worker.md', 'agents/correctness-reviewer.md', 'agents/security-auditor.md',
     'skills/agent-office', 'skills/orca-feature-workflow', 'skills/orca-workers', 'skills/github-execution-planning', 'skills/github-publication',
-    'skills/orca-cli', 'skills/orchestration', 'skills/orca-per-workspace-env', 'orca-guides.json'];
+    'skills/orca-cli', 'skills/orchestration', 'skills/orca-per-workspace-env', 'orca-guides.json',
+    'skills/dotnet-unit-testing', 'skills/dotnet-integration-testing', 'skills/dotnet-test-execution', 'skills/dotnet-test-quality',
+    'skills/browser-end-to-end-testing', 'skills/nx-run-tasks', 'skills/nx-workspace', 'skills/aspire', 'skills/aspire-init', 'skills/aspireify',
+    'skills/aspire-orchestration', 'skills/aspire-monitoring', 'skills/aspire-deployment',
+    'skills/aspire-project-v2-migration', 'skills/aspire-terminals', 'aspire-skills.json', 'aspire-skills.LICENSE'];
   const files = [];
   function walk(path, relative) {
     for (const child of readdirSync(path, { withFileTypes: true }).sort((a,b) => a.name.localeCompare(b.name))) {
@@ -20,7 +24,7 @@ export function workflowFiles(ompRoot, launchRoot) {
   }
   for (const relative of roots) {
     const path = join(ompRoot, relative);
-    if (/\.(?:mjs|ts|yml|md|json)$|\/agent-office\.LICENSE$/.test(relative)) files.push([relative, readFileSync(path)]);
+    if (/\.(?:mjs|ts|yml|md|json|LICENSE)$/.test(relative)) files.push([relative, readFileSync(path)]);
     else walk(path, relative);
   }
   for (const name of ['omp-launch.mjs', 'omp-launch-policy.mjs']) files.push([`runtime/${name}`, readFileSync(join(launchRoot, name))]);
