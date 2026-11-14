@@ -37,3 +37,14 @@ The office transport runs in a small owner-monitored Node helper. On Windows it 
 Each connection uses a fresh guest loopback port recorded in `/etc/teck-orca/office.json`. This prevents an older SSH session's cleanup from colliding with the replacement listener. On Windows, cleanup closes the owned SSH process tree, including its Docker proxy.
 
 OMP discovers the observer through `extensions/agent-office.ts`, which imports its ESM implementation. Existing sessions must be reopened/resumed to load it; `/reload-plugins` in OMP 18.16.0 does not reload extension code. Existing Pixtuoid binaries, service and observer files are retired when an owned running sandbox connects. Older immutable kits retain a no-op at their former startup path so they still boot. New images contain no Pixtuoid or ttyd.
+
+## Aspire KIND mode
+
+The sandbox image and native provisioning environment set TECK_KIND_MODE=sandbox.
+The shared Kubernetes startup hook installs the same default into the OMP launch
+environment when an owned sandbox is reused; no cluster is recreated or changed.
+Teck.Cloud's Aspire KIND profile reads this marker: sandbox keeps kindnet and omits
+Cilium/Istio ambient, while full (the default outside the sandbox) installs both.
+Explicit process overrides are preserved. This does not select a container engine,
+change the plugin's managed workspace cluster, or add kernel capabilities.
+Existing running processes retain their environment until relaunched after upgrade.

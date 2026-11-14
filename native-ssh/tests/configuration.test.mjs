@@ -127,3 +127,14 @@ test('an older ready preview gains only the naming hook while its OMP profile st
   assert.equal(await ensureNamingHook({ ...options, run: async (program, args) => { calls.push(args); return 'present'; } }), false);
   assert.equal(calls.length, 1);
 });
+
+
+test('sandbox sessions default to reduced KIND while preserving an explicit full override', () => {
+  for (const requested of ['', 'full', 'sandbox']) {
+    const result = spawnSync(bash, ['-c', environmentScript({id:'mode-test'}) + '\nprintf "%s" "$TECK_KIND_MODE"'], {
+      encoding:'utf8', env:{...process.env, TECK_KIND_MODE:requested},
+    });
+    assert.equal(result.status,0,result.stderr);
+    assert.equal(result.stdout,requested || 'sandbox');
+  }
+});

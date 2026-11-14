@@ -34,3 +34,19 @@ test('fresh kits install prerequisites and restore them at boot; native packagin
   assert.ok(files['src/kubernetes-prerequisites.mjs']);
   assert.equal(files['assets/kubernetes-prerequisites.sh'].toString(),readFileSync('runtime/kits/workload/kubernetes-prerequisites.sh','utf8').replaceAll('\r\n','\n'));
 });
+
+
+test('reused sandbox startup and OMP launch receive the mode without overriding an explicit full request',()=>{
+  const script=readFileSync('runtime/kits/workload/kubernetes-prerequisites.sh','utf8');
+  const hook=script.match(/<<'HOOK'\n([\s\S]*?)\nHOOK/)[1];
+  const mode=script.match(/  mode='([^']+)'/)[1];
+  // Stub only device preparation; execute the actual exported startup/launch snippets.
+  for(const requested of ['', 'full', 'sandbox']){
+    for(const startup of [hook, mode]){
+      const result=spawnSync(bash,['-c','id() { echo 1000; }; sudo() { :; };\n'+startup+'\nprintf "%s" "$TECK_KIND_MODE"'],{encoding:'utf8',env:{...process.env,TECK_KIND_MODE:requested}});
+      assert.equal(result.status,0,result.stderr);
+      assert.equal(result.stdout,requested||'sandbox');
+    }
+  }
+  assert.match(script,/environment=\/etc\/teck-orca\/environment\.sh/);
+});

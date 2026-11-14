@@ -30,6 +30,7 @@ if [ "${1:-}" = --install ]; then
   # well as from the workload's lifecycle startup hook (which is asynchronous).
   install -d -m 755 /etc/teck-orca
   cat > /etc/teck-orca/kubernetes-prerequisites-startup.sh <<'HOOK'
+export TECK_KIND_MODE="${TECK_KIND_MODE:-sandbox}"
 if [ "$(id -u)" = 0 ]; then
   /bin/sh /usr/local/lib/teck-devtools/kubernetes-prerequisites.sh
 else
@@ -37,6 +38,12 @@ else
 fi
 HOOK
   chmod 644 /etc/teck-orca/kubernetes-prerequisites-startup.sh
+  # Upgrade the OMP launch environment on reuse without recopying its profile.
+  environment=/etc/teck-orca/environment.sh
+  if [ -L "$environment" ]; then echo 'Teck environment needs inspection' >&2; exit 1; fi
+  touch "$environment"
+  mode='export TECK_KIND_MODE="${TECK_KIND_MODE:-sandbox}"'
+  if ! grep -qxF "$mode" "$environment"; then printf '\n%s\n' "$mode" >> "$environment"; fi
   hook='. /etc/teck-orca/kubernetes-prerequisites-startup.sh'
   for file in /etc/sandbox-persistent.sh /home/agent/.bashrc; do
     if [ -L "$file" ]; then echo "Teck Kubernetes startup file needs inspection: $file" >&2; exit 1; fi

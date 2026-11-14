@@ -14,6 +14,7 @@ export function nativeEnvironment(project) {
     AGENT_BROWSER_EXECUTABLE_PATH: '/usr/local/bin/chromium', AGENT_BROWSER_ARGS: '--no-sandbox,--disable-dev-shm-usage',
     AGENT_BROWSER_CA_CERT: '/etc/ssl/certs/ca-certificates.crt', AGENT_BROWSER_IGNORE_HTTPS_ERRORS: 'false',
     AGENT_BROWSER_CONTENT_BOUNDARIES: 'true', NODE_EXTRA_CA_CERTS: '/etc/ssl/certs/ca-certificates.crt',
+    TECK_KIND_MODE: 'sandbox',
     TECK_ORCA_PROJECT_ID: project.id,
     ...(project.name ? { TECK_ORCA_PROJECT_NAME: project.name } : {}),
   };
@@ -21,6 +22,7 @@ export function nativeEnvironment(project) {
 
 export const environmentScript = project => Object.entries(nativeEnvironment(project))
   .map(([key, value]) => key === 'HINDSIGHT_API_KEY' ? 'export HINDSIGHT_API_KEY="${HINDSIGHT_API_KEY:-proxy-managed}"' :
+    key === 'TECK_KIND_MODE' ? 'export TECK_KIND_MODE="${TECK_KIND_MODE:-sandbox}"' :
     key === 'HINDSIGHT_API_TOKEN' ? 'export HINDSIGHT_API_TOKEN="$HINDSIGHT_API_KEY"' : `export ${key}=${quote(value)}`).join('\n') + '\n';
 
 export function installationScript(staging, project = { id: 'preview' }) {

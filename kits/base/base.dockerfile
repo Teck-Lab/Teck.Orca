@@ -11,7 +11,8 @@ RUN apt-get update \
     && touch /etc/sandbox-persistent.sh \
     && chown agent:agent /etc/sandbox-persistent.sh \
     && chmod 0644 /etc/sandbox-persistent.sh
-ENV HOME=/home/agent \
+ENV TECK_KIND_MODE=sandbox \
+    HOME=/home/agent \
     BASH_ENV=/etc/sandbox-persistent.sh \
     DOTNET_ROOT=/usr/share/dotnet \
     DOTNET_CLI_TELEMETRY_OPTOUT=1 \
