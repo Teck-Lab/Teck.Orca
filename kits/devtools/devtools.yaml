@@ -8,6 +8,7 @@ requires:
 provides:
   - dotnet@10.0.401
   - typescript@5.9.3
+  - helm@4.1.4
   - dk.tecklab/language-servers@1
   - netcoredbg@3.2.0-1092
   - js-debug-adapter@1.140.0

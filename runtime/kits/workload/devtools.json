@@ -27,10 +27,10 @@
       }
     },
     "kubectl": {
-      "version": "1.35.8",
+      "version": "1.36.6",
       "sha256": {
-        "x64": "874d5e72dbb819f43cff16bcd1e4f8bac5b7f2361fe1e55049b0a6c676fb0cbf",
-        "arm64": "cc749967b62f4422260bc9c0aa7a7c55f45175ae38cb8d95767b5d2b7e04c1fd"
+        "x64": "29818b6729dc9262b692307470d0558d027725e738be5dd47c760261868a2634",
+        "arm64": "35507ef408c3d38849e5d3203e18f8e861db822aa664101a9ced0869edd06046"
       }
     },
     "omnisharp": {
@@ -59,6 +59,13 @@
       "sha256": {
         "x64": "5d857ba25c461d3218bb98d9e98cb61bc948bfa92b124667d7e6ed695fe2da5f",
         "arm64": "565d4a298d15e69a1bc7275a7fcf287d364668e53fdf09110d76aac5c820f78c"
+      }
+    },
+    "helmCli": {
+      "version": "4.1.4",
+      "sha256": {
+        "x64": "70b2c30a19da4db264dfd68c8a3664e05093a361cefd89572ffb36f8abfa3d09",
+        "arm64": "13d03672be289045d2ff00e4e345d61de1c6f21c1257a45955a30e8ae036d8f1"
       }
     }
   },

@@ -5,7 +5,7 @@ import { dirname } from 'node:path';
 const files = [
   '/usr/share/dotnet', '/opt/teck-devtools', '/opt/teck-debuggers', '/usr/local/lib/omnisharp',
   '/home/agent/.local/opt/js-debug',
-  ...['dotnet', 'omnisharp', 'marksman', 'terraform-ls', 'helm_ls', 'netcoredbg', ...readdirSync('/opt/teck-devtools/bin')].map(name => `/usr/local/bin/${name}`),
+  ...['dotnet', 'omnisharp', 'marksman', 'terraform-ls', 'helm_ls', 'helm', 'netcoredbg', ...readdirSync('/opt/teck-devtools/bin')].map(name => `/usr/local/bin/${name}`),
 ];
 for (const source of files) {
   const destination = `/out${source}`;

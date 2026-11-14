@@ -95,7 +95,7 @@ try {
   }
   const report = { uid: process.getuid(), dotnet: lock.dotnet.version, node: run('node', ['--version']),
     bun: buildOnly ? null : run('bun', ['--version']), omp: buildOnly ? null : run('omp', ['--version']), typescript: lock.npm.typescript,
-    chrome: run('google-chrome-stable', ['--version']), go: run('go', ['version']), java: run('javac', ['-version']), docker: run('docker', ['version', '--format', '{{.Server.Version}}']), uv: run('uv', ['--version']), kind: lock.native.kind.version, kubectl: lock.native.kubectl.version, compilers: ['C#', 'TypeScript', 'C++', 'Python', 'Go', 'Java'], languageServers: [] };
+    chrome: run('google-chrome-stable', ['--version']), go: run('go', ['version']), java: run('javac', ['-version']), docker: run('docker', ['version', '--format', '{{.Server.Version}}']), uv: run('uv', ['--version']), kind: lock.native.kind.version, kubectl: lock.native.kubectl.version, helm: run('helm', ['version', '--template', '{{.Version}}']), compilers: ['C#', 'TypeScript', 'C++', 'Python', 'Go', 'Java'], languageServers: [] };
   const servers = [
     ['typescript-language-server', '--stdio'], ['biome', 'lsp-proxy'],
     ['vscode-html-language-server', '--stdio'], ['vscode-css-language-server', '--stdio'],

@@ -15,6 +15,7 @@ capabilities:
           - api.nuget.org:443
           - data.nuget.org:443
           - globalcdn.nuget.org:443
+          - cr.kgateway.dev:443
           - quay.io:443
           - "*.quay.io:443"
           - dl.k8s.io:443

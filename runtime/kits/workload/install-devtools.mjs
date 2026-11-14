@@ -19,6 +19,11 @@ const download = (url, path, hash, algorithm = 'sha256') => {
 
 if (!process.argv.includes('--chrome')) {
 installKubernetesTools({ lock });
+const helmCli = lock.native.helmCli;
+download(`https://get.helm.sh/helm-v${helmCli.version}-linux-${debArch}.tar.gz`, '/tmp/teck-helm.tar.gz', helmCli.sha256[arch]);
+run('tar', ['-xzf', '/tmp/teck-helm.tar.gz', '-C', '/usr/local/bin', '--strip-components=1', `linux-${debArch}/helm`]);
+rmSync('/tmp/teck-helm.tar.gz');
+if (execFileSync('/usr/local/bin/helm', ['version', '--template', '{{.Version}}'], { encoding: 'utf8' }).trim() !== 'v' + helmCli.version) throw Error('Unexpected Helm CLI version');
 installDebugTools({ lock });
 mkdirSync('/usr/share/dotnet', { recursive: true });
 download(`https://builds.dotnet.microsoft.com/dotnet/Sdk/${lock.dotnet.version}/dotnet-sdk-${lock.dotnet.version}-linux-${arch}.tar.gz`, '/tmp/teck-dotnet.tar.gz', lock.dotnet.sha512[arch], 'sha512');
@@ -51,7 +56,7 @@ if (process.argv.includes('--pack')) {
     'usr/share/dotnet', 'opt/teck-devtools', 'opt/teck-debuggers', 'usr/local/lib/omnisharp',
     'home/agent/.local/opt/js-debug', 'usr/local/bin/netcoredbg',
     ...readdirSync('/opt/teck-devtools/bin').map(name => 'usr/local/bin/' + name),
-    ...['dotnet', 'omnisharp', 'marksman', 'terraform-ls', 'helm_ls', 'kind', 'kubectl'].map(name => 'usr/local/bin/' + name)]);
+    ...['dotnet', 'omnisharp', 'marksman', 'terraform-ls', 'helm_ls', 'kind', 'kubectl', 'helm'].map(name => 'usr/local/bin/' + name)]);
 }
 
 }
